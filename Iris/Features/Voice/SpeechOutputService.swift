@@ -57,7 +57,7 @@ final class SpeechOutputService: ObservableObject {
 
     init(speaker: Speaker? = nil) {
         self.speaker = speaker ?? Speaker.shared
-        subscription = self.speaker.$isSpeaking
+        subscription = self.speaker.$isSpeakingNow
             .receive(on: RunLoop.main)
             .sink { [weak self] speaking in
                 guard let self else { return }

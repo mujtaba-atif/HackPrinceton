@@ -30,10 +30,10 @@ targets:
       - path: Iris
         excludes:
           - Resources/Info.plist
+          - Secrets.swift.example
     info:
       path: Iris/Resources/Info.plist
       properties:
-        ElevenLabsAgentID: $(ELEVENLABS_AGENT_ID)
         CFBundleDisplayName: Iris
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
@@ -47,9 +47,17 @@ targets:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-    configFiles:
-      Debug: Config/Iris.xcconfig
-      Release: Config/Iris.xcconfig
+    preBuildScripts:
+      - name: Create Secrets.swift
+        inputFiles:
+          - $(SRCROOT)/Iris/Secrets.swift.example
+        outputFiles:
+          - $(SRCROOT)/Iris/Secrets.swift
+        script: |
+          if [ ! -f "$SRCROOT/Iris/Secrets.swift" ]; then
+            cp "$SRCROOT/Iris/Secrets.swift.example" "$SRCROOT/Iris/Secrets.swift"
+            echo "warning: Created Iris/Secrets.swift from the template. Add your ElevenLabs key, agent ID and voice ID."
+          fi
     dependencies:
       - package: ElevenLabs
       - package: LiveKit

@@ -1,3 +1,0 @@
-// Copy to Config/Local.xcconfig (git-ignored) and fill in your public ElevenLabs agent ID.
-// Never put an ElevenLabs API key (sk_...) here or anywhere in the app.
-ELEVENLABS_AGENT_ID = agent_PASTE_YOUR_PUBLIC_AGENT_ID

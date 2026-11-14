@@ -113,7 +113,7 @@ final class AgentSession: ObservableObject {
     /// `initialMessage` is sent to the agent as if the user had said it, once the agent's own greeting is done.
     ///
     /// `prompt`/`firstMessage` re-skin the one agent for the screen that is asking: the same agent ID backs
-    /// both Find and Analyze, so Find hands over its own persona rather than needing a second agent. The
+    /// both Locate and Explore, so Locate hands over its own persona rather than needing a second agent. The
     /// voice is overridden either way, persona or not: it is the same voice `Speaker` has been talking in
     /// for the whole screen up to this point, and the agent's own dashboard voice is a different person
     /// answering the question Iris just asked.
@@ -218,9 +218,6 @@ final class AgentSession: ObservableObject {
     }()
 
     private func connect(withOverrides: Bool) async throws {
-        guard let agentID = AssistantConfiguration.elevenLabsAgentID else {
-            throw AgentSessionError.notConfigured
-        }
         var config = ConversationConfig(
             onError: { print("Agent error: \($0)") },
             onAgentResponse: { [weak self] text, _ in
@@ -244,9 +241,16 @@ final class AgentSession: ObservableObject {
             if hasPersona {
                 config.agentOverrides = AgentOverrides(prompt: personaPrompt, firstMessage: personaFirstMessage)
             }
+            // The voice `Speaker` has been using, always: the agent picks up mid-conversation from
+            // whatever the screen last said, and a change of voice there reads as a second person.
+            config.ttsOverrides = TTSOverrides(
+                voiceId: Speaker.voiceID,
+                stability: Speaker.stability,
+                speed: Speaker.speed
+            )
         }
         let started = try await ElevenLabs.startConversation(
-            agentId: agentID,
+            agentId: Secrets.elevenLabsAgentID,
             config: config,
             onDisconnect: { [weak self] reason in
                 Task { @MainActor in self?.handleDisconnect(reason) }
@@ -332,8 +336,7 @@ final class AgentSession: ObservableObject {
     }
 
     private func runTool(_ call: ClientToolCallEvent, on conversation: Conversation) async {
-        // `read_label` is another name for the `rescan` tool.
-        guard (call.toolName == "rescan" || call.toolName == "read_label"), onRescan != nil else {
+        guard call.toolName == "rescan", onRescan != nil else {
             try? await conversation.sendToolResult(for: call.toolCallId, result: "Unknown tool.", isError: true)
             return
         }
@@ -496,15 +499,5 @@ final class AgentSession: ObservableObject {
         }
         status = .idle
         if !isStopping { onEnded?() }
-    }
-}
-
-enum AgentSessionError: LocalizedError {
-    case notConfigured
-
-    var errorDescription: String? {
-        switch self {
-        case .notConfigured: "No ElevenLabs agent ID is configured (ELEVENLABS_AGENT_ID in Config/Local.xcconfig)."
-        }
     }
 }

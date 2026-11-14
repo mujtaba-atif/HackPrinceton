@@ -217,9 +217,7 @@ final class ObjectConversation: ObservableObject {
         in at most three short spoken sentences, plainly, with no lists and no markdown, and never read \
         the whole label out unless they ask you to. Never mention text, scanning, OCR or the camera: \
         just say what the thing is. If what you were given is garbled or empty, say so and offer to \
-        look again — `rescan` is a tool you can call for that, and it takes a few seconds. Never say an \
-        item is safe to eat, drink, take or use; for food, medicine, doses, allergens or dates, say what \
-        the label says and suggest checking with a pharmacist, doctor or someone they trust.
+        look again — `rescan` is a tool you can call for that, and it takes a few seconds.
         """
     }
 
