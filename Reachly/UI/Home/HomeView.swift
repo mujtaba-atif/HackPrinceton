@@ -42,6 +42,19 @@ struct HomeView: View {
                     .accessibilityLabel("Start Exploring")
                     .accessibilityHint("Opens the Reachly exploration experience")
 
+                    #if DEBUG
+                    NavigationLink {
+                        HandTrackingDebugView()
+                    } label: {
+                        Label("Hand tracking debug", systemImage: "hand.raised")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(ReachlyTheme.secondaryText)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .padding(.top, 12)
+                    .accessibilityHint("Developer screen for testing hand tracking")
+                    #endif
+
                     Label(
                         "Camera and voice access will only be requested when a feature needs it.",
                         systemImage: "lock.shield.fill"
