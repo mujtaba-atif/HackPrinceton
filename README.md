@@ -1,6 +1,6 @@
-# Reachly
+# Iris
 
-Reachly is a native iOS accessibility app designed to help blind and visually impaired people find nearby objects, move a hand toward them, and understand what they are holding through clear spoken guidance.
+Iris is a native iOS accessibility app designed to help blind and visually impaired people find nearby objects, move a hand toward them, and understand what they are holding through clear spoken guidance.
 
 This repository contains the iOS 17+ SwiftUI app, an accessible home experience, and a live rear-camera Explore screen backed by one ARKit session. Explore runs on-device Core ML object detection, displays selectable boxes and an accessible object list, and estimates the selected object's distance on supported LiDAR devices. Camera-relative spatial estimates are exposed for future guidance. Hand tracking, reach guidance, and voice commands are not implemented yet.
 
@@ -22,15 +22,15 @@ From the repository root:
 
 ```sh
 xcodegen generate
-open Reachly.xcodeproj
+open Iris.xcodeproj
 ```
 
-Select a physical iPhone and run the `Reachly` scheme. AR camera tracking is unavailable in the iOS Simulator, where Reachly displays its unavailable state instead.
+Select a physical iPhone and run the `Iris` scheme. AR camera tracking is unavailable in the iOS Simulator, where Iris displays its unavailable state instead.
 
 ## Project structure
 
 ```text
-Reachly/
+Iris/
 ├── App/                    App entry point
 ├── Features/
 │   ├── CameraAR/           AR session, preview, lifecycle, and frame streams
@@ -82,9 +82,9 @@ Camera permission is requested only after the user enters Explore and chooses **
 
 Start the camera in Explore. Tap a box or a row in **Detected objects** to select a target; **Clear Target** removes the selection. Rows expose the class, confidence, and selected state to VoiceOver. The list scrolls at large Dynamic Type sizes. Target selection, loss, and reacquisition are announced without announcing every inference result.
 
-The bundled **YOLOv3TinyFP16** is a real 17.7 MB Core ML detector from [Apple's model gallery](https://developer.apple.com/machine-learning/models/), trained on 80 COCO classes. It accepts 416×416 color images and includes non-maximum suppression and labels, allowing Vision to return `VNRecognizedObjectObservation` values. No runtime download, API key, or network access is required. See [model provenance and supported classes](Reachly/Features/ObjectDetection/Resources/MODEL.md) for the exact download, checksum, authors, and license notice.
+The bundled **YOLOv3TinyFP16** is a real 17.7 MB Core ML detector from [Apple's model gallery](https://developer.apple.com/machine-learning/models/), trained on 80 COCO classes. It accepts 416×416 color images and includes non-maximum suppression and labels, allowing Vision to return `VNRecognizedObjectObservation` values. No runtime download, API key, or network access is required. See [model provenance and supported classes](Iris/Features/ObjectDetection/Resources/MODEL.md) for the exact download, checksum, authors, and license notice.
 
-- `VisionObjectDetector` serializes model loading and inference on its own actor. Vision rotates the rear sensor buffer with `.right` for Reachly's portrait-only UI, converts its pixel format, and resizes the whole upright image with `.scaleFill`. This avoids letterbox offsets, but can reduce accuracy through aspect-ratio distortion.
+- `VisionObjectDetector` serializes model loading and inference on its own actor. Vision rotates the rear sensor buffer with `.right` for Iris's portrait-only UI, converts its pixel format, and resizes the whole upright image with `.scaleFill`. This avoids letterbox offsets, but can reduce accuracy through aspect-ratio distortion.
 - `ObjectDetectionService` processes at most eight frames per second, one inference at a time. The broker retains only one pending frame. Frames older than 250 ms are skipped before inference; results older than 800 ms are discarded. The watchdog expires displayed boxes if the frame stream stalls. A generation token rejects results from an earlier camera run.
 - `ObjectDetectionState` associates same-class observations one-to-one with intersection-over-union ≥ 0.3. Confidence must be ≥ 0.35; model NMS uses IoU 0.45. At most 20 objects are presented. IDs survive short missing detections for up to 800 ms. The list retains existing track order as confidence changes.
 - A missing selected object becomes **lost** immediately on the next processed empty/unmatched result. Its current box becomes `nil`. Brief spatially overlapping reappearances can recover its ID; after expiry or a camera pause, a newly detected object requires explicit selection. The app never silently chooses a replacement target.
@@ -108,7 +108,7 @@ Select an object to see **“Bottle — approximately 0.7 meters away”**, with
 
 `DepthEstimationService` subscribes independently to the existing `CameraFrameBroker` and receives selected-target updates through `DepthEstimationProviding.setTarget`. A serial worker actor handles depth history, pixel-buffer reads, robust statistics, calibration and smoothing. The newest-frame stream and sequential consumption avoid a work queue. Sampling runs once per new detection, normally up to eight times per second; incoming frames only update the bounded history between detections.
 
-The existing ARKit configuration already gated `.sceneDepth` behind `supportsFrameSemantics`. That behavior is preserved; the controller now exposes `supportsSceneDepth` for the service/UI. `CameraFrame` adds only `sceneDepthConfidenceMap` and `isCameraTrackingNormal`. No new sessions, capture configuration modes, or broker changes were introduced. Raw `sceneDepth` keeps the depth paired with the RGB frame; Reachly smooths the resulting measurement itself rather than combining temporal depth smoothing with moving boxes. [Apple's ARDepthData documentation](https://developer.apple.com/documentation/arkit/ardepthdata) describes the depth/confidence maps and their relationship to the camera image.
+The existing ARKit configuration already gated `.sceneDepth` behind `supportsFrameSemantics`. That behavior is preserved; the controller now exposes `supportsSceneDepth` for the service/UI. `CameraFrame` adds only `sceneDepthConfidenceMap` and `isCameraTrackingNormal`. No new sessions, capture configuration modes, or broker changes were introduced. Raw `sceneDepth` keeps the depth paired with the RGB frame; Iris smooths the resulting measurement itself rather than combining temporal depth smoothing with moving boxes. [Apple's ARDepthData documentation](https://developer.apple.com/documentation/arkit/ardepthdata) describes the depth/confidence maps and their relationship to the camera image.
 
 Vision inference finishes after its frame was captured. The depth worker keeps at most 60 depth-only snapshots, expiring after 800 ms, and requires the detection timestamp to match a cached frame within 1 ms. It never uses an unrelated newer map. If a subscriber drops the matching frame, or an observation is older than 500 ms, distance is unavailable. No RGB images or whole ARFrames are retained in this history. A watchdog expires measurements if frames stop arriving. Target loss, selection changes, limited tracking and camera stop/restart invalidate results; each camera run gets a fresh processor/history.
 
@@ -143,17 +143,17 @@ Regenerate after adding source/resources, then build without signing:
 
 ```sh
 xcodegen generate
-xcodebuild -project Reachly.xcodeproj -scheme Reachly -configuration Debug \
+xcodebuild -project Iris.xcodeproj -scheme Iris -configuration Debug \
   -sdk iphoneos -destination 'generic/platform=iOS' \
-  -derivedDataPath /tmp/reachly-derived-data CODE_SIGNING_ALLOWED=NO clean build
+  -derivedDataPath /tmp/iris-derived-data CODE_SIGNING_ALLOWED=NO clean build
 ```
 
 Run focused tests on an available simulator (adjust the device name if needed):
 
 ```sh
-xcodebuild -project Reachly.xcodeproj -scheme Reachly \
+xcodebuild -project Iris.xcodeproj -scheme Iris \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
-  -derivedDataPath /tmp/reachly-derived-data CODE_SIGNING_ALLOWED=NO test
+  -derivedDataPath /tmp/iris-derived-data CODE_SIGNING_ALLOWED=NO test
 ```
 
 Tests cover identity association, target selection/loss/recovery/expiry, stale results, invalid detections, portrait rotation, coordinate clipping, both aspect-fill crop directions, missing-model errors, cancellation during loading, model classes, and real Vision inference using a synthetic pixel buffer. Simulator tests do not validate AR capture or recognition of physical objects.
