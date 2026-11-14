@@ -8,6 +8,8 @@ struct ExploreView: View {
     @StateObject private var camera = IrisCameraController()
     @StateObject private var detection = ObjectDetectionService()
     @StateObject private var depth = DepthEstimationService()
+    @StateObject private var labelGuidance = LabelGuidanceService()
+    @State private var isReadingLabel = false
 
     var body: some View {
         ZStack {
@@ -62,6 +64,8 @@ struct ExploreView: View {
             } else {
                 depth.stop()
                 detection.stop()
+                isReadingLabel = false
+                labelGuidance.stop()
             }
             guard let announcement = state.accessibilityAnnouncement else { return }
             UIAccessibility.post(notification: .announcement, argument: announcement)
@@ -69,7 +73,15 @@ struct ExploreView: View {
         .onChange(of: detection.selectedTarget) { _, target in
             depth.setTarget(target)
         }
+        .sheet(isPresented: $isReadingLabel, onDismiss: labelGuidance.stop) {
+            LabelGuidanceView(service: labelGuidance, retry: startLabelReading) {
+                isReadingLabel = false
+            }
+            .presentationDetents([.medium, .large])
+            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+        }
         .onDisappear {
+            labelGuidance.stop()
             depth.stop()
             depth.setTarget(nil)
             detection.reset()
@@ -172,6 +184,13 @@ struct ExploreView: View {
         VStack(spacing: 10) {
             switch camera.state {
             case .running:
+                Button(action: startLabelReading) {
+                    cameraControlLabel(title: "Read Label", systemImage: "text.viewfinder")
+                        .foregroundStyle(Color.black.opacity(0.88))
+                }
+                .buttonStyle(IrisPrimaryButtonStyle())
+                .accessibilityHint("Guides you to turn the selected item until its label faces the camera, then reads it aloud")
+
                 Button(action: camera.pause) {
                     cameraControlLabel(title: "Pause Camera", systemImage: "pause.fill")
                 }
@@ -246,7 +265,21 @@ struct ExploreView: View {
         openURL(url)
     }
 
+    /// Starts "Turn to Read" on the selected object (or the center of the view) using a fresh frame stream.
+    private func startLabelReading() {
+        labelGuidance.start(frames: camera.makeFrameStream(),
+                            target: { [detection] in detection.selectedTarget },
+                            distance: { [depth] in
+                                guard let estimate = depth.estimate,
+                                      estimate.validity == .measured,
+                                      estimate.objectID == detection.selectedTarget?.object.id else { return nil }
+                                return estimate.distanceMeters
+                            })
+        isReadingLabel = true
+    }
+
     private func exitExplore() {
+        labelGuidance.stop()
         depth.stop()
         depth.setTarget(nil)
         detection.reset()

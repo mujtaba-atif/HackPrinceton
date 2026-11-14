@@ -55,11 +55,9 @@
 		FF5EA7669D1E4C16798C6393 /* DepthEstimationProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFF8AEE1853CCF847D30886 /* DepthEstimationProcessor.swift */; };
 		FFB216213EBF665A9025BBB9 /* DepthSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9EA84FF42614C6B7DC3305 /* DepthSampler.swift */; };
 		B5E52F5E1487034C51DC62AF /* ElevenLabs in Frameworks */ = {isa = PBXBuildFile; productRef = 04375DC3B7B8CBA7F7901B60 /* ElevenLabs */; };
-		585F0B2C25243BFD27A9C295 /* OCRModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB16D902A4EDA6AE2AE54DF5 /* OCRModels.swift */; };
-		F66F20A9513AADCBC9253217 /* TextRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 651963CF8A5D7133FE6FF397 /* TextRecognizer.swift */; };
+		585F0B2C25243BFD27A9C295 /* LabelSnapshotModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB16D902A4EDA6AE2AE54DF5 /* LabelSnapshotModels.swift */; };
 		CAB140ECA6232AE3075DFFCC /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172268DB436A67974D36025B /* OCRService.swift */; };
 		1A472FA082D63E10559AB97E /* RecognizedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBEA5648DF3AE3DA1BC00271 /* RecognizedTextView.swift */; };
-		AC65E7325908384F18165FBD /* AudioSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595CBB79EB7E07C63AA51DBA /* AudioSessionCoordinator.swift */; };
 		DE1EE19704C2915211D40713 /* SpeechOutputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6871216BEA716ED80AB846 /* SpeechOutputService.swift */; };
 		5355D4CBF408396D1805AE04 /* AssistantContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A8960D61F2D41C9B5383DC0 /* AssistantContext.swift */; };
 		6A41763898239C3A4351EF53 /* AssistantFacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7302C31E5AF8F530FCD911 /* AssistantFacts.swift */; };
@@ -71,6 +69,17 @@
 		18835C427DA97D6D00A6946A /* VoiceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4AB58A2951DD083F1AD18 /* VoiceCommand.swift */; };
 		A3F533005B37F70D9E3E7C37 /* VoiceCommandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F8EBA6531AAD2E6C283205 /* VoiceCommandService.swift */; };
 		D7ECFA04AF0098E17891B9E8 /* VoiceAssistantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */; };
+		DFCB20AB557DBA23C1C14125 /* LabelFrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8858B7C49EA3E2EFA94918 /* LabelFrameProcessor.swift */; };
+		306B8470BFB0D6AD6DE6E9B1 /* LabelGuidanceCues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A4E9AEE5377CCDF1AA8335 /* LabelGuidanceCues.swift */; };
+		5082CAD4926E8E1EBC3C9E71 /* LabelGuidanceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15034B3475ED02C9ECE64A99 /* LabelGuidanceService.swift */; };
+		96FCCA57B8D45F93838CE8EC /* LabelGuidanceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9646EF5848BA594D0D22C19F /* LabelGuidanceStabilizer.swift */; };
+		C60D67FF6C9C0119A099C4D0 /* LabelInterpreter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 329D97960CCCE2F4D0ECF820 /* LabelInterpreter.swift */; };
+		47FA56498C2A78E10173253C /* LabelOrientationAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEA6BA3D6A65063959D72B4 /* LabelOrientationAnalyzer.swift */; };
+		DE7651873C98B18309B2CF37 /* LabelReadingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B7AEAA18B8E399572D422B4 /* LabelReadingModels.swift */; };
+		6DDE9A7ABB9EB5730E1085AD /* LabelTextAccumulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98690645B600F3F7E5728212 /* LabelTextAccumulator.swift */; };
+		78B32F880713E6B2B0F7B9E3 /* LabelGuidanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF999D6474A8D89A81892AFA /* LabelGuidanceView.swift */; };
+		950A871D5BF4DDE5A9574A01 /* LabelReadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */; };
+		AD26732AA91DCF97C6EE5822 /* LabelSnapshotReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B13123130C143053AC9482F /* LabelSnapshotReader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,11 +143,9 @@
 		F9ADE4BFC9891AA0716C24FA /* HandGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandGeometry.swift; sourceTree = "<group>"; };
 		FC82A8203AF5E65E11EDBD92 /* ObjectDetectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionState.swift; sourceTree = "<group>"; };
 		08957277764E1D54BFBA8CCF /* Iris.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Iris.xcconfig; path = Config/Iris.xcconfig; sourceTree = SOURCE_ROOT; };
-		FB16D902A4EDA6AE2AE54DF5 /* OCRModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRModels.swift; sourceTree = "<group>"; };
-		651963CF8A5D7133FE6FF397 /* TextRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRecognizer.swift; sourceTree = "<group>"; };
+		FB16D902A4EDA6AE2AE54DF5 /* LabelSnapshotModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelSnapshotModels.swift; sourceTree = "<group>"; };
 		172268DB436A67974D36025B /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		FBEA5648DF3AE3DA1BC00271 /* RecognizedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognizedTextView.swift; sourceTree = "<group>"; };
-		595CBB79EB7E07C63AA51DBA /* AudioSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSessionCoordinator.swift; sourceTree = "<group>"; };
 		FF6871216BEA716ED80AB846 /* SpeechOutputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechOutputService.swift; sourceTree = "<group>"; };
 		9A8960D61F2D41C9B5383DC0 /* AssistantContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantContext.swift; sourceTree = "<group>"; };
 		0A7302C31E5AF8F530FCD911 /* AssistantFacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantFacts.swift; sourceTree = "<group>"; };
@@ -150,6 +157,17 @@
 		72D4AB58A2951DD083F1AD18 /* VoiceCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommand.swift; sourceTree = "<group>"; };
 		22F8EBA6531AAD2E6C283205 /* VoiceCommandService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommandService.swift; sourceTree = "<group>"; };
 		742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceAssistantTests.swift; sourceTree = "<group>"; };
+		8A8858B7C49EA3E2EFA94918 /* LabelFrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelFrameProcessor.swift; sourceTree = "<group>"; };
+		46A4E9AEE5377CCDF1AA8335 /* LabelGuidanceCues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelGuidanceCues.swift; sourceTree = "<group>"; };
+		15034B3475ED02C9ECE64A99 /* LabelGuidanceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelGuidanceService.swift; sourceTree = "<group>"; };
+		9646EF5848BA594D0D22C19F /* LabelGuidanceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelGuidanceStabilizer.swift; sourceTree = "<group>"; };
+		329D97960CCCE2F4D0ECF820 /* LabelInterpreter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelInterpreter.swift; sourceTree = "<group>"; };
+		9EEA6BA3D6A65063959D72B4 /* LabelOrientationAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelOrientationAnalyzer.swift; sourceTree = "<group>"; };
+		6B7AEAA18B8E399572D422B4 /* LabelReadingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelReadingModels.swift; sourceTree = "<group>"; };
+		98690645B600F3F7E5728212 /* LabelTextAccumulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelTextAccumulator.swift; sourceTree = "<group>"; };
+		AF999D6474A8D89A81892AFA /* LabelGuidanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelGuidanceView.swift; sourceTree = "<group>"; };
+		52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelReadingTests.swift; sourceTree = "<group>"; };
+		0B13123130C143053AC9482F /* LabelSnapshotReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelSnapshotReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,6 +275,7 @@
 		8B859314DB564112B1801AB9 /* IrisTests */ = {
 			isa = PBXGroup;
 			children = (
+				52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */,
 				742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */,
 				BCBE9D9F09430759795B87DD /* DepthEstimationTests.swift */,
 				EAB9D74F971C908C48C294BE /* HandTrackingTests.swift */,
@@ -284,6 +303,7 @@
 		9D10B66D634215F4C496E76B /* Voice */ = {
 			isa = PBXGroup;
 			children = (
+				FF6871216BEA716ED80AB846 /* SpeechOutputService.swift */,
 				22F8EBA6531AAD2E6C283205 /* VoiceCommandService.swift */,
 				72D4AB58A2951DD083F1AD18 /* VoiceCommand.swift */,
 				F964D09B0D26D1CCFC354060 /* VoiceGuidanceProviding.swift */,
@@ -306,6 +326,7 @@
 			children = (
 				68C2A2295A1FF386D46FA3E2 /* Components */,
 				22066024C41492529EF58145 /* Exploration */,
+				557E02960D82EDDC2AC9C404 /* LabelReading */,
 				9D0FEF3C86CFDBBDD55D59F9 /* Home */,
 				5094B17BA1C276A12DD0C1B2 /* Theme */,
 			);
@@ -366,8 +387,8 @@
 			isa = PBXGroup;
 			children = (
 				75E0319372597868C2F8A30B /* CameraAR */,
+				50B7E35C504C63AC0C53135D /* LabelReading */,
 				7CBF24A9D39BB84F55A961C3 /* Assistant */,
-				484AF4AD9F31BA23A32D3FD4 /* Speech */,
 				855CFB7C90FF651223369323 /* OCR */,
 				4CA8630163EB555B0BDD984E /* DepthEstimation */,
 				F34B89636DC30D6B4C8167A6 /* Guidance */,
@@ -383,19 +404,8 @@
 			children = (
 				FBEA5648DF3AE3DA1BC00271 /* RecognizedTextView.swift */,
 				172268DB436A67974D36025B /* OCRService.swift */,
-				651963CF8A5D7133FE6FF397 /* TextRecognizer.swift */,
-				FB16D902A4EDA6AE2AE54DF5 /* OCRModels.swift */,
 			);
 			path = OCR;
-			sourceTree = "<group>";
-		};
-		484AF4AD9F31BA23A32D3FD4 /* Speech */ = {
-			isa = PBXGroup;
-			children = (
-				FF6871216BEA716ED80AB846 /* SpeechOutputService.swift */,
-				595CBB79EB7E07C63AA51DBA /* AudioSessionCoordinator.swift */,
-			);
-			path = Speech;
 			sourceTree = "<group>";
 		};
 		7CBF24A9D39BB84F55A961C3 /* Assistant */ = {
@@ -410,6 +420,31 @@
 				9A8960D61F2D41C9B5383DC0 /* AssistantContext.swift */,
 			);
 			path = Assistant;
+			sourceTree = "<group>";
+		};
+		50B7E35C504C63AC0C53135D /* LabelReading */ = {
+			isa = PBXGroup;
+			children = (
+				0B13123130C143053AC9482F /* LabelSnapshotReader.swift */,
+				FB16D902A4EDA6AE2AE54DF5 /* LabelSnapshotModels.swift */,
+				98690645B600F3F7E5728212 /* LabelTextAccumulator.swift */,
+				6B7AEAA18B8E399572D422B4 /* LabelReadingModels.swift */,
+				9EEA6BA3D6A65063959D72B4 /* LabelOrientationAnalyzer.swift */,
+				329D97960CCCE2F4D0ECF820 /* LabelInterpreter.swift */,
+				9646EF5848BA594D0D22C19F /* LabelGuidanceStabilizer.swift */,
+				15034B3475ED02C9ECE64A99 /* LabelGuidanceService.swift */,
+				46A4E9AEE5377CCDF1AA8335 /* LabelGuidanceCues.swift */,
+				8A8858B7C49EA3E2EFA94918 /* LabelFrameProcessor.swift */,
+			);
+			path = LabelReading;
+			sourceTree = "<group>";
+		};
+		557E02960D82EDDC2AC9C404 /* LabelReading */ = {
+			isa = PBXGroup;
+			children = (
+				AF999D6474A8D89A81892AFA /* LabelGuidanceView.swift */,
+			);
+			path = LabelReading;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -532,6 +567,16 @@
 				61393187C91D5A9896EBC446 /* HandTrackingDebugView.swift in Sources */,
 				5A87F5408117D121C5C86DD7 /* HandTrackingOverlay.swift in Sources */,
 				71E14BCD9C262AB978670EBE /* HandTrackingProviding.swift in Sources */,
+				AD26732AA91DCF97C6EE5822 /* LabelSnapshotReader.swift in Sources */,
+				78B32F880713E6B2B0F7B9E3 /* LabelGuidanceView.swift in Sources */,
+				6DDE9A7ABB9EB5730E1085AD /* LabelTextAccumulator.swift in Sources */,
+				DE7651873C98B18309B2CF37 /* LabelReadingModels.swift in Sources */,
+				47FA56498C2A78E10173253C /* LabelOrientationAnalyzer.swift in Sources */,
+				C60D67FF6C9C0119A099C4D0 /* LabelInterpreter.swift in Sources */,
+				96FCCA57B8D45F93838CE8EC /* LabelGuidanceStabilizer.swift in Sources */,
+				5082CAD4926E8E1EBC3C9E71 /* LabelGuidanceService.swift in Sources */,
+				306B8470BFB0D6AD6DE6E9B1 /* LabelGuidanceCues.swift in Sources */,
+				DFCB20AB557DBA23C1C14125 /* LabelFrameProcessor.swift in Sources */,
 				A3F533005B37F70D9E3E7C37 /* VoiceCommandService.swift in Sources */,
 				18835C427DA97D6D00A6946A /* VoiceCommand.swift in Sources */,
 				00E573258528C4A278FB5649 /* VoiceAssistantDebugView.swift in Sources */,
@@ -542,11 +587,9 @@
 				6A41763898239C3A4351EF53 /* AssistantFacts.swift in Sources */,
 				5355D4CBF408396D1805AE04 /* AssistantContext.swift in Sources */,
 				DE1EE19704C2915211D40713 /* SpeechOutputService.swift in Sources */,
-				AC65E7325908384F18165FBD /* AudioSessionCoordinator.swift in Sources */,
 				1A472FA082D63E10559AB97E /* RecognizedTextView.swift in Sources */,
 				CAB140ECA6232AE3075DFFCC /* OCRService.swift in Sources */,
-				F66F20A9513AADCBC9253217 /* TextRecognizer.swift in Sources */,
-				585F0B2C25243BFD27A9C295 /* OCRModels.swift in Sources */,
+				585F0B2C25243BFD27A9C295 /* LabelSnapshotModels.swift in Sources */,
 				26C6EF0FCA3F4F9511E630B5 /* HandTrackingService.swift in Sources */,
 				939F1419BF3E0832EF420846 /* HandTrackingState.swift in Sources */,
 				8863DF67A22CAB0119FC5484 /* HomeView.swift in Sources */,
@@ -577,6 +620,7 @@
 				B43AEED99A9FE287C9C34E44 /* DepthEstimationTests.swift in Sources */,
 				27823675AFD2B1EAE64B27B5 /* HandTrackingTests.swift in Sources */,
 				15442A1C76D81A8E1CD1121F /* ObjectDetectionTests.swift in Sources */,
+				950A871D5BF4DDE5A9574A01 /* LabelReadingTests.swift in Sources */,
 				D7ECFA04AF0098E17891B9E8 /* VoiceAssistantTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

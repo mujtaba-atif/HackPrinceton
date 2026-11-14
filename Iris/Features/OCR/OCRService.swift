@@ -1,84 +1,50 @@
-import Combine
+import CoreGraphics
 import Foundation
+import Vision
 
-/// Reads printed text from the existing camera stream on demand. Owns no camera.
-@MainActor
-final class OCRService: ObservableObject {
-    /// Frames sampled per read; the best result wins, which smooths over motion blur.
-    static let framesPerRead = 3
-    static let frameSpacing: TimeInterval = 0.25
-    /// Gives up if the stream stops delivering frames (camera paused or stopped).
-    static let timeout: Duration = .seconds(4)
+enum TextRecognitionLevel: Sendable {
+    /// Quick, lower-accuracy pass for live guidance.
+    case fast
+    /// Slower pass with language correction for the final read.
+    case accurate
+}
 
-    @Published private(set) var state: OCRState = .idle
+enum OCRError: LocalizedError, Equatable {
+    case unreadableImage
+    case recognitionFailed(String)
 
-    var latestResult: OCRResult? { state.result }
-
-    private let recognizer = TextRecognizer()
-    private var readTask: Task<OCRState, Never>?
-    private var timedOut = false
-
-    /// Reads the selected object (when it is currently tracked) or else the center of the view.
-    @discardableResult
-    func read(frames: AsyncStream<CameraFrame>, focus: SelectedObjectTarget?) async -> OCRState {
-        readTask?.cancel()
-        state = .reading
-        let region = OCRGeometry.focusRegion(for: focus?.currentBoundingBox)
-        let focusName = focus?.currentBoundingBox == nil ? nil : focus?.object.name
-        let recognizer = recognizer
-        timedOut = false
-
-        let task = Task<OCRState, Never> {
-            var best: OCRResult?
-            var sampled = 0
-            var lastTimestamp: TimeInterval?
-            do {
-                for await frame in frames {
-                    if Task.isCancelled { break }
-                    if let lastTimestamp, frame.timestamp - lastTimestamp < Self.frameSpacing { continue }
-                    lastTimestamp = frame.timestamp
-                    sampled += 1
-                    let lines = try await recognizer.recognize(frame.capturedImage, region: region)
-                    let result = OCRResult(lines: lines, focusName: focusName, timestamp: frame.timestamp)
-                    if !lines.isEmpty, result.score > (best?.score ?? 0) { best = result }
-                    if sampled >= Self.framesPerRead { break }
-                }
-            } catch {
-                return .failed(message: "Text recognition failed. " + error.localizedDescription)
-            }
-            if Task.isCancelled, !self.timedOut { return .idle }
-            if sampled == 0 {
-                return .failed(message: "The camera isn't providing images. Start the camera and try again.")
-            }
-            guard let best else {
-                return .noText(hint: "No readable text found. Hold the label 20 to 40 centimeters from the camera, keep it steady, and make sure it's well lit.")
-            }
-            return .result(best)
+    var errorDescription: String? {
+        switch self {
+        case .unreadableImage: "The camera image could not be prepared for reading."
+        case let .recognitionFailed(message): message
         }
-        readTask = task
-        let watchdog = Task { [weak self] in
-            try await Task.sleep(for: Self.timeout)
-            self?.timedOut = true
-            task.cancel()
-        }
-        let outcome = await task.value
-        watchdog.cancel()
-        // A newer read may have replaced this one while it ran.
-        if readTask == task {
-            state = outcome
-            readTask = nil
-        }
-        return outcome
     }
+}
 
-    func cancel() {
-        readTask?.cancel()
-        readTask = nil
-        if state == .reading { state = .idle }
-    }
+/// Reusable Vision text recognition on an already upright image.
+/// Synchronous: call it from a background actor, never the main actor.
+struct OCRService: Sendable {
+    var recognitionLanguages = ["en-US"]
 
-    func clear() {
-        cancel()
-        state = .idle
+    /// - Returns: Lines with bounding boxes normalized to `image`, bottom-left origin.
+    func recognizeText(in image: CGImage, level: TextRecognitionLevel) throws -> [RecognizedTextLine] {
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = level == .accurate ? .accurate : .fast
+        request.usesLanguageCorrection = level == .accurate
+        request.recognitionLanguages = recognitionLanguages
+
+        let handler = VNImageRequestHandler(cgImage: image, orientation: .up)
+        do {
+            try handler.perform([request])
+        } catch {
+            throw OCRError.recognitionFailed(error.localizedDescription)
+        }
+        return (request.results ?? []).compactMap { observation in
+            guard let candidate = observation.topCandidates(1).first else { return nil }
+            let text = candidate.string.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty else { return nil }
+            return RecognizedTextLine(text: text, confidence: Double(candidate.confidence),
+                                      boundingBox: observation.boundingBox)
+        }
     }
 }

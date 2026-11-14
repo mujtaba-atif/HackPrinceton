@@ -34,7 +34,7 @@ final class VoiceAssistantCoordinator: ObservableObject {
 
     let speech: SpeechOutputService
     let listener: VoiceCommandService
-    let ocr: OCRService
+    let ocr: LabelSnapshotReader
     let agent: ElevenLabsAgentSession
 
     private let agentID: String?
@@ -49,12 +49,12 @@ final class VoiceAssistantCoordinator: ObservableObject {
     init(agentID: String? = AssistantConfiguration.elevenLabsAgentID,
          speech: SpeechOutputService? = nil,
          listener: VoiceCommandService? = nil,
-         ocr: OCRService? = nil,
+         ocr: LabelSnapshotReader? = nil,
          agent: ElevenLabsAgentSession? = nil) {
         self.agentID = agentID
         self.speech = speech ?? SpeechOutputService()
         self.listener = listener ?? VoiceCommandService()
-        self.ocr = ocr ?? OCRService()
+        self.ocr = ocr ?? LabelSnapshotReader()
         self.agent = agent ?? ElevenLabsAgentSession()
 
         // Re-publish child state so a single @ObservedObject drives the whole panel.
