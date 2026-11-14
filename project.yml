@@ -32,6 +32,7 @@ targets:
         NSMicrophoneUsageDescription: "Reachly uses the microphone so you can control exploration with your voice."
         NSSpeechRecognitionUsageDescription: "Reachly uses speech recognition to understand spoken object searches and navigation commands."
         UIApplicationSupportsIndirectInputEvents: true
+        UIRequiresFullScreen: true
         UILaunchScreen:
           UIColorName: ReachlyBackground
         UISupportedInterfaceOrientations:

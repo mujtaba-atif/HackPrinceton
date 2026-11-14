@@ -30,7 +30,7 @@ struct HomeView: View {
                         .padding(.top, 16)
 
                     NavigationLink {
-                        ExplorationPlaceholderView()
+                        ExploreView()
                     } label: {
                         PrimaryActionLabel(
                             title: "Start Exploring",

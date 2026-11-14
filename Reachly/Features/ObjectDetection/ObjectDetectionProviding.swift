@@ -7,6 +7,7 @@ protocol ObjectDetectionProviding: AnyObject {
     var readiness: FeatureReadiness { get }
     var latestObjects: [DetectedObject] { get }
 
+    func process(_ frame: CameraFrame) async
     func reset()
 }
 
