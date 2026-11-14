@@ -11,14 +11,21 @@
 		0C1BDA6C57C3DF6004F53BDA /* ReachlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48C72ED22D64530607CF140 /* ReachlyTheme.swift */; };
 		15442A1C76D81A8E1CD1121F /* ObjectDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9981313BDE0A42F71C952310 /* ObjectDetectionTests.swift */; };
 		1AFEA6513B36372410F18383 /* GuidanceProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74DBCEA6307E2C2CC696E70 /* GuidanceProviding.swift */; };
+		1B0D3A9F26F5389119432D57 /* HandGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ADE4BFC9891AA0716C24FA /* HandGeometry.swift */; };
 		26ACA3C4FA5FEE297F841CFB /* ObjectDetectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC82A8203AF5E65E11EDBD92 /* ObjectDetectionState.swift */; };
+		26C6EF0FCA3F4F9511E630B5 /* HandTrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB3029BA505DCBD8E09996F /* HandTrackingService.swift */; };
+		27823675AFD2B1EAE64B27B5 /* HandTrackingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB9D74F971C908C48C294BE /* HandTrackingTests.swift */; };
 		28175E154EE0E9D7A7E2404C /* MODEL.md in Resources */ = {isa = PBXBuildFile; fileRef = 6CA265C76C852B3A3C16FDF4 /* MODEL.md */; };
 		28A236357322F102D577891B /* ObjectDetectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC91816AEFECDFD609E0AD15 /* ObjectDetectionService.swift */; };
 		319EC88645F1CA6DC8363364 /* SpatialTargetEstimate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E02A27E8F639D9973F85E9 /* SpatialTargetEstimate.swift */; };
 		34C52A9DE25EC9E3D314ED81 /* DetectedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86F74F222E6B60D917203E2 /* DetectedObject.swift */; };
 		381C3EF1B607A146A96621C8 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3823341A098234191A55DAA /* ExploreView.swift */; };
+		42271ABF98564C50112623BF /* VisionHandPoseDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7C7FB21EE596DA4DB6153C /* VisionHandPoseDetector.swift */; };
 		438D12EE284E33D42AE4F19D /* CameraSessionControlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603084E62C8E96C4789377BA /* CameraSessionControlling.swift */; };
+		5A87F5408117D121C5C86DD7 /* HandTrackingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 486417B797750CFF01C30151 /* HandTrackingOverlay.swift */; };
+		61393187C91D5A9896EBC446 /* HandTrackingDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F5924C2894AA9F8FCAA3A4 /* HandTrackingDebugView.swift */; };
 		62534DA60438D3BDFD6917B5 /* YOLOv3TinyFP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 35C86D862821FC1D75B25EB1 /* YOLOv3TinyFP16.mlmodel */; };
+		715CB2607D634BE5AC4FD689 /* HandObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970225AC6C16FF496CBB512A /* HandObservation.swift */; };
 		71E14BCD9C262AB978670EBE /* HandTrackingProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5789D27832D67FE34F30B6F4 /* HandTrackingProviding.swift */; };
 		81642BF964EFFCE1B00A61FB /* DetectionGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA6D2EBEDC3E2412452299C1 /* DetectionGeometry.swift */; };
 		8863DF67A22CAB0119FC5484 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3967AF12CF0A884A69A2B8B1 /* HomeView.swift */; };
@@ -26,6 +33,7 @@
 		8E374EB79C406F4FC85022D0 /* DetectedObjectsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 642D61C9C8B8E0D22621313F /* DetectedObjectsList.swift */; };
 		8FEFDAF88B1393AC0AA03342 /* FeatureReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516E36BCDECF327BEAE6B827 /* FeatureReadiness.swift */; };
 		93721CC20B86C337CC950622 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2E5427E9CC3CBB1A2445DEBA /* Assets.xcassets */; };
+		939F1419BF3E0832EF420846 /* HandTrackingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F156A131A431C70F510B2441 /* HandTrackingState.swift */; };
 		94917A731928BC80636E048A /* ReachlyMark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C848419508E651585A4DC05 /* ReachlyMark.swift */; };
 		A92699E54447C451E9D6608F /* ReachlyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2F4C20AB8488B7BF484637 /* ReachlyApp.swift */; };
 		B43AEED99A9FE287C9C34E44 /* DepthEstimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBE9D9F09430759795B87DD /* DepthEstimationTests.swift */; };
@@ -41,6 +49,7 @@
 		DA42CF7138E0DF1CEE9DBDC1 /* CameraFrameBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E47D5D9E2DFFBEA2E929D1F /* CameraFrameBroker.swift */; };
 		DCEE8C9A66DCFC07A2913A6C /* ReachlyCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7B0D15557AEC96A835B222 /* ReachlyCameraController.swift */; };
 		E48F23BA27D3DC4CFFC47097 /* VoiceGuidanceProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F964D09B0D26D1CCFC354060 /* VoiceGuidanceProviding.swift */; };
+		E4DFAD1631F1FC623F49D55C /* OneEuroFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5884B880E731365F6E2E084E /* OneEuroFilter.swift */; };
 		E5A603390AA3F88DC8204A87 /* ObjectDetectionProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCF742E6E90CCEBCEFD0085 /* ObjectDetectionProviding.swift */; };
 		E69D1D17BA275A411C16BF4F /* DepthFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42DBFB336D291260F00520A8 /* DepthFrame.swift */; };
 		FF5EA7669D1E4C16798C6393 /* DepthEstimationProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDFF8AEE1853CCF847D30886 /* DepthEstimationProcessor.swift */; };
@@ -66,9 +75,11 @@
 		35C86D862821FC1D75B25EB1 /* YOLOv3TinyFP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = YOLOv3TinyFP16.mlmodel; sourceTree = "<group>"; };
 		3967AF12CF0A884A69A2B8B1 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		42DBFB336D291260F00520A8 /* DepthFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthFrame.swift; sourceTree = "<group>"; };
+		486417B797750CFF01C30151 /* HandTrackingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingOverlay.swift; sourceTree = "<group>"; };
 		516E36BCDECF327BEAE6B827 /* FeatureReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureReadiness.swift; sourceTree = "<group>"; };
 		54D4A0EB27DBCEB7AA75D51A /* VoiceFirstBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceFirstBadge.swift; sourceTree = "<group>"; };
 		5789D27832D67FE34F30B6F4 /* HandTrackingProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingProviding.swift; sourceTree = "<group>"; };
+		5884B880E731365F6E2E084E /* OneEuroFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneEuroFilter.swift; sourceTree = "<group>"; };
 		5E47D5D9E2DFFBEA2E929D1F /* CameraFrameBroker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFrameBroker.swift; sourceTree = "<group>"; };
 		603084E62C8E96C4789377BA /* CameraSessionControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionControlling.swift; sourceTree = "<group>"; };
 		642D61C9C8B8E0D22621313F /* DetectedObjectsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedObjectsList.swift; sourceTree = "<group>"; };
@@ -79,9 +90,12 @@
 		7A7B0D15557AEC96A835B222 /* ReachlyCameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachlyCameraController.swift; sourceTree = "<group>"; };
 		7D7C068166425648B59A8DE1 /* ObjectDetectionOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionOverlay.swift; sourceTree = "<group>"; };
 		88330442CC85755923655D6B /* SpatialTargetReadout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialTargetReadout.swift; sourceTree = "<group>"; };
+		8D7C7FB21EE596DA4DB6153C /* VisionHandPoseDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHandPoseDetector.swift; sourceTree = "<group>"; };
 		8D9EA84FF42614C6B7DC3305 /* DepthSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthSampler.swift; sourceTree = "<group>"; };
+		970225AC6C16FF496CBB512A /* HandObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandObservation.swift; sourceTree = "<group>"; };
 		9981313BDE0A42F71C952310 /* ObjectDetectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionTests.swift; sourceTree = "<group>"; };
 		9C848419508E651585A4DC05 /* ReachlyMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachlyMark.swift; sourceTree = "<group>"; };
+		9FB3029BA505DCBD8E09996F /* HandTrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingService.swift; sourceTree = "<group>"; };
 		A3823341A098234191A55DAA /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
 		AC91816AEFECDFD609E0AD15 /* ObjectDetectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionService.swift; sourceTree = "<group>"; };
 		B86F74F222E6B60D917203E2 /* DetectedObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetectedObject.swift; sourceTree = "<group>"; };
@@ -93,10 +107,14 @@
 		DDCF742E6E90CCEBCEFD0085 /* ObjectDetectionProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionProviding.swift; sourceTree = "<group>"; };
 		DFDEB634C1826134503ABEA8 /* VisionObjectDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionObjectDetector.swift; sourceTree = "<group>"; };
 		E6399115B6091CBD5D0BC5A3 /* DepthEstimationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthEstimationService.swift; sourceTree = "<group>"; };
+		E6F5924C2894AA9F8FCAA3A4 /* HandTrackingDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingDebugView.swift; sourceTree = "<group>"; };
+		EAB9D74F971C908C48C294BE /* HandTrackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingTests.swift; sourceTree = "<group>"; };
 		EDFF8AEE1853CCF847D30886 /* DepthEstimationProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepthEstimationProcessor.swift; sourceTree = "<group>"; };
 		F0DE3D98F4D0429E992E11CD /* ReachlyTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ReachlyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F156A131A431C70F510B2441 /* HandTrackingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingState.swift; sourceTree = "<group>"; };
 		F48C72ED22D64530607CF140 /* ReachlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachlyTheme.swift; sourceTree = "<group>"; };
 		F964D09B0D26D1CCFC354060 /* VoiceGuidanceProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceGuidanceProviding.swift; sourceTree = "<group>"; };
+		F9ADE4BFC9891AA0716C24FA /* HandGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandGeometry.swift; sourceTree = "<group>"; };
 		FC82A8203AF5E65E11EDBD92 /* ObjectDetectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -195,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				BCBE9D9F09430759795B87DD /* DepthEstimationTests.swift */,
+				EAB9D74F971C908C48C294BE /* HandTrackingTests.swift */,
 				9981313BDE0A42F71C952310 /* ObjectDetectionTests.swift */,
 			);
 			path = ReachlyTests;
@@ -257,7 +276,15 @@
 		EE6AF340F0C8C499AEEFE0BF /* HandTracking */ = {
 			isa = PBXGroup;
 			children = (
+				F9ADE4BFC9891AA0716C24FA /* HandGeometry.swift */,
+				970225AC6C16FF496CBB512A /* HandObservation.swift */,
+				E6F5924C2894AA9F8FCAA3A4 /* HandTrackingDebugView.swift */,
+				486417B797750CFF01C30151 /* HandTrackingOverlay.swift */,
 				5789D27832D67FE34F30B6F4 /* HandTrackingProviding.swift */,
+				9FB3029BA505DCBD8E09996F /* HandTrackingService.swift */,
+				F156A131A431C70F510B2441 /* HandTrackingState.swift */,
+				5884B880E731365F6E2E084E /* OneEuroFilter.swift */,
+				8D7C7FB21EE596DA4DB6153C /* VisionHandPoseDetector.swift */,
 			);
 			path = HandTracking;
 			sourceTree = "<group>";
@@ -409,12 +436,19 @@
 				381C3EF1B607A146A96621C8 /* ExploreView.swift in Sources */,
 				8FEFDAF88B1393AC0AA03342 /* FeatureReadiness.swift in Sources */,
 				1AFEA6513B36372410F18383 /* GuidanceProviding.swift in Sources */,
+				1B0D3A9F26F5389119432D57 /* HandGeometry.swift in Sources */,
+				715CB2607D634BE5AC4FD689 /* HandObservation.swift in Sources */,
+				61393187C91D5A9896EBC446 /* HandTrackingDebugView.swift in Sources */,
+				5A87F5408117D121C5C86DD7 /* HandTrackingOverlay.swift in Sources */,
 				71E14BCD9C262AB978670EBE /* HandTrackingProviding.swift in Sources */,
+				26C6EF0FCA3F4F9511E630B5 /* HandTrackingService.swift in Sources */,
+				939F1419BF3E0832EF420846 /* HandTrackingState.swift in Sources */,
 				8863DF67A22CAB0119FC5484 /* HomeView.swift in Sources */,
 				D968201B8A391BEFA38BFA76 /* ObjectDetectionOverlay.swift in Sources */,
 				E5A603390AA3F88DC8204A87 /* ObjectDetectionProviding.swift in Sources */,
 				28A236357322F102D577891B /* ObjectDetectionService.swift in Sources */,
 				26ACA3C4FA5FEE297F841CFB /* ObjectDetectionState.swift in Sources */,
+				E4DFAD1631F1FC623F49D55C /* OneEuroFilter.swift in Sources */,
 				8DE8083F4C0C4A6A78E304F5 /* PrimaryActionLabel.swift in Sources */,
 				A92699E54447C451E9D6608F /* ReachlyApp.swift in Sources */,
 				DCEE8C9A66DCFC07A2913A6C /* ReachlyCameraController.swift in Sources */,
@@ -422,6 +456,7 @@
 				0C1BDA6C57C3DF6004F53BDA /* ReachlyTheme.swift in Sources */,
 				319EC88645F1CA6DC8363364 /* SpatialTargetEstimate.swift in Sources */,
 				02BB1AB061FA6E3CB773A1EF /* SpatialTargetReadout.swift in Sources */,
+				42271ABF98564C50112623BF /* VisionHandPoseDetector.swift in Sources */,
 				C7F9560AE9E832CD55ACE3EE /* VisionObjectDetector.swift in Sources */,
 				CE3B0C2210C6EF486652F3F2 /* VoiceFirstBadge.swift in Sources */,
 				E48F23BA27D3DC4CFFC47097 /* VoiceGuidanceProviding.swift in Sources */,
@@ -434,6 +469,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B43AEED99A9FE287C9C34E44 /* DepthEstimationTests.swift in Sources */,
+				27823675AFD2B1EAE64B27B5 /* HandTrackingTests.swift in Sources */,
 				15442A1C76D81A8E1CD1121F /* ObjectDetectionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
