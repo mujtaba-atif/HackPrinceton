@@ -46,7 +46,9 @@ final class HandTrackingTests: XCTestCase {
     }
 
     func testVisionAndSensorConversions() {
-        XCTAssertEqual(HandGeometry.visionToImage(CGPoint(x: 0.2, y: 0.9)), CGPoint(x: 0.2, y: 0.1))
+        let image = HandGeometry.visionToImage(CGPoint(x: 0.2, y: 0.9))
+        XCTAssertEqual(image.x, 0.2, accuracy: 1e-9)
+        XCTAssertEqual(image.y, 0.1, accuracy: 1e-9)
         // Upright top-left corner maps to the landscape sensor's bottom-left corner under `.right`.
         XCTAssertEqual(HandGeometry.imageToSensor(CGPoint(x: 0, y: 0)), CGPoint(x: 0, y: 1))
         XCTAssertEqual(HandGeometry.uprightSize(forBufferSize: CGSize(width: 1920, height: 1440)), imageSize)
