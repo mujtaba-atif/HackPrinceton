@@ -8,6 +8,7 @@ final class ReachlyCameraController: NSObject, ObservableObject, CameraSessionCo
     @Published private(set) var state: CameraSessionState = .idle
 
     let session: ARSession
+    let supportsSceneDepth = ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth)
 
     private let frameBroker: CameraFrameBroker
     private let delegateProxy: ARSessionDelegateProxy
@@ -98,7 +99,7 @@ final class ReachlyCameraController: NSObject, ObservableObject, CameraSessionCo
         configuration.worldAlignment = .gravity
         configuration.environmentTexturing = .none
 
-        if ARWorldTrackingConfiguration.supportsFrameSemantics(.sceneDepth) {
+        if supportsSceneDepth {
             configuration.frameSemantics.insert(.sceneDepth)
         }
 

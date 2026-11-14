@@ -3,6 +3,7 @@ import UIKit
 
 struct DetectedObjectsList: View {
     @ObservedObject var detection: ObjectDetectionService
+    var spatialEstimate: SpatialTargetEstimate? = nil
     let retry: () -> Void
 
     var body: some View {
@@ -27,6 +28,7 @@ struct DetectedObjectsList: View {
                 }
 
                 if let target = detection.selectedTarget {
+                    SpatialTargetReadout(target: target, estimate: spatialEstimate)
                     Text(target.state == .tracking
                          ? "Target: \(target.object.name)"
                          : "Target lost: \(target.object.name). Find it again or select another object.")
