@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0C1BDA6C57C3DF6004F53BDA /* ReachlyTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48C72ED22D64530607CF140 /* ReachlyTheme.swift */; };
 		1AFEA6513B36372410F18383 /* GuidanceProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = C74DBCEA6307E2C2CC696E70 /* GuidanceProviding.swift */; };
-		257139A2CE5556A77E43C0CE /* ExplorationPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E3C53F196E4F2C5AF70B832 /* ExplorationPlaceholderView.swift */; };
+		381C3EF1B607A146A96621C8 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3823341A098234191A55DAA /* ExploreView.swift */; };
 		438D12EE284E33D42AE4F19D /* CameraSessionControlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603084E62C8E96C4789377BA /* CameraSessionControlling.swift */; };
 		71E14BCD9C262AB978670EBE /* HandTrackingProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5789D27832D67FE34F30B6F4 /* HandTrackingProviding.swift */; };
 		8863DF67A22CAB0119FC5484 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3967AF12CF0A884A69A2B8B1 /* HomeView.swift */; };
@@ -20,6 +20,10 @@
 		A92699E54447C451E9D6608F /* ReachlyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2F4C20AB8488B7BF484637 /* ReachlyApp.swift */; };
 		BD0ED0439EC76F395252909F /* ExplorationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669BC9AFD91E3D554974408E /* ExplorationModels.swift */; };
 		CE3B0C2210C6EF486652F3F2 /* VoiceFirstBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54D4A0EB27DBCEB7AA75D51A /* VoiceFirstBadge.swift */; };
+		CE40BA89D84AB215FAA50EDE /* CameraFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9A3C2A7B222A98CE56D413 /* CameraFrame.swift */; };
+		CF9C5457F3332626BA112524 /* ARCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C24D512256F55375C520521 /* ARCameraPreview.swift */; };
+		DA42CF7138E0DF1CEE9DBDC1 /* CameraFrameBroker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E47D5D9E2DFFBEA2E929D1F /* CameraFrameBroker.swift */; };
+		DCEE8C9A66DCFC07A2913A6C /* ReachlyCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7B0D15557AEC96A835B222 /* ReachlyCameraController.swift */; };
 		E48F23BA27D3DC4CFFC47097 /* VoiceGuidanceProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F964D09B0D26D1CCFC354060 /* VoiceGuidanceProviding.swift */; };
 		E5A603390AA3F88DC8204A87 /* ObjectDetectionProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCF742E6E90CCEBCEFD0085 /* ObjectDetectionProviding.swift */; };
 /* End PBXBuildFile section */
@@ -27,15 +31,19 @@
 /* Begin PBXFileReference section */
 		02A4A459CC270C7292EE8EC3 /* PrimaryActionLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryActionLabel.swift; sourceTree = "<group>"; };
 		0A2F4C20AB8488B7BF484637 /* ReachlyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachlyApp.swift; sourceTree = "<group>"; };
-		1E3C53F196E4F2C5AF70B832 /* ExplorationPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorationPlaceholderView.swift; sourceTree = "<group>"; };
+		2C24D512256F55375C520521 /* ARCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARCameraPreview.swift; sourceTree = "<group>"; };
 		2E5427E9CC3CBB1A2445DEBA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3967AF12CF0A884A69A2B8B1 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		516E36BCDECF327BEAE6B827 /* FeatureReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureReadiness.swift; sourceTree = "<group>"; };
 		54D4A0EB27DBCEB7AA75D51A /* VoiceFirstBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceFirstBadge.swift; sourceTree = "<group>"; };
 		5789D27832D67FE34F30B6F4 /* HandTrackingProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingProviding.swift; sourceTree = "<group>"; };
+		5E47D5D9E2DFFBEA2E929D1F /* CameraFrameBroker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFrameBroker.swift; sourceTree = "<group>"; };
 		603084E62C8E96C4789377BA /* CameraSessionControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSessionControlling.swift; sourceTree = "<group>"; };
 		669BC9AFD91E3D554974408E /* ExplorationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorationModels.swift; sourceTree = "<group>"; };
+		6C9A3C2A7B222A98CE56D413 /* CameraFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFrame.swift; sourceTree = "<group>"; };
+		7A7B0D15557AEC96A835B222 /* ReachlyCameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachlyCameraController.swift; sourceTree = "<group>"; };
 		9C848419508E651585A4DC05 /* ReachlyMark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachlyMark.swift; sourceTree = "<group>"; };
+		A3823341A098234191A55DAA /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreView.swift; sourceTree = "<group>"; };
 		C74DBCEA6307E2C2CC696E70 /* GuidanceProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceProviding.swift; sourceTree = "<group>"; };
 		D7B371AF159051AA02C6BC66 /* Reachly.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Reachly.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDCF742E6E90CCEBCEFD0085 /* ObjectDetectionProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionProviding.swift; sourceTree = "<group>"; };
@@ -55,7 +63,7 @@
 		22066024C41492529EF58145 /* Exploration */ = {
 			isa = PBXGroup;
 			children = (
-				1E3C53F196E4F2C5AF70B832 /* ExplorationPlaceholderView.swift */,
+				A3823341A098234191A55DAA /* ExploreView.swift */,
 			);
 			path = Exploration;
 			sourceTree = "<group>";
@@ -110,7 +118,11 @@
 		75E0319372597868C2F8A30B /* CameraAR */ = {
 			isa = PBXGroup;
 			children = (
+				2C24D512256F55375C520521 /* ARCameraPreview.swift */,
+				6C9A3C2A7B222A98CE56D413 /* CameraFrame.swift */,
+				5E47D5D9E2DFFBEA2E929D1F /* CameraFrameBroker.swift */,
 				603084E62C8E96C4789377BA /* CameraSessionControlling.swift */,
+				7A7B0D15557AEC96A835B222 /* ReachlyCameraController.swift */,
 			);
 			path = CameraAR;
 			sourceTree = "<group>";
@@ -264,9 +276,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF9C5457F3332626BA112524 /* ARCameraPreview.swift in Sources */,
+				CE40BA89D84AB215FAA50EDE /* CameraFrame.swift in Sources */,
+				DA42CF7138E0DF1CEE9DBDC1 /* CameraFrameBroker.swift in Sources */,
 				438D12EE284E33D42AE4F19D /* CameraSessionControlling.swift in Sources */,
 				BD0ED0439EC76F395252909F /* ExplorationModels.swift in Sources */,
-				257139A2CE5556A77E43C0CE /* ExplorationPlaceholderView.swift in Sources */,
+				381C3EF1B607A146A96621C8 /* ExploreView.swift in Sources */,
 				8FEFDAF88B1393AC0AA03342 /* FeatureReadiness.swift in Sources */,
 				1AFEA6513B36372410F18383 /* GuidanceProviding.swift in Sources */,
 				71E14BCD9C262AB978670EBE /* HandTrackingProviding.swift in Sources */,
@@ -274,6 +289,7 @@
 				E5A603390AA3F88DC8204A87 /* ObjectDetectionProviding.swift in Sources */,
 				8DE8083F4C0C4A6A78E304F5 /* PrimaryActionLabel.swift in Sources */,
 				A92699E54447C451E9D6608F /* ReachlyApp.swift in Sources */,
+				DCEE8C9A66DCFC07A2913A6C /* ReachlyCameraController.swift in Sources */,
 				94917A731928BC80636E048A /* ReachlyMark.swift in Sources */,
 				0C1BDA6C57C3DF6004F53BDA /* ReachlyTheme.swift in Sources */,
 				CE3B0C2210C6EF486652F3F2 /* VoiceFirstBadge.swift in Sources */,

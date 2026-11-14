@@ -6,6 +6,7 @@ protocol HandTrackingProviding: AnyObject {
     var readiness: FeatureReadiness { get }
     var trackedHands: [TrackedHand] { get }
 
+    func process(_ frame: CameraFrame) async
     func reset()
 }
 
