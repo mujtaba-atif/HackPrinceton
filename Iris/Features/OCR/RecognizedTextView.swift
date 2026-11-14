@@ -51,7 +51,7 @@ struct RecognizedTextView: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.orange)
             }
-            ForEach(result.lines) { line in
+            ForEach(Array(result.lines.enumerated()), id: \.offset) { _, line in
                 Text(line.text)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(IrisTheme.primaryText)
@@ -103,7 +103,6 @@ struct RecognizedTextView: View {
                     .accessibilityHint("Stops reading aloud")
                 } else {
                     Button {
-                        speech.forgetRecentUtterances()
                         speech.speak(result.text)
                     } label: {
                         PrimaryActionLabel(title: "Read Aloud", systemImage: "speaker.wave.2.fill")

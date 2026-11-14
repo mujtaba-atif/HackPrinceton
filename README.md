@@ -2,7 +2,7 @@
 
 Iris is a native iOS accessibility app designed to help blind and visually impaired people find nearby objects, move a hand toward them, and understand what they are holding through clear spoken guidance.
 
-This repository contains the iOS 17+ SwiftUI app, an accessible home experience, and a live rear-camera Explore screen backed by one ARKit session. Explore runs on-device Core ML object detection, displays selectable boxes and an accessible object list, and estimates the selected object's distance on supported LiDAR devices. Camera-relative spatial estimates are exposed for future guidance. Hand tracking, reach guidance, and voice commands are not implemented yet.
+This repository contains the iOS 17+ SwiftUI app, an accessible home experience, and a live rear-camera Explore screen backed by one ARKit session. Explore runs on-device Core ML object detection, displays selectable boxes and an accessible object list, and estimates the selected object's distance on supported LiDAR devices. Camera-relative spatial estimates are exposed for future guidance. **Read Label** guides the user to turn a held item until its label faces the camera, then reads it aloud (see [Label reading](#label-reading-turn-to-read)). Reach guidance and voice commands are not implemented yet.
 
 ## Requirements
 
@@ -36,15 +36,18 @@ Iris/
 │   ├── CameraAR/           AR session, preview, lifecycle, and frame streams
 │   ├── ObjectDetection/    Core ML model, Vision inference, tracking, selection, overlay and list
 │   ├── DepthEstimation/    Depth sampling, calibration, smoothing, spatial estimates and distance UI
+│   ├── LabelReading/       "Turn to Read": label orientation analysis, guidance, text merging, label interpretation
+│   ├── OCR/                Reusable Vision text recognition
 │   ├── HandTracking/       Hand observation boundary
 │   ├── Guidance/           Spoken, visual, and haptic guidance boundary
-│   └── Voice/              Speech input and output boundary
+│   └── Voice/              Speech output service, audio session coordinator, voice boundary
 ├── Models/                 Shared domain and readiness models
 ├── Resources/              Info.plist and asset catalogs
 └── UI/
     ├── Components/         Reusable branded controls
     ├── Exploration/        Accessible live-camera experience
     ├── Home/               Accessible home screen
+    ├── LabelReading/       Read Label sheet: live instruction, readiness meter, result card
     └── Theme/              Color and layout tokens
 ```
 
@@ -145,6 +148,58 @@ This estimates a visible surface within a detection box, **not the object's cent
 
 Probe's `CameraController.swift` and depth helpers in `ObjectDetection.swift` were studied for capability gating, sensor orientation, confidence filtering, median sampling, and intrinsics. Iris uses its own separate service, timestamp matching, bounded history, validity model and box-region sampler. No Probe hand or reach-guidance code was imported.
 
+## Label reading (Turn to Read)
+
+With the camera running, **Read Label** opens a half-height sheet (the camera stays visible above it). Iris reads the selected object's box, or the center 60% of the view when nothing is selected, so cans and boxes outside the detector's classes still work.
+
+### How it decides the label isn't facing the camera
+
+About five times per second, `LabelFrameProcessor` crops the frame (rotating the landscape sensor buffer with `.right`, like every other Vision consumer) and runs `VNRecognizeTextRequest` (`.fast`). `LabelOrientationAnalyzer` then measures, relative to the **object's** bounds rather than the padded crop:
+
+| Signal | Meaning | Decision |
+|---|---|---|
+| No usable text | Label is on the back | `searching`: "Turn it slowly to the left…"; `needsLight` if the crop is dark |
+| Text touching the object's right edge and leaning right | Label wraps around the right side | `turnLeft` |
+| Text touching the left edge and leaning left | Label wraps around the left side | `turnRight` |
+| Confidence-weighted text center beyond ±0.25 | Label is off to one side | Turn toward it |
+| Centered, ≥ 12 characters, mean confidence ≥ 0.5 | Label faces the camera | `ready`: "Stop. Hold still while I read." |
+| Centered but tiny text (or LiDAR distance > 0.7 m) | Too far | `moveCloser` |
+| Centered but weak recognition | Blur or glare | `holdSteady` |
+
+Convention: **"turn left" means the front of the item moves toward the user's left.** The first turn instruction in a session says so out loud.
+
+`LabelGuidanceStabilizer` keeps speech calm. A decision must hold for 3 consecutive frames before it's spoken, the same phrase is never repeated within 2.5 seconds, and standing instructions are re-prompted every 5 seconds. While a turn is requested, it tracks the text's movement: net movement toward center gives "Good, keep going", and sustained movement the other way for more than 1 second gives "Other way". With no text for 8 seconds it suggests turning the other way. After two sweeps, or 25 seconds overall, it stops with a clear message. Between phrases, a haptic tick (`LabelGuidanceCueing`, a placeholder for the team's sound effects) speeds up as more of the label becomes visible.
+
+### Reading
+
+Text is merged across frames as the item turns (`LabelTextAccumulator`: near-duplicate and fragment merging). On `ready` (or **Read Now**), four `.accurate` passes are added. `OfflineLabelInterpreter` extracts fields with rules only: no network and no API key.
+
+- Prescription detection (an `Rx` marker or at least two keywords such as refill/qty/tablet/pharmacy).
+- Drug name: the line carrying a strength (e.g. `METFORMIN HCL 500 MG`). It never picks the largest text on a prescription, because that is often the patient's name. Non-prescription items use the largest line.
+- Strength, directions (joined across two lines), Rx number (must contain a digit), quantity, refills, prescriber, pharmacy, filled and discard/expiration dates (`NSDataDetector`), and warnings.
+
+Speech order: name and strength → directions → discard/expiration date → first warning. Then "Tap More Details for the rest" and, for prescriptions, "If anything sounds wrong, confirm with your pharmacist." Unreadable important fields are named ("I couldn't read the directions…"). A low-confidence name is spoken as "I think this says …, but I'm not sure." Abbreviations are expanded for speech (`MG` → milligrams). Iris never states that anything is safe, never gives dosing advice beyond the printed directions, never identifies loose pills, and doesn't read the patient's name in the summary. Frames, crops and label text are never stored or logged.
+
+The result card offers **Read Aloud, More Details, Read Everything, Repeat, Stop Speaking, Read Again**. VoiceOver Magic Tap (two-finger double-tap) stops speech, or reads now / replays / retries depending on state.
+
+### Speech and audio
+
+`SpeechOutputService` wraps `AVSpeechSynthesizer` with interrupt/enqueue/skip-if-busy priorities and duplicate suppression, and uses the person's VoiceOver voice and rate (`prefersAssistiveTechnologySettings`). `AudioSessionCoordinator` is the single owner of `AVAudioSession` (`.playback`, `.spokenAudio`, ducking others). Sound effects and future voice commands should configure audio through it. Voice commands will need `.playAndRecord` there.
+
+### Integration and shared code
+
+`LabelGuidanceService` subscribes to `camera.makeFrameStream()` only while guiding and releases the stream when it finishes, fails or stops. It reads the detector's selected target and the depth estimate through read-only closures. A selected target lost for under 3 seconds (often hidden by the turning hand) keeps its last box. `ExploreView` changes are limited to the Read Label button, the sheet, and stopping the service when the camera stops or Explore exits. No camera, detection, depth or hand-tracking code was modified. Hand-occlusion hints ("your fingers may be covering the label") are not implemented because hand tracking isn't wired into Explore yet.
+
+### Physical iPhone checklist (not yet performed)
+
+1. Print a mock prescription label (fictional patient and drug) and tape it on an empty pill bottle. Start Camera, select the bottle, tap **Read Label**, with the label facing away.
+2. Turn slowly in the instructed direction. Expect "Turn it left. That means the front…", "Good, keep going", then "Stop. Hold still while I read." Turn the wrong way on purpose and expect "Other way."
+3. Confirm drug name and strength are read first, then directions and discard date. **More Details** reads Rx number, quantity, refills, prescriber and pharmacy.
+4. Repeat with a soup can (no selection, center of view), a cleaning product, and in Airplane Mode (everything works offline).
+5. Dim the lights (too dark), hold the item far away (move closer), and cover the label. Each gives its own instruction or a clear failure within 25 seconds.
+6. Enable VoiceOver. Speech uses the VoiceOver voice; Magic Tap stops and replays; every result button is reachable. Pause the camera or exit Explore mid-guidance: speech stops and no guidance continues.
+7. Profile while guiding: OCR stays off the main thread, and detection/depth remain responsive.
+
 ## Validation
 
 Regenerate after adding source/resources, then build without signing:
@@ -168,7 +223,11 @@ Tests cover identity association, target selection/loss/recovery/expiry, stale r
 
 Depth tests use synthetic float-depth and byte-confidence buffers with padded rows. They cover orientation/region mapping, calibrated bearings and radial distance, invalid intrinsics, outliers, mixed surfaces, sparse/invalid samples, exact timestamp pairing, bounded history, lost/expired targets, tracking interruptions, missing depth, unsupported devices, smoothing resets and service lifecycle fallbacks. LiDAR hardware is not simulated.
 
-Validated November 14, 2026 with Xcode 26.2: clean unsigned iOS device build passed; all 32 tests (18 depth and 14 detection tests) passed on the iPhone 17 Pro simulator (iOS 26.2). The build emitted only the App Intents metadata notice because this app does not use App Intents. Physical-device checks below remain outstanding.
+Label-reading tests cover orientation decisions (edge cutoff, centering, padding vs. object edges, darkness, distance), crop planning, speech stabilization (3-frame stability, repeats, encouragement vs. jitter, wrong-way detection, sweeps), phrase building, cross-frame text merging, prescription/grocery interpretation and summaries, crop orientation against `DetectionGeometry.sensorRect` with a synthetic sensor buffer, real Vision OCR on rendered text, and service lifecycle (camera stream ended, timeout, stop, frame-stream release).
+
+Validated November 14, 2026 with Xcode 27.2 (label reading): clean unsigned iOS device build passed; all 91 tests passed on the iPhone 18 Pro simulator.
+
+Earlier: validated November 14, 2026 with Xcode 26.2: clean unsigned iOS device build passed; all 32 tests (18 depth and 14 detection tests) passed on the iPhone 17 Pro simulator (iOS 26.2). The build emitted only the App Intents metadata notice because this app does not use App Intents. Physical-device checks below remain outstanding.
 
 ### Physical iPhone checklist (not yet performed)
 

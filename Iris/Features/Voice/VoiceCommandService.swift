@@ -104,7 +104,7 @@ final class VoiceCommandService: ObservableObject {
     // MARK: - Recognition
 
     private func startRecognition(with recognizer: SFSpeechRecognizer) throws {
-        try AudioSessionCoordinator.activate()
+        AudioSessionCoordinator.shared.activateForListening()
         latestTranscript = ""
 
         let request = SFSpeechAudioBufferRecognitionRequest()

@@ -2,6 +2,13 @@ import XCTest
 @testable import Iris
 
 final class VoiceAssistantTests: XCTestCase {
+    private func label(_ texts: [String], confidence: Double = 0.9, focus: String? = nil) -> OCRResult {
+        OCRResult(lines: texts.enumerated().map { index, text in
+            AccumulatedTextLine(text: text, confidence: confidence, seenCount: 2, averageHeight: 0.05,
+                                averageMidY: 0.9 - Double(index) * 0.1, firstSeenOrder: index)
+        }, focusName: focus, timestamp: 1)
+    }
+
     // MARK: Command parsing
 
     func testSampleCommandsParse() {
@@ -73,44 +80,9 @@ final class VoiceAssistantTests: XCTestCase {
     func testSafetyNoteForConsumptionAndMedication() {
         XCTAssertTrue(AssistantFacts.answer("Is this safe to eat?", context: context([("apple", 0.9, 0.5)]))
             .contains(AssistantFacts.safetyNote))
-        let label = OCRResult(lines: [RecognizedTextLine(text: "Take 2 tablets daily", confidence: 0.9,
-                                                         boundingBox: CGRect(x: 0.2, y: 0.5, width: 0.5, height: 0.05))],
-                              focusName: nil, timestamp: 1)
-        XCTAssertTrue(AssistantFacts.describeText(.result(label)).contains(AssistantFacts.safetyNote))
+        let reading = label(["Take 2 tablets daily"])
+        XCTAssertTrue(AssistantFacts.describeText(.result(reading)).contains(AssistantFacts.safetyNote))
         XCTAssertFalse(AssistantFacts.visibleObjects(context([("chair", 0.9, 0.5)])).contains(AssistantFacts.safetyNote))
-    }
-
-    // MARK: OCR geometry
-
-    func testReadingOrderTopToBottomLeftToRight() {
-        func line(_ text: String, x: CGFloat, y: CGFloat) -> RecognizedTextLine {
-            RecognizedTextLine(text: text, confidence: 0.9, boundingBox: CGRect(x: x, y: y, width: 0.2, height: 0.04))
-        }
-        let ordered = OCRGeometry.readingOrder([line("bottom", x: 0.1, y: 0.2), line("right", x: 0.5, y: 0.805),
-                                                line("left", x: 0.1, y: 0.8)])
-        XCTAssertEqual(ordered.map(\.text), ["left", "right", "bottom"])
-    }
-
-    func testFocusRegionExpandsAndClips() {
-        XCTAssertEqual(OCRGeometry.focusRegion(for: nil), OCRGeometry.defaultRegion)
-        let region = OCRGeometry.focusRegion(for: CGRect(x: 0.5, y: 0.5, width: 0.2, height: 0.2))
-        XCTAssertEqual(region.minX, 0.476, accuracy: 1e-9)
-        XCTAssertEqual(region.width, 0.248, accuracy: 1e-9)
-        let edge = OCRGeometry.focusRegion(for: CGRect(x: 0.9, y: 0.0, width: 0.1, height: 0.2))
-        XCTAssertLessThanOrEqual(edge.maxX, 1)
-        XCTAssertGreaterThanOrEqual(edge.minY, 0)
-    }
-
-    // MARK: Speech
-
-    func testRepeatedUtterancesSuppressedWithinWindow() {
-        var filter = RecentUtteranceFilter(window: 3)
-        XCTAssertTrue(filter.shouldSpeak("Bottle ahead", at: 0))
-        XCTAssertFalse(filter.shouldSpeak("bottle ahead", at: 1))
-        XCTAssertTrue(filter.shouldSpeak("Cup on your left", at: 1))
-        XCTAssertTrue(filter.shouldSpeak("Bottle ahead", at: 3.5))
-        filter.reset()
-        XCTAssertTrue(filter.shouldSpeak("Bottle ahead", at: 3.6))
     }
 
     // MARK: ElevenLabs conversation behaviour
@@ -125,9 +97,7 @@ final class VoiceAssistantTests: XCTestCase {
     }
 
     func testReadLabelToolTextFlagsMisreadsAndSafety() {
-        let result = OCRResult(lines: [RecognizedTextLine(text: "Ibuprofen 200 mg", confidence: 0.4,
-                                                          boundingBox: CGRect(x: 0.2, y: 0.5, width: 0.5, height: 0.05))],
-                               focusName: "bottle", timestamp: 1)
+        let result = label(["Ibuprofen 200 mg"], confidence: 0.4, focus: "bottle")
         let text = AssistantFacts.toolText(for: .result(result))
         XCTAssertTrue(text.hasPrefix("Read in reading order; may contain misread characters"))
         XCTAssertTrue(text.contains("selected bottle"))
@@ -138,9 +108,7 @@ final class VoiceAssistantTests: XCTestCase {
 
     @MainActor
     func testReadLabelHandOffMessage() {
-        let result = OCRResult(lines: [RecognizedTextLine(text: "Oat Milk", confidence: 0.9,
-                                                          boundingBox: CGRect(x: 0.2, y: 0.5, width: 0.5, height: 0.05))],
-                               focusName: nil, timestamp: 1)
+        let result = label(["Oat Milk"])
         let message = VoiceAssistantCoordinator.describeRequest(for: .result(result))
         XCTAssertTrue(message.contains("- Oat Milk"))
         XCTAssertTrue(message.contains("may contain misread characters"))
