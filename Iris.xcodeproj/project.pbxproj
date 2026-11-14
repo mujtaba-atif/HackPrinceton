@@ -76,8 +76,6 @@
 		FC44698F6CF29488D1214D8D /* ObjectConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D7333E76966306E23E8E88 /* ObjectConversation.swift */; };
 		F4CE618DD3FE40DAE294F4F5 /* LabelTextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */; };
 		B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */; };
-		42EE4EC83F869813A3FE766D /* LocateMeasurements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054A786B864DF3687842F878 /* LocateMeasurements.swift */; };
-		852924408A48D470A6EEA869 /* LocateTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */; };
 		7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755033595C1F3BB46DC83F00 /* Speaker.swift */; };
 		1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */; };
 		20EEF65CB78975CEF6B1E969 /* VoiceListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9F75CE03C12CC79C15115C /* VoiceListener.swift */; };
@@ -105,6 +103,12 @@
 		1731BDB8F9C940A24001D44B /* GuidanceRipple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5541AEC519176B9639B2032D /* GuidanceRipple.swift */; };
 		818A36B82427DC9FA8656147 /* WaterVisualizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FB3E1F770B91D5FCF0E8AC /* WaterVisualizer.swift */; };
 		B7949439CC8121C58B40B4CE /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7596E344345AB05C574D20FB /* LiveKit */; };
+		71852BAF5E3F62958B4F5AB3 /* yolo26n-seg.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */; };
+		327F814E23A0F1CECDC30C7B /* BoundingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4B9D8D705E569613508285 /* BoundingBox.swift */; };
+		495DC139EB93A665D6CAA1F7 /* ModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302E52BFED13DC936B0FFE1A /* ModelStore.swift */; };
+		0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73195524758434685EDE70A4 /* ObjectDetection.swift */; };
+		F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */; };
+		B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -189,8 +193,6 @@
 		C7D7333E76966306E23E8E88 /* ObjectConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectConversation.swift; sourceTree = "<group>"; };
 		B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelTextReader.swift; sourceTree = "<group>"; };
 		4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceBeepController.swift; sourceTree = "<group>"; };
-		054A786B864DF3687842F878 /* LocateMeasurements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateMeasurements.swift; sourceTree = "<group>"; };
-		AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateTracker.swift; sourceTree = "<group>"; };
 		755033595C1F3BB46DC83F00 /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetParser.swift; sourceTree = "<group>"; };
 		CB9F75CE03C12CC79C15115C /* VoiceListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceListener.swift; sourceTree = "<group>"; };
@@ -217,6 +219,12 @@
 		9E44C4C4C8BE620696581CAF /* ConversationWater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationWater.swift; sourceTree = "<group>"; };
 		5541AEC519176B9639B2032D /* GuidanceRipple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceRipple.swift; sourceTree = "<group>"; };
 		C5FB3E1F770B91D5FCF0E8AC /* WaterVisualizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterVisualizer.swift; sourceTree = "<group>"; };
+		DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "yolo26n-seg.mlpackage"; sourceTree = "<group>"; };
+		CA4B9D8D705E569613508285 /* BoundingBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBox.swift; sourceTree = "<group>"; };
+		302E52BFED13DC936B0FFE1A /* ModelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelStore.swift; sourceTree = "<group>"; };
+		73195524758434685EDE70A4 /* ObjectDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
+		4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmentation.swift; sourceTree = "<group>"; };
+		D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentationOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -504,8 +512,12 @@
 		C6436FC52638AF1D781B0C81 /* Locate */ = {
 			isa = PBXGroup;
 			children = (
-				AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */,
-				054A786B864DF3687842F878 /* LocateMeasurements.swift */,
+				D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */,
+				4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */,
+				73195524758434685EDE70A4 /* ObjectDetection.swift */,
+				302E52BFED13DC936B0FFE1A /* ModelStore.swift */,
+				CA4B9D8D705E569613508285 /* BoundingBox.swift */,
+				B7F0AF49E565610C38E25EFA /* Resources */,
 				4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */,
 			);
 			path = Locate;
@@ -567,6 +579,14 @@
 				2390BD742EF871F1300FF6F6 /* AudioLevels.swift */,
 			);
 			path = Water;
+			sourceTree = "<group>";
+		};
+		B7F0AF49E565610C38E25EFA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -670,6 +690,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */,
+				F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */,
+				0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */,
+				495DC139EB93A665D6CAA1F7 /* ModelStore.swift in Sources */,
+				327F814E23A0F1CECDC30C7B /* BoundingBox.swift in Sources */,
 				818A36B82427DC9FA8656147 /* WaterVisualizer.swift in Sources */,
 				1731BDB8F9C940A24001D44B /* GuidanceRipple.swift in Sources */,
 				8DD30BEF7D27EEE14413F291 /* ConversationWater.swift in Sources */,
@@ -696,8 +721,6 @@
 				20EEF65CB78975CEF6B1E969 /* VoiceListener.swift in Sources */,
 				1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */,
 				7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */,
-				852924408A48D470A6EEA869 /* LocateTracker.swift in Sources */,
-				42EE4EC83F869813A3FE766D /* LocateMeasurements.swift in Sources */,
 				B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */,
 				F4CE618DD3FE40DAE294F4F5 /* LabelTextReader.swift in Sources */,
 				FC44698F6CF29488D1214D8D /* ObjectConversation.swift in Sources */,
@@ -758,6 +781,7 @@
 				CE3B0C2210C6EF486652F3F2 /* VoiceFirstBadge.swift in Sources */,
 				E48F23BA27D3DC4CFFC47097 /* VoiceGuidanceProviding.swift in Sources */,
 				62534DA60438D3BDFD6917B5 /* YOLOv3TinyFP16.mlmodel in Sources */,
+				71852BAF5E3F62958B4F5AB3 /* yolo26n-seg.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

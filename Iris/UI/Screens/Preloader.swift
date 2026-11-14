@@ -1,4 +1,3 @@
-import CoreML
 import SwiftUI
 import UIKit
 
@@ -89,10 +88,16 @@ final class Preloader: ObservableObject {
         warm([MainArt.analyzeCard, MainArt.analyzeLabel], fill(MainArt.artboard), oversample: MainScreen.lensZoom)
     }
 
-    /// Compiles the bundled object detector once, so tapping Locate doesn't stall on it. Iris's
-    /// detector loads the same compiled model again when the screen starts, from the warmed cache.
     private nonisolated static func loadModels() {
-        guard let url = Bundle.main.url(forResource: "YOLOv3TinyFP16", withExtension: "mlmodelc") else { return }
-        _ = try? MLModel(contentsOf: url, configuration: MLModelConfiguration())
+        do {
+            if let segmentation = try ModelStore.model(names: [SegmentationDetector.defaultModelName]) {
+                ModelStore.prime(segmentation)
+            }
+            // Bundled but disabled (`ObjectDetector.yoloEnabled`), so it isn't primed — just loaded,
+            // so flipping it back on doesn't put the load back in the way of the navigation.
+            _ = try ModelStore.model(names: ObjectDetector.objectModelNames)
+        } catch {
+            print("Preloader: model warmup failed: \(error)")
+        }
     }
 }
