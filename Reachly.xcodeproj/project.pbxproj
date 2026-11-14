@@ -37,6 +37,15 @@
 		DCEE8C9A66DCFC07A2913A6C /* ReachlyCameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7B0D15557AEC96A835B222 /* ReachlyCameraController.swift */; };
 		E48F23BA27D3DC4CFFC47097 /* VoiceGuidanceProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = F964D09B0D26D1CCFC354060 /* VoiceGuidanceProviding.swift */; };
 		E5A603390AA3F88DC8204A87 /* ObjectDetectionProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCF742E6E90CCEBCEFD0085 /* ObjectDetectionProviding.swift */; };
+		BAA34983BD996CC48B948420 /* HandObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21106D6B9FDBC30CB6CC71C9 /* HandObservation.swift */; };
+		9847383E6CBFA8CC6C048CFF /* HandGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD736329857AE0415DB370CC /* HandGeometry.swift */; };
+		B48B239F1FC429499E39CDD0 /* OneEuroFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F0E94F8011F735F3368835 /* OneEuroFilter.swift */; };
+		3AFA4E6269F1C46975919276 /* VisionHandPoseDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048130DAF2E14D0125076F40 /* VisionHandPoseDetector.swift */; };
+		D3D710C3DB8E3F19D6E0F7E2 /* HandTrackingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4E72844CABC7B1EFBAA761 /* HandTrackingState.swift */; };
+		683A769F04EBF7E2C2624578 /* HandTrackingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F241B0D50245FC53D77CE5 /* HandTrackingService.swift */; };
+		23A820A3FCE15CD27C4B9E1A /* HandTrackingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF43714751618F7F815AC414 /* HandTrackingOverlay.swift */; };
+		DF4F5C446A61EAF019010915 /* HandTrackingDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44CADFB9C2EA73C5781169CB /* HandTrackingDebugView.swift */; };
+		F90CD10F51305DDF37C555AB /* HandTrackingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FD5B31D9CA32F33A4B33698 /* HandTrackingTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +91,15 @@
 		F48C72ED22D64530607CF140 /* ReachlyTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachlyTheme.swift; sourceTree = "<group>"; };
 		F964D09B0D26D1CCFC354060 /* VoiceGuidanceProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceGuidanceProviding.swift; sourceTree = "<group>"; };
 		FC82A8203AF5E65E11EDBD92 /* ObjectDetectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionState.swift; sourceTree = "<group>"; };
+		21106D6B9FDBC30CB6CC71C9 /* HandObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandObservation.swift; sourceTree = "<group>"; };
+		BD736329857AE0415DB370CC /* HandGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandGeometry.swift; sourceTree = "<group>"; };
+		74F0E94F8011F735F3368835 /* OneEuroFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneEuroFilter.swift; sourceTree = "<group>"; };
+		048130DAF2E14D0125076F40 /* VisionHandPoseDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionHandPoseDetector.swift; sourceTree = "<group>"; };
+		CE4E72844CABC7B1EFBAA761 /* HandTrackingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingState.swift; sourceTree = "<group>"; };
+		89F241B0D50245FC53D77CE5 /* HandTrackingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingService.swift; sourceTree = "<group>"; };
+		AF43714751618F7F815AC414 /* HandTrackingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingOverlay.swift; sourceTree = "<group>"; };
+		44CADFB9C2EA73C5781169CB /* HandTrackingDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingDebugView.swift; sourceTree = "<group>"; };
+		8FD5B31D9CA32F33A4B33698 /* HandTrackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTrackingTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -165,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				9981313BDE0A42F71C952310 /* ObjectDetectionTests.swift */,
+				8FD5B31D9CA32F33A4B33698 /* HandTrackingTests.swift */,
 			);
 			path = ReachlyTests;
 			sourceTree = "<group>";
@@ -227,6 +246,14 @@
 			isa = PBXGroup;
 			children = (
 				5789D27832D67FE34F30B6F4 /* HandTrackingProviding.swift */,
+				44CADFB9C2EA73C5781169CB /* HandTrackingDebugView.swift */,
+				AF43714751618F7F815AC414 /* HandTrackingOverlay.swift */,
+				89F241B0D50245FC53D77CE5 /* HandTrackingService.swift */,
+				CE4E72844CABC7B1EFBAA761 /* HandTrackingState.swift */,
+				048130DAF2E14D0125076F40 /* VisionHandPoseDetector.swift */,
+				74F0E94F8011F735F3368835 /* OneEuroFilter.swift */,
+				BD736329857AE0415DB370CC /* HandGeometry.swift */,
+				21106D6B9FDBC30CB6CC71C9 /* HandObservation.swift */,
 			);
 			path = HandTracking;
 			sourceTree = "<group>";
@@ -373,6 +400,14 @@
 				8FEFDAF88B1393AC0AA03342 /* FeatureReadiness.swift in Sources */,
 				1AFEA6513B36372410F18383 /* GuidanceProviding.swift in Sources */,
 				71E14BCD9C262AB978670EBE /* HandTrackingProviding.swift in Sources */,
+				DF4F5C446A61EAF019010915 /* HandTrackingDebugView.swift in Sources */,
+				23A820A3FCE15CD27C4B9E1A /* HandTrackingOverlay.swift in Sources */,
+				683A769F04EBF7E2C2624578 /* HandTrackingService.swift in Sources */,
+				D3D710C3DB8E3F19D6E0F7E2 /* HandTrackingState.swift in Sources */,
+				3AFA4E6269F1C46975919276 /* VisionHandPoseDetector.swift in Sources */,
+				B48B239F1FC429499E39CDD0 /* OneEuroFilter.swift in Sources */,
+				9847383E6CBFA8CC6C048CFF /* HandGeometry.swift in Sources */,
+				BAA34983BD996CC48B948420 /* HandObservation.swift in Sources */,
 				8863DF67A22CAB0119FC5484 /* HomeView.swift in Sources */,
 				D968201B8A391BEFA38BFA76 /* ObjectDetectionOverlay.swift in Sources */,
 				E5A603390AA3F88DC8204A87 /* ObjectDetectionProviding.swift in Sources */,
@@ -395,6 +430,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				15442A1C76D81A8E1CD1121F /* ObjectDetectionTests.swift in Sources */,
+				F90CD10F51305DDF37C555AB /* HandTrackingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
