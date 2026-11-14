@@ -54,15 +54,6 @@ struct HomeView: View {
                     .padding(.top, 12)
                     .accessibilityHint("Developer screen for testing hand tracking")
 
-                    NavigationLink {
-                        VoiceAssistantDebugView()
-                    } label: {
-                        Label("Voice assistant debug", systemImage: "waveform")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(IrisTheme.secondaryText)
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                    }
-                    .accessibilityHint("Developer screen for testing OCR, speech, and the voice assistant")
                     #endif
 
                     Label(

@@ -10,17 +10,17 @@ enum AssistantConfiguration {
         return id
     }
 
-    /// Sent as an agent prompt override. Also paste it into the agent's dashboard prompt,
-    /// so the rules hold even if the agent rejects overrides (Iris then retries without them).
+    /// The prompt to paste into the ElevenLabs dashboard. Each screen sends its own persona as an
+    /// override (`ObjectConversation.persona`, `ExploreScreen.persona`); this is what the agent falls
+    /// back to when overrides aren't allowed, so it carries the same rules.
     static let agentPrompt = """
     You are Iris, a calm, warm voice guide for someone who is blind or has low vision. They point \
     their phone camera at things around them, and you help them find objects and understand labels.
 
     How you know things:
-    - You cannot see. You only know what your tools return and what the app tells you in messages \
-    and context updates. Call get_visible_objects, find_object, or describe_selected_object before \
-    answering anything about what is in front of them. Call read_label for anything written.
-    - read_label takes a few seconds. Say a brief "One moment" before calling it.
+    - You cannot see. You only know the label text the app sends you and what your rescan tool \
+    returns. If you need to look at the label again, say a brief "One moment" and call rescan; it \
+    takes a few seconds.
     - Label text comes in reading order and may contain misread characters. Fix obvious misreads \
     silently, but if something important is unclear, such as a dose, a date, or an allergen, say \
     that part was hard to read and offer to look again.
@@ -36,7 +36,7 @@ enum AssistantConfiguration {
     when the information says so, and suggest reading the label to confirm.
     - Never invent what an object is, what a label says, quantities, or surroundings. If you got \
     nothing, low confidence, or the camera is off, say so plainly and suggest what to try.
-    - When summarizing instructions, only use text from read_label and say if parts were unclear.
+    - When summarizing instructions, only use the label text you were given and say if parts were unclear.
 
     Safety:
     - Never say an item is safe to eat, drink, take, or use. For food, drinks, medication, dosage, \
@@ -45,26 +45,4 @@ enum AssistantConfiguration {
     """
 
     static let firstMessage = "Hi, I'm Iris. Ask me what's in front of you, or to read a label."
-
-    /// A short utterance matching one of these ends the conversation (checked on the user's transcript).
-    static let endPhrases: [String] = [
-        "goodbye", "bye", "bye bye", "bye iris", "goodbye iris", "end conversation", "end the conversation",
-        "stop conversation", "stop the conversation", "end call", "that's all", "that is all",
-        "i'm done", "i am done", "we're done", "go back", "exit", "quit"
-    ]
-
-    /// Longer sentences are never treated as an end request, so "go back to the bottle" keeps talking.
-    static let maximumEndPhraseWords = 5
-
-    /// True when the user's whole utterance is a request to end the conversation.
-    static func isEndRequest(_ transcript: String) -> Bool {
-        let words = VoiceCommandParser.normalize(transcript)
-            .replacingOccurrences(of: "please", with: "")
-            .replacingOccurrences(of: "okay", with: "")
-            .replacingOccurrences(of: "thanks", with: "")
-            .replacingOccurrences(of: "thank you", with: "")
-            .split(separator: " ")
-        guard !words.isEmpty, words.count <= maximumEndPhraseWords else { return false }
-        return endPhrases.contains(words.joined(separator: " "))
-    }
 }
