@@ -2,7 +2,7 @@
 
 Reachly is a native iOS accessibility app designed to help blind and visually impaired people find nearby objects, move a hand toward them, and understand what they are holding through clear spoken guidance.
 
-This repository contains the iOS 17+ SwiftUI app, an accessible home experience, and a live rear-camera Explore screen backed by one ARKit session. Explore runs on-device Core ML object detection, displays selectable boxes and an accessible object list, and exposes a tracked target for future guidance. Hand tracking, depth estimation, reach guidance, and voice commands are not implemented yet.
+This repository contains the iOS 17+ SwiftUI app, an accessible home experience, and a live rear-camera Explore screen backed by one ARKit session. Explore runs on-device Core ML object detection, displays selectable boxes and an accessible object list, and estimates the selected object's distance on supported LiDAR devices. Camera-relative spatial estimates are exposed for future guidance. Hand tracking, reach guidance, and voice commands are not implemented yet.
 
 ## Requirements
 
@@ -35,6 +35,7 @@ Reachly/
 ├── Features/
 │   ├── CameraAR/           AR session, preview, lifecycle, and frame streams
 │   ├── ObjectDetection/    Core ML model, Vision inference, tracking, selection, overlay and list
+│   ├── DepthEstimation/    Depth sampling, calibration, smoothing, spatial estimates and distance UI
 │   ├── HandTracking/       Hand observation boundary
 │   ├── Guidance/           Spoken, visual, and haptic guidance boundary
 │   └── Voice/              Speech input and output boundary
@@ -93,11 +94,48 @@ The bundled **YOLOv3TinyFP16** is a real 17.7 MB Core ML detector from [Apple's 
 
 `DetectedObject.boundingBox` (also exposed as `region`) is normalized to the **entire upright portrait image**, with **bottom-left origin**, matching Vision. It is not normalized to the visible preview. `DetectionGeometry.viewRect` flips Y, applies centered aspect-fill scaling, and subtracts the cropped margins. The overlay is attached directly to the camera preview before its safe-area extension, so both share the same viewport. Visible boxes are clipped to that viewport.
 
-`ObjectDetectionProviding.selectedTarget` exposes the tracked object, `.tracking`/`.lost`, `lastSeenTimestamp` (the originating `CameraFrame.timestamp`), upright image dimensions, and an optional `currentBoundingBox`. `sensorBoundingBox` converts a current box to normalized native landscape sensor/depth coordinates with top-left origin. Future depth work must use a timestamp-matched frame, validate freshness and depth, and ignore lost targets. Detection retains no depth buffers or AR frames. The boxes lag the live feed by inference latency; they are not motion-compensated.
+`ObjectDetectionProviding.selectedTarget` exposes the tracked object, `.tracking`/`.lost`, `lastSeenTimestamp` (the originating `CameraFrame.timestamp`), upright image dimensions, and an optional `currentBoundingBox`. `sensorBoundingBox` converts a current box to normalized native landscape sensor/depth coordinates with top-left origin. Depth estimation uses that coordinate contract and a timestamp-matched frame. Detection itself retains no depth buffers or AR frames. The boxes lag the live feed by inference latency; they are not motion-compensated.
 
 ### Limitations
 
-Only the fixed 80 model classes are supported; this is not arbitrary object recognition, OCR, segmentation, or a hand detector. IDs are approximate spatial associations, not persistent physical identities. Two similar objects crossing, fast motion, prolonged occlusion, or camera movement can swap or lose IDs. Small, transparent, poorly lit, or partly hidden objects are difficult for this compact model. Confidence is a model score, not a calibrated probability of correctness. All full-image detections are listed, including objects in preview-cropped margins. Portrait rear-camera use is supported; adding landscape/front-camera support requires updating orientation and geometry together. Recognition and real-time speed still need physical-device validation. No reach/distance advice is emitted.
+Only the fixed 80 model classes are supported; this is not arbitrary object recognition, OCR, segmentation, or a hand detector. IDs are approximate spatial associations, not persistent physical identities. Two similar objects crossing, fast motion, prolonged occlusion, or camera movement can swap or lose IDs. Small, transparent, poorly lit, or partly hidden objects are difficult for this compact model. Confidence is a model score, not a calibrated probability of correctness. All full-image detections are listed, including objects in preview-cropped margins. Portrait rear-camera use is supported; adding landscape/front-camera support requires updating orientation and geometry together. Recognition and real-time speed still need physical-device validation. No reaching instructions are emitted.
+
+## Depth and spatial positioning
+
+Select an object to see **“Bottle — approximately 0.7 meters away”**, with its horizontal/vertical direction relative to the portrait camera. The exact class name comes from detection. Unsupported devices, unreliable readings, missing frames, lost targets, and limited tracking show **“Distance unavailable”**. No metric distance is inferred from the RGB image. The readout is inside the existing scrollable object list, supports Dynamic Type and VoiceOver, and does not interrupt speech on every update.
+
+### Data flow and shared camera changes
+
+`DepthEstimationService` subscribes independently to the existing `CameraFrameBroker` and receives selected-target updates through `DepthEstimationProviding.setTarget`. A serial worker actor handles depth history, pixel-buffer reads, robust statistics, calibration and smoothing. The newest-frame stream and sequential consumption avoid a work queue. Sampling runs once per new detection, normally up to eight times per second; incoming frames only update the bounded history between detections.
+
+The existing ARKit configuration already gated `.sceneDepth` behind `supportsFrameSemantics`. That behavior is preserved; the controller now exposes `supportsSceneDepth` for the service/UI. `CameraFrame` adds only `sceneDepthConfidenceMap` and `isCameraTrackingNormal`. No new sessions, capture configuration modes, or broker changes were introduced. Raw `sceneDepth` keeps the depth paired with the RGB frame; Reachly smooths the resulting measurement itself rather than combining temporal depth smoothing with moving boxes. [Apple's ARDepthData documentation](https://developer.apple.com/documentation/arkit/ardepthdata) describes the depth/confidence maps and their relationship to the camera image.
+
+Vision inference finishes after its frame was captured. The depth worker keeps at most 60 depth-only snapshots, expiring after 800 ms, and requires the detection timestamp to match a cached frame within 1 ms. It never uses an unrelated newer map. If a subscriber drops the matching frame, or an observation is older than 500 ms, distance is unavailable. No RGB images or whole ARFrames are retained in this history. A watchdog expires measurements if frames stop arriving. Target loss, selection changes, limited tracking and camera stop/restart invalidate results; each camera run gets a fresh processor/history.
+
+### Coordinates and measurement
+
+The portrait Vision box is mapped to native landscape sensor space by `(x, y, width, height) = (1 − box.maxY, 1 − box.maxX, box.height, box.width)`. Native depth and RGB images cover the same field of view at different resolutions. Normalized sensor coordinates therefore select depth pixels directly, while the RGB resolution and camera intrinsics unproject the box center. Preview aspect-fill cropping is only a display transform and must not be applied to depth sampling. `DepthGeometry` reuses the existing `DetectionGeometry` contract; rotated image dimensions are checked before sampling.
+
+The sampler uses the central 60% of each box dimension and reads at most 400 pixel centers, respecting each buffer's row stride. It accepts finite depth from 0.15–5 meters with ARKit medium/high confidence. It requires at least nine valid samples and 50% validity among sampled pixels. The median is rejected if median absolute deviation exceeds `max(0.04 m, 8%)` or fewer than 70% of valid samples agree within `max(0.08 m, 15%)`. Missing confidence maps are unavailable. These are conservative application thresholds, not claims of sensor accuracy.
+
+Depth values are axial distance from the camera plane, so the service unprojects them using camera intrinsics and reports the **Euclidean camera-to-surface distance**, rather than calling the raw axial value the distance. Horizontal/vertical bearing comes from that ray; ±7 degrees counts as centered. This follows Apple's [scene-depth unprojection approach](https://developer.apple.com/documentation/arkit/displaying-a-point-cloud-using-scene-depth).
+
+Valid axial measurements use a time-based exponential smoother with a 250 ms time constant. It resets on invalid data, target changes, gaps over 500 ms, time reversal, or jumps exceeding `max(0.2 m, 25%)`, so it does not blend unrelated surfaces. It adds some lag, and a large valid change is shown immediately rather than averaged with the previous surface.
+
+### Interface for future hand tracking / guidance
+
+`DepthEstimationProviding.estimate` is an optional `SpatialTargetEstimate`, containing:
+
+- `objectID`: the selected detector track identifier.
+- `distanceMeters`: optional radial distance to the box's approximate central surface.
+- Horizontal/vertical position and optional bearing angles in radians (right/up positive).
+- `positionInPortraitCameraMeters`: optional `(right, up, forward)` coordinates. **These are not ARKit world axes or an anchor.**
+- `validity`: `.measured` or `.unavailable(reason)`, with explicit failure causes.
+- `timestamp`: the original AR frame time for a measurement; invalid results carry the associated observation time.
+
+Future guidance must check identity, `.measured`, freshness and coordinate conventions, and align its hand measurement to the same time. A 2D bearing can remain available without depth; it never implies a 3D point. `DepthEstimationService` does not consume hand observations, issue reach instructions, or modify hand-tracking protocols. A later branch can consume this interface without replacing the camera or detector.
+
+This estimates a visible surface within a detection box, **not the object's center of mass, nearest edge, grasp point, or a persistent world pose**. Backgrounds and occluding objects can still dominate a box even when sample statistics pass. Transparent/reflective objects, thin objects and motion are difficult. `.measured` means the configured checks passed, not that the reading is ground truth. Physical-device accuracy, latency and sustained performance remain to be measured.
 
 ## Validation
 
@@ -120,7 +158,9 @@ xcodebuild -project Reachly.xcodeproj -scheme Reachly \
 
 Tests cover identity association, target selection/loss/recovery/expiry, stale results, invalid detections, portrait rotation, coordinate clipping, both aspect-fill crop directions, missing-model errors, cancellation during loading, model classes, and real Vision inference using a synthetic pixel buffer. Simulator tests do not validate AR capture or recognition of physical objects.
 
-Validated November 14, 2026 with Xcode 26.2: clean unsigned iOS device build passed; all 14 tests passed on the iPhone 17 Pro simulator (iOS 26.2). The build emitted only the App Intents metadata notice because this app does not use App Intents. Physical-device checks below remain outstanding.
+Depth tests use synthetic float-depth and byte-confidence buffers with padded rows. They cover orientation/region mapping, calibrated bearings and radial distance, invalid intrinsics, outliers, mixed surfaces, sparse/invalid samples, exact timestamp pairing, bounded history, lost/expired targets, tracking interruptions, missing depth, unsupported devices, smoothing resets and service lifecycle fallbacks. LiDAR hardware is not simulated.
+
+Validated November 14, 2026 with Xcode 26.2: clean unsigned iOS device build passed; all 32 tests (18 depth and 14 detection tests) passed on the iPhone 17 Pro simulator (iOS 26.2). The build emitted only the App Intents metadata notice because this app does not use App Intents. Physical-device checks below remain outstanding.
 
 ### Physical iPhone checklist (not yet performed)
 
@@ -132,4 +172,13 @@ Validated November 14, 2026 with Xcode 26.2: clean unsigned iOS device build pas
 6. Pause/resume, lock/unlock, background/foreground, interrupt the camera, and exit/re-enter Explore. Boxes must clear on pause and never reappear from a cancelled inference. Deny camera permission, enable it in Settings, and later revoke it; detection must follow the camera's availability without starting its own session.
 7. Temporarily remove the model from target membership in a local debug build, regenerate/build, and confirm an accessible model error while the camera remains usable. Restore it before continuing. Retry must not crash or create another session.
 8. Profile for at least two minutes with Instruments (Time Profiler/Allocations) on the intended demo phone. Check responsive controls, no main-thread inference, bounded memory, no accumulating frame queue, inference latency, heat and battery use. Hardware speed and thermal performance are not established by the simulator build.
+
+### Additional depth checks on physical iPhones (not yet performed)
+
+1. On a LiDAR-equipped iPhone, select a large opaque bottle or book against a distant background. Compare readings at approximately 0.4, 0.7, 1.0 and 2.0 meters using a tape measure from the rear camera to the visible surface. Record error and variability; no measured accuracy claim is made yet.
+2. Move it to each side and above/below camera center. Check direction signs and edge alignment. At the same forward depth, an off-axis object's radial distance should increase. Repeat with another screen aspect ratio; display cropping must not change the sampled region.
+3. Hold still and watch jitter, then move toward/away from the object. Verify smoothing settles promptly. Switch between a near cup and far bottle: no distance should carry across target IDs. Occlude or lose the target and confirm the number disappears.
+4. Try a transparent glass, reflective bottle, tiny/distant object, and a box spanning foreground/background. Confirm unreliable cases can show **Distance unavailable** and note false stable readings (box statistics cannot guarantee object membership).
+5. Pause/resume, background/foreground, interrupt tracking, and exit/re-enter Explore. No previous distance may reappear from an earlier session. Shake/cover the camera enough to limit AR tracking and verify invalidation and recovery.
+6. On a non-LiDAR iPhone, verify object detection still works and the selected target shows **Distance unavailable**, with no meters fabricated. On both devices, test the readout with VoiceOver and the largest Dynamic Type setting; every row/control should remain reachable by scrolling.
 
