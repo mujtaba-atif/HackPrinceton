@@ -164,7 +164,7 @@ struct HomeScreen: View {
                     try? await Task.sleep(for: .seconds(0.25))
                     guard !Task.isCancelled else { return }
                     hasIntroduced = true
-                    Speaker.shared.speak("Hello, this is Iris. I can help you locate things around you, or help you explore an item you're holding!")
+                    Speaker.shared.speak("Hello, this is Iris. I can help you find things around you, or help you understand an item you're holding!")
                 }
                 await Speaker.shared.waitUntilIdle()
                 guard !Task.isCancelled else { return }

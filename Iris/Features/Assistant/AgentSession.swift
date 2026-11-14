@@ -31,12 +31,12 @@ final class AgentSession: ObservableObject {
     var onEnded: (() -> Void)?
 
     /// Every phrase the user says, once it has been checked against the keywords above. This is the
-    /// agent's transcription standing in for the one `VoiceListener` used to produce — `ContentView`
+    /// agent's transcription standing in for the one `VoiceListener` used to produce — `LocateScreen`
     /// reads the object to find out of it.
     var onTranscript: ((String) -> Void)?
 
     /// Saying one of these ends the screen. Overridable: while the user is naming an object, a bare
-    /// "back" or "bye" is as likely to be part of the name as a command, so `ContentView` narrows it.
+    /// "back" or "bye" is as likely to be part of the name as a command, so `LocateScreen` narrows it.
     var endKeywords = [
         "go back", "end conversation", "end the conversation", "end call", "end the call",
         "take me back", "goodbye", "bye", "exit", "quit", "i'm done", "i am done", "we're done",

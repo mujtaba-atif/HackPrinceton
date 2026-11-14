@@ -119,7 +119,7 @@ final class ObjectConversation: ObservableObject {
         // are the three seconds it takes to say, and the label is in hand by the time it ends. Nothing
         // is said here at all any more — a second "hold it there while I read it" was another two
         // seconds of speech saying what had just been said, on the near side of the handoff where
-        // every word still has to be checked against `ContentView.backKeywords`.
+        // every word still has to be checked against `LocateScreen.backKeywords`.
         lines = await scan(
             from: readableAt,
             after: readAfter,

@@ -245,7 +245,7 @@ struct ExploreScreen: View {
 
 /// Outlines the part of the picture that is being read, and fills in green during the countdown. The camera image
 /// fills the screen and is cropped to fit, so the outline is computed the same way (see SegmentationOverlay in
-/// ContentView).
+/// LocateScreen).
 private struct ScanAreaOutline: View {
     let imageSize: CGSize
     let viewSize: CGSize

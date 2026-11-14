@@ -6,7 +6,7 @@ import CoreGraphics
 /// Loads the bundle's CoreML models once and keeps them.
 ///
 /// Loading a compiled model reads its weights off disk, which was slow enough to stall the
-/// navigation into `ContentView`: `ObjectDetector` and `SegmentationDetector` are `@StateObject`s
+/// navigation into `LocateScreen`: `ObjectDetector` and `SegmentationDetector` are `@StateObject`s
 /// there, so their `init` ran on the main thread the moment the screen was pushed. `Preloader`
 /// warms them at launch behind `LoadingScreen` instead, and the detectors take them from here.
 enum ModelStore {

@@ -170,7 +170,7 @@ class ObjectDetector: ObservableObject {
     // All confidently-detected fingertips per hand; LiDAR can drop out on any single one.
     private var leftFingers: [Finger] = []
     private var rightFingers: [Finger] = []
-    // Latest mask from SegmentationDetector (set by ContentView).
+    // Latest mask from SegmentationDetector (set by LocateScreen).
     var objectMask: ObjectMask? = nil {
         didSet { tryComputeDistance() }
     }

@@ -27,7 +27,7 @@ struct LocateScreen: View {
     /// model doesn't know falls back to bottles.
     private static let defaultTarget = "bottle"
     @State private var target = LocateScreen.defaultTarget
-    private let question = "What would you like me to locate?"
+    private let question = "What do you want to find?"
     /// Guidance must not depend on someone having spoken: after this long with no answer, it starts
     /// with the default target.
     private let namingGrace: TimeInterval = 12
