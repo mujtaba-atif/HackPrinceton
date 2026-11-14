@@ -7,6 +7,7 @@ struct ExploreView: View {
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var camera = ReachlyCameraController()
     @StateObject private var detection = ObjectDetectionService()
+    @StateObject private var depth = DepthEstimationService()
 
     var body: some View {
         ZStack {
@@ -35,7 +36,7 @@ struct ExploreView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             VStack(spacing: 0) {
                 if camera.state == .running {
-                    DetectedObjectsList(detection: detection) {
+                    DetectedObjectsList(detection: detection, spatialEstimate: depth.estimate) {
                         detection.start(frames: camera.makeFrameStream())
                     }
                 }
@@ -56,14 +57,21 @@ struct ExploreView: View {
         }
         .onChange(of: camera.state) { _, state in
             if state == .running {
+                depth.start(frames: camera.makeFrameStream(), supportsSceneDepth: camera.supportsSceneDepth)
                 detection.start(frames: camera.makeFrameStream())
             } else {
+                depth.stop()
                 detection.stop()
             }
             guard let announcement = state.accessibilityAnnouncement else { return }
             UIAccessibility.post(notification: .announcement, argument: announcement)
         }
+        .onChange(of: detection.selectedTarget) { _, target in
+            depth.setTarget(target)
+        }
         .onDisappear {
+            depth.stop()
+            depth.setTarget(nil)
             detection.reset()
             camera.stop()
         }
@@ -239,6 +247,8 @@ struct ExploreView: View {
     }
 
     private func exitExplore() {
+        depth.stop()
+        depth.setTarget(nil)
         detection.reset()
         camera.stop()
         dismiss()

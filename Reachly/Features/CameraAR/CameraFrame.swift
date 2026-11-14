@@ -9,6 +9,8 @@ import simd
 struct CameraFrame: @unchecked Sendable {
     let capturedImage: CVPixelBuffer
     let sceneDepthMap: CVPixelBuffer?
+    let sceneDepthConfidenceMap: CVPixelBuffer?
+    let isCameraTrackingNormal: Bool
     let timestamp: TimeInterval
     let cameraTransform: simd_float4x4
     let cameraIntrinsics: simd_float3x3
@@ -17,6 +19,12 @@ struct CameraFrame: @unchecked Sendable {
     init(arFrame: ARFrame) {
         capturedImage = arFrame.capturedImage
         sceneDepthMap = arFrame.sceneDepth?.depthMap
+        sceneDepthConfidenceMap = arFrame.sceneDepth?.confidenceMap
+        if case .normal = arFrame.camera.trackingState {
+            isCameraTrackingNormal = true
+        } else {
+            isCameraTrackingNormal = false
+        }
         timestamp = arFrame.timestamp
         cameraTransform = arFrame.camera.transform
         cameraIntrinsics = arFrame.camera.intrinsics
