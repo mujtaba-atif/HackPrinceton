@@ -2,7 +2,13 @@
 
 Iris is a native iOS accessibility app designed to help blind and visually impaired people find nearby objects, move a hand toward them, and understand what they are holding through clear spoken guidance.
 
-This repository contains the iOS 17+ SwiftUI app, an accessible home experience, and a live rear-camera Explore screen backed by one ARKit session. Explore runs on-device Core ML object detection, displays selectable boxes and an accessible object list, and estimates the selected object's distance on supported LiDAR devices. Camera-relative spatial estimates are exposed for future guidance. **Read Label** guides the user to turn a held item until its label faces the camera, then reads it aloud (see [Label reading](#label-reading-turn-to-read)). Reach guidance and voice commands are not implemented yet.
+The app follows [Probe](https://github.com/amiezeng/Probe)'s design and flows (used with its authors' permission), on Iris's own camera, detection, hand-tracking, depth and label-reading features. It is voice-first:
+
+- **Home → Main.** Iris introduces itself and listens ("continue"), then asks whether to **Locate** something or **Explore** something you're holding. Every screen understands "go back".
+- **Locate** (Probe's Find). Say what you're looking for. Iris finds it with on-device object detection, then guides your hand to it in three steps with a stereo tone, water ripples and short spoken cues, using hand tracking and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
+- **Explore** (Probe's Analyze). Hold an item up. **Turn to Read** tells you which way to turn it until the label faces the camera, then the ElevenLabs agent summarizes it and answers questions. Without the agent, Iris speaks an offline reading of the label.
+
+See [docs/IRIS.md](docs/IRIS.md) for the flows, the ElevenLabs setup and on-device testing. The original Explore screen and hand-tracking debug screen are still available in Debug builds (long-press the home screen for 2 seconds).
 
 ## Requirements
 
@@ -31,23 +37,30 @@ Select a physical iPhone and run the `Iris` scheme. AR camera tracking is unavai
 
 ```text
 Iris/
-├── App/                    App entry point
+├── App/                    App entry point (Probe's loading → home → main sequence)
 ├── Features/
+│   ├── Assistant/          ElevenLabs agent session, Locate's label hand-off, grounded object facts
 │   ├── CameraAR/           AR session, preview, lifecycle, and frame streams
-│   ├── ObjectDetection/    Core ML model, Vision inference, tracking, selection, overlay and list
 │   ├── DepthEstimation/    Depth sampling, calibration, smoothing, spatial estimates and distance UI
-│   ├── LabelReading/       "Turn to Read": label orientation analysis, guidance, text merging, label interpretation
+│   ├── HandTracking/       Vision hand pose, smoothing, overlay
+│   ├── LabelReading/       "Turn to Read": orientation guidance, text merging, label interpretation
+│   ├── Locate/             Probe's three-step tone guidance and fingertip-to-object measurement
+│   ├── ObjectDetection/    Core ML model, Vision inference, tracking, selection, overlay and list
 │   ├── OCR/                Reusable Vision text recognition
-│   ├── HandTracking/       Hand observation boundary
-│   ├── Guidance/           Spoken, visual, and haptic guidance boundary
-│   └── Voice/              Speech output service, audio session coordinator, voice boundary
+│   ├── Guidance/           Guidance boundary
+│   └── Voice/              Speaker (one voice, one queue), keyword listener, target parsing
 ├── Models/                 Shared domain and readiness models
 ├── Resources/              Info.plist and asset catalogs
 └── UI/
+    ├── Art/                Probe's vector artwork and Iris lettering
+    ├── Motion/             Eyes, floating, water pour and leaf-fall transitions, bubble title
+    ├── Water/              Audio-reactive water, guidance ripples, conversation water
+    ├── Status/             Status blob and listening pill
+    ├── Screens/            Loading, Home, Main, Locate, Explore
+    ├── Exploration/        Original Explore screen (developer)
+    ├── Home/               Original home screen (developer)
+    ├── LabelReading/       Read Label sheet (developer Explore screen)
     ├── Components/         Reusable branded controls
-    ├── Exploration/        Accessible live-camera experience
-    ├── Home/               Accessible home screen
-    ├── LabelReading/       Read Label sheet: live instruction, readiness meter, result card
     └── Theme/              Color and layout tokens
 ```
 
@@ -70,7 +83,7 @@ The generated `Info.plist` includes purpose strings for:
 - Microphone access
 - Speech recognition
 
-Camera permission is requested only after the user enters Explore and chooses **Start Camera**. Microphone and speech-recognition permissions are not requested yet.
+Microphone and speech-recognition permission are requested when the home screen first listens. Camera permission is requested when Locate or Explore opens.
 
 ## Camera behavior
 
@@ -249,3 +262,6 @@ Earlier: validated November 14, 2026 with Xcode 26.2: clean unsigned iOS device 
 5. Pause/resume, background/foreground, interrupt tracking, and exit/re-enter Explore. No previous distance may reappear from an earlier session. Shake/cover the camera enough to limit AR tracking and verify invalidation and recovery.
 6. On a non-LiDAR iPhone, verify object detection still works and the selected target shows **Distance unavailable**, with no meters fabricated. On both devices, test the readout with VoiceOver and the largest Dynamic Type setting; every row/control should remain reachable by scrolling.
 
+## Credits
+
+Iris's screens, artwork, motion, guidance tones and voice flow are ported from [Probe](https://github.com/amiezeng/Probe) by its authors, with permission. Ported files carry a header saying so.

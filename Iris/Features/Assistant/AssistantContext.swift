@@ -33,19 +33,17 @@ struct VisibleObject: Equatable, Sendable {
     }
 }
 
-/// Everything the assistant is allowed to know: only real detections and real OCR output.
+/// Everything the assistant is allowed to know: only real detections.
 struct AssistantContext: Equatable, Sendable {
     var isCameraRunning: Bool
     var objects: [VisibleObject]
     var selected: SelectedObjectTarget?
-    var ocr: OCRResult?
 
-    init(isCameraRunning: Bool, snapshot: DetectionSnapshot, ocr: OCRResult?) {
+    init(isCameraRunning: Bool, snapshot: DetectionSnapshot) {
         self.isCameraRunning = isCameraRunning
         objects = snapshot.objects.sorted { $0.confidence > $1.confidence }.map(VisibleObject.init)
         selected = snapshot.selectedTarget
-        self.ocr = ocr
     }
 
-    static let empty = AssistantContext(isCameraRunning: false, snapshot: DetectionSnapshot(), ocr: nil)
+    static let empty = AssistantContext(isCameraRunning: false, snapshot: DetectionSnapshot())
 }

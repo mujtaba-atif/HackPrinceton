@@ -2,12 +2,6 @@ import XCTest
 @testable import Iris
 
 final class VoiceAssistantTests: XCTestCase {
-    private func label(_ texts: [String], confidence: Double = 0.9, focus: String? = nil) -> OCRResult {
-        OCRResult(lines: texts.enumerated().map { index, text in
-            AccumulatedTextLine(text: text, confidence: confidence, seenCount: 2, averageHeight: 0.05,
-                                averageMidY: 0.9 - Double(index) * 0.1, firstSeenOrder: index)
-        }, focusName: focus, timestamp: 1)
-    }
 
     // MARK: Command parsing
 
@@ -36,13 +30,13 @@ final class VoiceAssistantTests: XCTestCase {
 
     // MARK: Grounded answers never invent
 
-    private func context(_ objects: [(String, Double, CGFloat)], running: Bool = true, ocr: OCRResult? = nil) -> AssistantContext {
+    private func context(_ objects: [(String, Double, CGFloat)], running: Bool = true) -> AssistantContext {
         var snapshot = DetectionSnapshot()
         snapshot.objects = objects.map {
             DetectedObject(id: UUID(), name: $0.0, confidence: $0.1,
                            boundingBox: CGRect(x: $0.2 - 0.05, y: 0.4, width: 0.1, height: 0.2))
         }
-        return AssistantContext(isCameraRunning: running, snapshot: snapshot, ocr: ocr)
+        return AssistantContext(isCameraRunning: running, snapshot: snapshot)
     }
 
     func testEmptyContextAdmitsUncertainty() {
@@ -50,7 +44,6 @@ final class VoiceAssistantTests: XCTestCase {
         XCTAssertTrue(AssistantFacts.identify(empty).contains("can't identify"))
         XCTAssertTrue(AssistantFacts.visibleObjects(empty).contains("don't detect"))
         XCTAssertTrue(AssistantFacts.identify(context([], running: false)).contains("camera isn't running"))
-        XCTAssertTrue(AssistantFacts.answer("what does the label say", context: empty).contains("haven't read"))
     }
 
     func testObjectsDescribedWithPositionAndHedging() {
@@ -78,40 +71,63 @@ final class VoiceAssistantTests: XCTestCase {
     // MARK: Safety
 
     func testSafetyNoteForConsumptionAndMedication() {
-        XCTAssertTrue(AssistantFacts.answer("Is this safe to eat?", context: context([("apple", 0.9, 0.5)]))
+        XCTAssertTrue(AssistantFacts.withSafetyNote("That's an apple.", for: "Is this safe to eat?")
             .contains(AssistantFacts.safetyNote))
-        let reading = label(["Take 2 tablets daily"])
-        XCTAssertTrue(AssistantFacts.describeText(.result(reading)).contains(AssistantFacts.safetyNote))
-        XCTAssertFalse(AssistantFacts.visibleObjects(context([("chair", 0.9, 0.5)])).contains(AssistantFacts.safetyNote))
+        XCTAssertTrue(AssistantFacts.needsSafetyNote("Take 2 tablets daily"))
+        XCTAssertFalse(AssistantFacts.needsSafetyNote("Blue chair"))
     }
 
-    // MARK: ElevenLabs conversation behaviour
+    // MARK: Probe flows
 
-    func testSpokenEndPhrasesOnlyWhenWholeUtterance() {
-        XCTAssertTrue(AssistantConfiguration.isEndRequest("Goodbye"))
-        XCTAssertTrue(AssistantConfiguration.isEndRequest("Okay, I'm done, thanks!"))
-        XCTAssertTrue(AssistantConfiguration.isEndRequest("End the conversation please"))
-        XCTAssertFalse(AssistantConfiguration.isEndRequest("Go back to the bottle on the left"))
-        XCTAssertFalse(AssistantConfiguration.isEndRequest("What does the exit sign say"))
-        XCTAssertFalse(AssistantConfiguration.isEndRequest(""))
+    func testTargetParserStripsRequests() {
+        XCTAssertEqual(TargetParser.extract(from: "Can you help me find my water bottle please"), "water bottle")
+        XCTAssertEqual(TargetParser.extract(from: "I'm looking for the keys"), "keys")
+        XCTAssertEqual(TargetParser.extract(from: "Cup"), "cup")
     }
 
-    func testReadLabelToolTextFlagsMisreadsAndSafety() {
-        let result = label(["Ibuprofen 200 mg"], confidence: 0.4, focus: "bottle")
-        let text = AssistantFacts.toolText(for: .result(result))
-        XCTAssertTrue(text.hasPrefix("Read in reading order; may contain misread characters"))
-        XCTAssertTrue(text.contains("selected bottle"))
-        XCTAssertTrue(text.contains("- Ibuprofen 200 mg"))
-        XCTAssertTrue(text.contains("confidence was low"))
-        XCTAssertTrue(AssistantFacts.toolText(for: .noText(hint: "Hold it closer.")).contains("Hold it closer"))
+    func testFoundTrackerDebouncesContactWithHysteresis() {
+        var tracker = FoundTracker()
+        XCTAssertFalse(tracker.update(distance: 0.01, time: 0))
+        XCTAssertFalse(tracker.update(distance: 0.01, time: 0.2))
+        XCTAssertTrue(tracker.update(distance: 0.01, time: 0.35), "contact held past the dwell")
+        XCTAssertTrue(tracker.update(distance: 0.04, time: 0.5), "inside the release band stays found")
+        XCTAssertTrue(tracker.update(distance: 0.08, time: 0.6))
+        XCTAssertFalse(tracker.update(distance: 0.08, time: 1.2), "clearly apart past the release time")
+        XCTAssertFalse(tracker.update(distance: nil, time: 5))
     }
 
     @MainActor
-    func testReadLabelHandOffMessage() {
-        let result = label(["Oat Milk"])
-        let message = VoiceAssistantCoordinator.describeRequest(for: .result(result))
-        XCTAssertTrue(message.contains("- Oat Milk"))
+    func testNearestEdgeOfTargetBox() {
+        let box = CGRect(x: 0.4, y: 0.4, width: 0.2, height: 0.2)
+        func assertPoint(_ a: CGPoint, _ b: CGPoint, line: UInt = #line) {
+            XCTAssertEqual(a.x, b.x, accuracy: 1e-9, line: line)
+            XCTAssertEqual(a.y, b.y, accuracy: 1e-9, line: line)
+        }
+        assertPoint(LocateTracker.nearestEdge(to: CGPoint(x: 0.1, y: 0.5), of: box), CGPoint(x: 0.4, y: 0.5))
+        assertPoint(LocateTracker.nearestEdge(to: CGPoint(x: 0.58, y: 0.5), of: box), CGPoint(x: 0.6, y: 0.5))
+        assertPoint(LocateTracker.nearestEdge(to: CGPoint(x: 0.9, y: 0.9), of: box), CGPoint(x: 0.6, y: 0.6))
+    }
+
+    @MainActor
+    func testExploreSummaryRequestCarriesTextAndFields() {
+        var reading = LabelReading()
+        reading.title = "Ibuprofen"
+        reading.strength = "200 mg"
+        reading.allLines = ["Ibuprofen", "200 mg tablets"]
+        let message = ExploreScreen.summaryRequest(for: reading)
         XCTAssertTrue(message.contains("may contain misread characters"))
-        XCTAssertTrue(VoiceAssistantCoordinator.describeRequest(for: .noText(hint: "No text.")).contains("No text."))
+        XCTAssertTrue(message.contains("- 200 mg tablets"))
+        XCTAssertTrue(message.contains("Strength: 200 mg"))
+        XCTAssertTrue(ExploreScreen.persona.contains("Never say an item is safe"))
+    }
+
+    func testIrisWordmarkSplitsIntoLettersInPlace() {
+        let rect = CGRect(x: 76.6, y: 270.9, width: 572.0, height: 126.3)
+        let title = IrisLettering.layer(name: "Title", text: "IRIS", in: rect, color: .white)
+        XCTAssertEqual(title.pieces.count, 4)
+        XCTAssertTrue(rect.insetBy(dx: -1, dy: -1).contains(title.bounds))
+        let label = IrisLettering.layer(name: "Label", text: "LOCATE", in: CGRect(x: 0, y: 0, width: 90, height: 300),
+                                        color: .white, orientation: .upward)
+        XCTAssertGreaterThan(label.bounds.height, label.bounds.width, "sideways label runs vertically")
     }
 }

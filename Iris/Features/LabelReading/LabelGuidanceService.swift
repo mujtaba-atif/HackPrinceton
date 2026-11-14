@@ -74,6 +74,9 @@ final class LabelGuidanceService: ObservableObject {
         /// (a hand turning the item often hides it from the detector).
         var lostTargetGrace: TimeInterval = 3
         var maximumConsecutiveFailures = 6
+        /// Speak the offline summary as soon as the read finishes. Explore turns this off when the
+        /// ElevenLabs agent will summarize instead, and calls `readSummary()` if the agent is unavailable.
+        var speaksResult = true
     }
 
     @Published private(set) var state: LabelGuidanceState = .idle
@@ -300,7 +303,9 @@ final class LabelGuidanceService: ObservableObject {
         releaseFrames()
         reading = result
         state = .result
-        say(LabelReadingSpeech.summary(result))
+        if configuration.speaksResult {
+            say(LabelReadingSpeech.summary(result))
+        }
     }
 
     private func fail(_ failure: LabelGuidanceFailure) {

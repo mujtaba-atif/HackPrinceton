@@ -1,8 +1,7 @@
 import Foundation
 
-/// Deterministic, grounded descriptions built only from `AssistantContext`.
-/// Used both as offline answers and as client-tool results for the ElevenLabs agent,
-/// so the agent receives facts plus explicit uncertainty, never guesses.
+/// Deterministic, grounded descriptions built only from `AssistantContext` (real detections), plus
+/// matching a spoken object name to a detection for Locate and Iris's safety wording.
 enum AssistantFacts {
     static let safetyNote = "I can't confirm whether anything is safe to eat, drink, or take. Please check the label with someone you trust, a pharmacist, or a doctor."
 
@@ -102,60 +101,6 @@ enum AssistantFacts {
         }
         let note = match.name.lowercased() == spokenName.lowercased() ? "" : " I'm matching it as \(a(match.name))."
         return ("I found \(match.confidenceWord) \(a(match.name)) \(match.position). I've selected it.\(note)", match)
-    }
-
-    // MARK: Text
-
-    static func describeText(_ state: OCRState) -> String {
-        switch state {
-        case let .result(result):
-            var answer = result.focusName.map { "The \($0) says: " } ?? "It says: "
-            answer += result.lines.prefix(12).map(\.text).joined(separator: ". ")
-            if result.lines.count > 12 { answer += ". There's more text; open the text view to hear all of it." }
-            if result.isLowConfidence { answer += " Some of this may be misread." }
-            return withSafetyNote(answer, for: result.text)
-        case let .noText(hint):
-            return hint
-        case let .failed(message):
-            return message
-        case .reading:
-            return "Still reading."
-        case .idle:
-            return "I haven't read any text yet. Point the camera at a label and ask me to read it."
-        }
-    }
-
-    /// The `read_label` tool result: all lines, flagged as possibly misread, plus the facts the agent
-    /// needs to state uncertainty. The agent decides what matters; it is told never to read it all out.
-    static func toolText(for state: OCRState) -> String {
-        guard case let .result(result) = state else { return describeText(state) }
-        var text = "Read in reading order; may contain misread characters"
-        text += result.focusName.map { " (from the selected \($0))" } ?? ""
-        text += ":\n" + result.lines.prefix(40).map { "- \($0.text)" }.joined(separator: "\n")
-        if result.isLowConfidence { text += "\nRecognition confidence was low; say parts may be misread." }
-        if needsSafetyNote(result.text) { text += "\nDo not say it is safe to eat, drink, or take." }
-        return text
-    }
-
-    /// Offline answer to an open question. Never invents details beyond the context.
-    static func answer(_ question: String, context: AssistantContext) -> String {
-        let q = VoiceCommandParser.normalize(question)
-        let answer: String
-        if q.contains("summar") || q.contains("instruction") || q.contains("label") || q.contains("say") || q.contains("text") {
-            if let ocr = context.ocr {
-                answer = (q.contains("summar") ? "Without the online assistant I can't summarize, but here's the text. " : "")
-                    + describeText(.result(ocr))
-            } else {
-                answer = "I haven't read any text yet. Say \"read this label\" while pointing the camera at it."
-            }
-        } else if q.contains("see") || q.contains("objects") || q.contains("around") || q.contains("nearby") {
-            answer = visibleObjects(context)
-        } else if q.contains("what is") || q.contains("what's") || q.contains("this") {
-            answer = identify(context)
-        } else {
-            answer = "I can only answer from what the camera detects and text I read. Try \"what am I looking at\", \"read this label\", or \"find my water bottle\"."
-        }
-        return withSafetyNote(answer, for: question)
     }
 
     // MARK: Helpers

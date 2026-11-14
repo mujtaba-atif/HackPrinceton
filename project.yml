@@ -10,6 +10,9 @@ packages:
   ElevenLabs:
     url: https://github.com/elevenlabs/elevenlabs-swift-sdk.git
     exactVersion: 3.3.1
+  LiveKit:
+    url: https://github.com/livekit/client-sdk-swift.git
+    majorVersion: 2.0.0
 
 settings:
   base:
@@ -48,6 +51,7 @@ targets:
       Release: Config/Iris.xcconfig
     dependencies:
       - package: ElevenLabs
+      - package: LiveKit
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.iris.ios
