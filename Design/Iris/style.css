@@ -8,20 +8,20 @@
 .options{background:radial-gradient(ellipse at 100% 0%,#B5DEFA88,transparent 62%),linear-gradient(145deg,#297FDB,#3299E3 60%,#123A73)}
 .screen:after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.045;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23fff' filter='url(%23n)' d='M0 0h160v160H0z'/%3E%3C/svg%3E");z-index:7}
 .brand,.tagline,.swipe,.question,.option,.water-well{z-index:3}
-.home .brand{animation:brand-side .95s cubic-bezier(.18,.8,.25,1.2) both}
-.home .brand span{animation:jelly 1.3s calc(.7s + var(--i)*.09s) both,pulse 3s calc(2s + var(--i)*.1s) ease-in-out infinite alternate}
-.tagline{animation:tagline-side .8s .35s cubic-bezier(.2,.8,.25,1.1) both}
+.home .brand{animation:none}
+.home .brand span{animation:none}
+.tagline{animation:none}
 .mascot{z-index:2;animation:companion-pop 1.35s .12s cubic-bezier(.2,.8,.25,1) both;transform-origin:75% 85%}
 .mascot svg{filter:drop-shadow(-8px -8px 24px #72C7F51A)}
 .swipe{top:658px}.chevrons{animation:nudge 1.4s ease-in-out infinite alternate}
-.question{top:116px}.question span{animation:word-side .75s calc(.1s + var(--i)*.09s) cubic-bezier(.2,.7,.2,1.25) both}.question span:nth-child(even){animation-name:word-other}
+.question{top:116px}.question span,.question span:nth-child(even){animation:none}
 .water-well{top:215px;opacity:.6}
 .option{filter:none;perspective:800px;isolation:isolate;transition:scale .22s cubic-bezier(.2,.8,.3,1.5)}
 .option:hover{scale:1.035}.option:active{scale:.96}
-.option.find{top:322px;animation:locate-spring 1.15s .2s cubic-bezier(.16,.7,.2,1) both}
-.option.analyze{top:534px;animation:explore-spring 1.25s .38s cubic-bezier(.16,.7,.2,1) both}
-.face-art{height:100%;position:relative;animation:card-hover 5.8s 1.5s ease-in-out infinite alternate;filter:drop-shadow(0 18px 18px #061B3724)}
-.analyze .face-art{animation:card-hover-other 6.6s 1.8s ease-in-out infinite alternate}
+.option.find{left:14px;top:322px;animation:locate-spring 1.15s .2s cubic-bezier(.16,.7,.2,1) both}
+.option.analyze{left:41px;top:534px;animation:explore-spring 1.25s .38s cubic-bezier(.16,.7,.2,1) both}
+.face-art{height:100%;position:relative;transform:rotate(-2deg);animation:card-drift-locate 6.4s ease-in-out infinite;filter:drop-shadow(0 18px 18px #061B3724)}
+.analyze .face-art{transform:rotate(2deg);animation:card-drift-explore 7.2s -.9s ease-in-out infinite}
 .option svg{border-radius:23px;overflow:hidden}.option [id^=findEyes],.option [id^=findPupils]{animation:blink 6s 2.5s infinite}
 .eye-glass{position:absolute;left:95px;top:30px;width:188px;height:111px;border:1px solid #FAFCFF99;border-radius:23px;background:linear-gradient(135deg,#FAFCFF30,#B5DEFA04 43%,#72C7F51A);box-shadow:inset 1px 1px 1px #FAFCFF80,inset -1px -1px 2px #72C7F533,0 12px 24px #061B3730;backdrop-filter:blur(.55px) saturate(1.2);transform:rotate(-7deg);pointer-events:none;animation:eye-panel 5.4s ease-in-out infinite alternate;overflow:hidden}
 .eye-glass:after,.explore-optic:after,.glass-float i{content:'';position:absolute;inset:-50%;background:linear-gradient(120deg,transparent 38%,#FAFCFF55 48%,transparent 57%);transform:translateX(-40%);animation:glass-sheen 6s ease-in-out infinite;pointer-events:none}
@@ -54,7 +54,8 @@
 @keyframes word-side{from{transform:translateX(-90px) rotate(-9deg) scale(.7);opacity:0}to{transform:none;opacity:1}}@keyframes word-other{from{transform:translateX(90px) rotate(9deg) scale(.7);opacity:0}to{transform:none;opacity:1}}
 @keyframes locate-spring{0%{transform:translate(-390px,-35px) rotate(-18deg) scale(.7);opacity:0}65%{transform:translate(15px,0) rotate(3deg) scale(1.04);opacity:1}83%{transform:translate(-6px,0) rotate(-1deg) scale(.98)}100%{transform:none;opacity:1}}
 @keyframes explore-spring{0%{transform:translate(390px,60px) rotate(19deg) scale(.65);opacity:0}65%{transform:translate(-15px,-3px) rotate(-3deg) scale(1.05);opacity:1}83%{transform:translate(6px,2px) rotate(1deg) scale(.98)}100%{transform:none;opacity:1}}
-@keyframes card-hover{from{transform:translate(-2px,-5px) rotate(-1deg)}to{transform:translate(3px,5px) rotate(1.2deg)}}@keyframes card-hover-other{from{transform:translate(3px,5px) rotate(1.1deg)}to{transform:translate(-3px,-5px) rotate(-1deg)}}
+@keyframes card-drift-locate{0%,100%{transform:translate(0,0) rotate(-2deg)}25%{transform:translate(-3px,-7px) rotate(-2.8deg)}50%{transform:translate(0,-2px) rotate(-2deg)}75%{transform:translate(3px,6px) rotate(-1.2deg)}}
+@keyframes card-drift-explore{0%,100%{transform:translate(0,0) rotate(2deg)}25%{transform:translate(3px,6px) rotate(2.8deg)}50%{transform:translate(0,2px) rotate(2deg)}75%{transform:translate(-3px,-7px) rotate(1.2deg)}}
 @keyframes eye-panel{from{transform:translate(-6px,-4px) rotate(-8deg)}to{transform:translate(8px,5px) rotate(3deg)}}@keyframes optic-sweep{from{transform:translate(-32px,-7px) rotate(-9deg)}to{transform:translate(12px,8px) rotate(12deg)}}
 @keyframes glass-sheen{0%,20%{transform:translateX(-55%)}65%,100%{transform:translateX(55%)}}@keyframes optic-shine{from{opacity:.2}to{opacity:.8}}
 @keyframes glass-orbit{from{transform:translate(-5px,-6px) rotate(14deg)}to{transform:translate(7px,13px) rotate(29deg)}}@keyframes glass-orbit-other{from{transform:translate(-6px,10px) rotate(-22deg)}to{transform:translate(12px,-12px) rotate(-5deg)}}
@@ -66,3 +67,40 @@
 @keyframes glass-wipe{0%{left:-140%;transform:skewX(-12deg)}100%{left:-10%;transform:skewX(0)}}
 body.reduced .celebration,body.reduced .sprinkles{display:none}body.reduced .pour{left:-10%}body.reduced .glass-float,body.reduced .eye-glass,body.reduced .explore-optic{animation:none}
 @media(prefers-reduced-motion:reduce){.celebration,.sprinkles{display:none}.glass-float,.eye-glass,.explore-optic{animation:none!important}}
+
+/* Iris welcome crew and curious Locate eyes. */
+.mini-crew{position:absolute;inset:0;z-index:4;pointer-events:none}
+.mini-friend{position:absolute;overflow:visible;filter:drop-shadow(0 8px 8px #061B3733);animation:huddle-hello .95s calc(.45s + var(--crew-i)*.13s) cubic-bezier(.2,.8,.25,1.1) both}
+.friend-skye{left:20px;top:280px;width:210px;height:262.5px;--lean:-8deg;--in-x:-65px;--in-y:30px;z-index:1}
+.friend-echo{left:154px;top:328px;width:190px;height:237.5px;--lean:10deg;--in-x:70px;--in-y:-35px;z-index:2}
+.friend-pip{left:20px;top:448px;width:207px;height:258.75px;--lean:-6deg;--in-x:-55px;--in-y:85px;z-index:3}
+.friend-nova{left:148px;top:431px;width:210px;height:262.5px;--lean:6deg;--in-x:60px;--in-y:100px;z-index:4}
+.mini-idle{height:100%;transform-origin:50% 75%;animation:huddle-bob calc(3.8s + var(--crew-i)*.4s) calc(var(--crew-i)*-.7s) ease-in-out infinite alternate}
+.mini-friend svg{width:100%;height:100%;overflow:visible}.mini-eyes{transform-box:fill-box;transform-origin:center;animation:friend-blink 7.8s calc(var(--crew-i)*1.1s + 2s) infinite}.mini-gaze{animation:friend-glance 10s calc(var(--crew-i)*-1.8s) ease-in-out infinite}
+.home .swipe{top:704px;height:82px;font-size:16px;z-index:6;color:var(--white);background:transparent;border:0;box-shadow:none}.home .chevrons{height:34px;margin-bottom:5px}.home .chevrons svg{height:32px;width:26px}
+.option [id^=findEyes],.option [id^=findPupils]{animation:none;transform-box:fill-box;transform-origin:center}
+.option #findEyeAssembly{transform-box:fill-box;transform-origin:center;animation:locate-blink 8.6s 1.2s infinite}
+.option #findPupils{animation:locate-wander 12.4s ease-in-out infinite}
+@keyframes huddle-hello{0%{transform:translate(var(--in-x),var(--in-y)) scale(.7);opacity:0}75%{transform:translate(0,-5px) scale(1.035);opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
+@keyframes huddle-bob{from{transform:translateY(0) rotate(var(--lean))}to{transform:translateY(-7px) rotate(calc(var(--lean) * .55))}}
+@keyframes friend-blink{0%,63%,67%,100%{scale:1 1}65%{scale:1 .08}}@keyframes friend-glance{0%,15%,90%,100%{transform:translate(0,0)}30%,40%{transform:translate(-3px,-2px)}60%,70%{transform:translate(2px,1px)}}
+@keyframes locate-blink{0%,37%,40%,83%,86%,100%{scale:1 1}38.5%,84.5%{scale:1 .06}}
+@keyframes locate-wander{0%,8%,96%,100%{transform:translate(0,0)}16%,24%{transform:translate(0,-12px)}32%,40%{transform:translate(-14px,-2px)}48%,56%{transform:translate(-2px,12px)}64%,72%{transform:translate(14px,1px)}80%,88%{transform:translate(8px,-10px)}}
+body.reduced .mini-friend{opacity:1;transform:none}body.reduced .mini-idle{transform:rotate(var(--lean))}
+@media(prefers-reduced-motion:reduce){.mini-friend{opacity:1;transform:none}.mini-idle{transform:rotate(var(--lean))}}
+
+/* Iris 10 — a single glass-light reveal on three intentional text moments. */
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.prism-text{--prism-delay:.12s;--prism-step:.075s;--prism-lift:12px;--prism-blur:5px;--prism-duration:2.1s}
+.tagline.prism-text{--prism-delay:.45s;--prism-step:.022s;--prism-lift:6px;--prism-blur:3px;--prism-duration:1.8s}
+.question.prism-text{--prism-delay:.12s;--prism-step:.018s;--prism-lift:7px;--prism-blur:3px;--prism-duration:1.65s}
+.screen .prism-text .prism-flow{display:inline;animation:none}
+.screen .prism-text .prism-word{display:inline-block;white-space:nowrap;animation:none}
+.screen .prism-text .prism-char{display:inline-block;color:var(--white);opacity:1;transform:none;filter:none;animation:prism-arrive .78s calc(var(--prism-delay) + var(--char)*var(--prism-step)) cubic-bezier(.2,.7,.25,1) both}
+@supports (background-clip:text) or (-webkit-background-clip:text){
+ .screen .prism-text .prism-char{background-image:linear-gradient(180deg,#FAFCFF 0%,#FAFCFF 18%,#A6DFFF 31%,#B9B8FF 44%,#E7F5FF 57%,#FAFCFF 72%,#FAFCFF 100%);background-size:100% 360%;background-position:50% 100%;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:prism-arrive .78s calc(var(--prism-delay) + var(--char)*var(--prism-step)) cubic-bezier(.2,.7,.25,1) both,prism-light var(--prism-duration) calc(var(--prism-delay) + var(--char)*var(--prism-step)) cubic-bezier(.25,.1,.3,1) both}
+}
+@keyframes prism-arrive{from{opacity:0;transform:translateY(var(--prism-lift));filter:blur(var(--prism-blur))}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes prism-light{from{background-position:50% 0%}to{background-position:50% 100%}}
+body.reduced .screen .prism-text .prism-char{animation:none!important;background:none;-webkit-text-fill-color:var(--white);color:var(--white);opacity:1;filter:none;transform:none}
+@media(prefers-reduced-motion:reduce){.screen .prism-text .prism-char{animation:none!important;background:none;-webkit-text-fill-color:var(--white);color:var(--white);opacity:1;filter:none;transform:none}}
