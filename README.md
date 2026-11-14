@@ -2,7 +2,7 @@
 
 Reachly is a native iOS accessibility app designed to help blind and visually impaired people find nearby objects, move a hand toward them, and understand what they are holding through clear spoken guidance.
 
-This repository currently contains the iOS 17+ product foundation: the SwiftUI app shell, Reachly visual identity, accessible home experience, feature boundaries, permission metadata, and XcodeGen configuration. Camera capture, object detection, hand tracking, guidance logic, and voice processing are intentionally not implemented yet.
+This repository contains the iOS 17+ SwiftUI foundation, Reachly visual identity, an accessible home experience, and a live rear-camera Explore screen backed by one ARKit session. Object detection, hand tracking, guidance logic, and voice processing are intentionally not implemented yet.
 
 ## Requirements
 
@@ -25,7 +25,7 @@ xcodegen generate
 open Reachly.xcodeproj
 ```
 
-Select an iPhone simulator or device and run the `Reachly` scheme. The current foundation does not start a camera or microphone session.
+Select a physical iPhone and run the `Reachly` scheme. AR camera tracking is unavailable in the iOS Simulator, where Reachly displays its unavailable state instead.
 
 ## Project structure
 
@@ -33,7 +33,7 @@ Select an iPhone simulator or device and run the `Reachly` scheme. The current f
 Reachly/
 ├── App/                    App entry point
 ├── Features/
-│   ├── CameraAR/           Camera and AR session boundary
+│   ├── CameraAR/           AR session, preview, lifecycle, and frame streams
 │   ├── ObjectDetection/    Object observation boundary
 │   ├── HandTracking/       Hand observation boundary
 │   ├── Guidance/           Spoken, visual, and haptic guidance boundary
@@ -42,12 +42,12 @@ Reachly/
 ├── Resources/              Info.plist and asset catalogs
 └── UI/
     ├── Components/         Reusable branded controls
-    ├── Exploration/        Exploration destination shell
+    ├── Exploration/        Accessible live-camera experience
     ├── Home/               Accessible home screen
     └── Theme/              Color and layout tokens
 ```
 
-The feature folders contain protocols only. Concrete system-framework and machine-learning implementations can be added behind those boundaries without coupling them to SwiftUI screens.
+The camera layer owns one `ARSession` for preview, tracking, and frame delivery. It publishes independent newest-frame streams so future object detection and hand tracking services can subscribe without starting competing camera sessions. The remaining feature folders expose protocol boundaries for their future implementations.
 
 ## Accessibility foundation
 
@@ -66,5 +66,14 @@ The generated `Info.plist` includes purpose strings for:
 - Microphone access
 - Speech recognition
 
-The app does not request these permissions in the foundation build. Each permission should be requested just in time when its corresponding feature is implemented.
+Camera permission is requested only after the user enters Explore and chooses **Start Camera**. Microphone and speech-recognition permissions are not requested yet.
+
+## Camera behavior
+
+- **Start Camera** requests access and starts rear-camera AR tracking.
+- **Pause Camera** stops new frame capture while keeping the Explore screen open.
+- **Resume Camera** restarts the same session.
+- **Exit** stops the session before returning home.
+- Capture pauses while the app is in the background and resumes only if it was previously running.
+- Permission denial, device restrictions, missing hardware, ARKit support, interruptions, and session failures each have a visible accessible state.
 
