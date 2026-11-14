@@ -11,25 +11,6 @@ struct NormalizedRegion: Equatable, Sendable {
     let height: Double
 }
 
-struct DetectedObject: Identifiable, Equatable, Sendable {
-    let id: UUID
-    let name: String
-    let confidence: Double
-    let region: NormalizedRegion
-
-    init(
-        id: UUID = UUID(),
-        name: String,
-        confidence: Double,
-        region: NormalizedRegion
-    ) {
-        self.id = id
-        self.name = name
-        self.confidence = confidence
-        self.region = region
-    }
-}
-
 enum HandSide: String, Equatable, Sendable {
     case left
     case right

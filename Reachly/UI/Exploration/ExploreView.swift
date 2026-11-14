@@ -6,6 +6,7 @@ struct ExploreView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @StateObject private var camera = ReachlyCameraController()
+    @StateObject private var detection = ObjectDetectionService()
 
     var body: some View {
         ZStack {
@@ -13,9 +14,13 @@ struct ExploreView: View {
                 .ignoresSafeArea()
 
             ARCameraPreview(session: camera.session)
+                .overlay {
+                    if camera.state == .running {
+                        ObjectDetectionOverlay(snapshot: detection.snapshot, select: detection.select)
+                    }
+                }
                 .ignoresSafeArea()
                 .opacity(showsCameraImage ? 1 : 0)
-                .accessibilityHidden(true)
 
             if camera.state != .running {
                 Color.black.opacity(showsCameraImage ? 0.58 : 0.18)
@@ -28,7 +33,14 @@ struct ExploreView: View {
             topBar
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            controls
+            VStack(spacing: 0) {
+                if camera.state == .running {
+                    DetectedObjectsList(detection: detection) {
+                        detection.start(frames: camera.makeFrameStream())
+                    }
+                }
+                controls
+            }
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -43,10 +55,16 @@ struct ExploreView: View {
             }
         }
         .onChange(of: camera.state) { _, state in
+            if state == .running {
+                detection.start(frames: camera.makeFrameStream())
+            } else {
+                detection.stop()
+            }
             guard let announcement = state.accessibilityAnnouncement else { return }
             UIAccessibility.post(notification: .announcement, argument: announcement)
         }
         .onDisappear {
+            detection.reset()
             camera.stop()
         }
     }
@@ -221,6 +239,7 @@ struct ExploreView: View {
     }
 
     private func exitExplore() {
+        detection.reset()
         camera.stop()
         dismiss()
     }

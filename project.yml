@@ -47,6 +47,18 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         ENABLE_USER_SCRIPT_SANDBOXING: YES
 
+  ReachlyTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: ReachlyTests
+    dependencies:
+      - target: Reachly
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.reachly.ios.tests
+
 schemes:
   Reachly:
     build:
@@ -54,6 +66,10 @@ schemes:
         Reachly: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - ReachlyTests
     archive:
       config: Release
 
