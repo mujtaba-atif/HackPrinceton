@@ -74,7 +74,6 @@
 		950A871D5BF4DDE5A9574A01 /* LabelReadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */; };
 		00E388654F932D3EC127013D /* AgentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E077E636FB62FB15697FBAB6 /* AgentSession.swift */; };
 		FC44698F6CF29488D1214D8D /* ObjectConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D7333E76966306E23E8E88 /* ObjectConversation.swift */; };
-		F4CE618DD3FE40DAE294F4F5 /* LabelTextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */; };
 		B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */; };
 		7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755033595C1F3BB46DC83F00 /* Speaker.swift */; };
 		1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */; };
@@ -109,6 +108,8 @@
 		0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73195524758434685EDE70A4 /* ObjectDetection.swift */; };
 		F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */; };
 		B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */; };
+		6C1CBCE8BD772F8E124719F8 /* TextConsolidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */; };
+		7291E0C5631DCB7613BB7F65 /* TextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965C24B30DBF979D7034F8B9 /* TextReader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -191,7 +192,6 @@
 		52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelReadingTests.swift; sourceTree = "<group>"; };
 		E077E636FB62FB15697FBAB6 /* AgentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSession.swift; sourceTree = "<group>"; };
 		C7D7333E76966306E23E8E88 /* ObjectConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectConversation.swift; sourceTree = "<group>"; };
-		B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelTextReader.swift; sourceTree = "<group>"; };
 		4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceBeepController.swift; sourceTree = "<group>"; };
 		755033595C1F3BB46DC83F00 /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetParser.swift; sourceTree = "<group>"; };
@@ -225,6 +225,8 @@
 		73195524758434685EDE70A4 /* ObjectDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
 		4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmentation.swift; sourceTree = "<group>"; };
 		D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentationOverlay.swift; sourceTree = "<group>"; };
+		C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextConsolidator.swift; sourceTree = "<group>"; };
+		965C24B30DBF979D7034F8B9 /* TextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextReader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -451,6 +453,7 @@
 		FA4ABDAD4CEA38B9BB1B6DDF /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				9290ACDF0681308EF14C4D46 /* Explore */,
 				C6436FC52638AF1D781B0C81 /* Locate */,
 				75E0319372597868C2F8A30B /* CameraAR */,
 				50B7E35C504C63AC0C53135D /* LabelReading */,
@@ -488,7 +491,6 @@
 		50B7E35C504C63AC0C53135D /* LabelReading */ = {
 			isa = PBXGroup;
 			children = (
-				B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */,
 				98690645B600F3F7E5728212 /* LabelTextAccumulator.swift */,
 				6B7AEAA18B8E399572D422B4 /* LabelReadingModels.swift */,
 				9EEA6BA3D6A65063959D72B4 /* LabelOrientationAnalyzer.swift */,
@@ -587,6 +589,15 @@
 				DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		9290ACDF0681308EF14C4D46 /* Explore */ = {
+			isa = PBXGroup;
+			children = (
+				965C24B30DBF979D7034F8B9 /* TextReader.swift */,
+				C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */,
+			);
+			path = Explore;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -690,6 +701,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7291E0C5631DCB7613BB7F65 /* TextReader.swift in Sources */,
+				6C1CBCE8BD772F8E124719F8 /* TextConsolidator.swift in Sources */,
 				B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */,
 				F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */,
 				0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */,
@@ -722,7 +735,6 @@
 				1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */,
 				7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */,
 				B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */,
-				F4CE618DD3FE40DAE294F4F5 /* LabelTextReader.swift in Sources */,
 				FC44698F6CF29488D1214D8D /* ObjectConversation.swift in Sources */,
 				00E388654F932D3EC127013D /* AgentSession.swift in Sources */,
 				CF9C5457F3332626BA112524 /* ARCameraPreview.swift in Sources */,

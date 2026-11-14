@@ -128,16 +128,27 @@ final class VoiceAssistantTests: XCTestCase {
     }
 
     @MainActor
-    func testExploreSummaryRequestCarriesTextAndFields() {
-        var reading = LabelReading()
-        reading.title = "Ibuprofen"
-        reading.strength = "200 mg"
-        reading.allLines = ["Ibuprofen", "200 mg tablets"]
-        let message = ExploreScreen.summaryRequest(for: reading)
+    func testExploreSummaryRequestCarriesLabelText() {
+        let message = ExploreScreen.summaryRequest(for: ["Ibuprofen", "200 mg tablets"])
         XCTAssertTrue(message.contains("may contain misread characters"))
         XCTAssertTrue(message.contains("- 200 mg tablets"))
-        XCTAssertTrue(message.contains("Strength: 200 mg"))
-        XCTAssertTrue(ExploreScreen.persona.contains("Never say an item is safe"))
+        XCTAssertTrue(message.contains("Summarize this item in one or two short sentences, then wait."))
+    }
+
+    func testTextConsolidatorKeepsLinesSeenInThreeScans() {
+        var consolidator = TextConsolidator()
+        let label = TextReading(text: "Oat Milk", midY: 0.8, minX: 0.2)
+        let size = TextReading(text: "1 Litre", midY: 0.5, minX: 0.2)
+        let misread = TextReading(text: "0at Mi1k", midY: 0.8, minX: 0.2)
+        consolidator.add([label, size])
+        consolidator.add([label, misread])
+        XCTAssertEqual(consolidator.consolidated(), [], "nothing has been seen three times yet")
+        consolidator.add([label, size])
+        XCTAssertEqual(consolidator.consolidated(), ["Oat Milk"], "only lines seen in three scans count")
+        consolidator.add([label, size])
+        XCTAssertEqual(consolidator.consolidated(), ["Oat Milk", "1 Litre"], "top to bottom")
+        consolidator.reset()
+        XCTAssertEqual(consolidator.consolidated(), [])
     }
 
     func testIrisWordmarkSplitsIntoLettersInPlace() {

@@ -38,7 +38,7 @@ final class ObjectConversation: ObservableObject {
 
     /// Reads the middle 60% of the frame (`TextReader.region`) — which is roughly the part
     /// `ConversationWater`'s rim leaves clear, so what is being read is what is not under water.
-    private let reader = LabelTextReader()
+    private let reader = TextReader()
     private let agent = AgentSession()
     private var statusSink: AnyCancellable?
     private var task: Task<Void, Never>?

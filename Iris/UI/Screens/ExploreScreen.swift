@@ -2,44 +2,49 @@ import SwiftUI
 
 struct ExploreScreen: View {
     var onBack: () -> Void = {}
-
     @StateObject private var listener = VoiceListener()
+    /// The one AR session; the reader gets its frames through the broker.
     @StateObject private var camera = IrisCameraController()
-    @StateObject private var guidance = LabelGuidanceService(
-        configuration: ExploreScreen.guidanceConfiguration
-    )
-    /// Reads again when the agent (or the user) asks for a rescan mid-conversation.
-    @StateObject private var rescanReader = LabelTextReader(scanInterval: 0.25)
-    @StateObject private var agent = AgentSession()
+    @State private var frameTask: Task<Void, Never>?
     @Environment(\.scenePhase) private var scenePhase
-
+    // 4 Hz rather than the default 2: the countdown can't start until the consolidator has seen a line
+    // three times, and at 2 Hz that alone was a second and a half of holding still before anything moved.
+    @StateObject private var reader = TextReader(scanInterval: 0.25)
+    @StateObject private var agent = AgentSession()
     @State private var summaryStarted = false
     @State private var listening = false
     @State private var rescanning = false
-    @State private var frameTask: Task<Void, Never>?
-    @State private var listenLoop: Task<Void, Never>?
+    @State private var currentHold: TimeInterval = 2
+    @State private var holdStartedAt: Date?
+    @State private var secondsLeft = 0
+    @State private var ringProgress: CGFloat = 0
+    @State private var holdCount = 0
 
     private let backKeywords = ["go back", "back", "return", "previous", "exit", "leave", "quit", "cancel"]
-    private let retryKeywords = ["again", "try again", "retry", "scan again", "read again", "one more time"]
+    // Once text is found the user holds still for this long, then the agent starts with whatever was read.
+    // The countdown is evidence, not ceremony: at 4 Hz two seconds is eight more scans on top of the three
+    // that found the text, which is the consolidator's whole window. Five seconds bought a fuller read of
+    // the small print at the cost of holding a can out at arm's length for the better part of seven.
+    private let holdDuration: TimeInterval = 2
+    // The countdown restarts if the text has been out of view for this long.
+    private let textLostGrace: TimeInterval = 1
+    // Hints when nothing readable is in view.
+    private let firstHintAfter: TimeInterval = 8
+    private let laterHintEvery: TimeInterval = 12
+    private let maxHints = 2
     // A rescan is quicker than the first scan, because the agent is waiting for the result and gives up on a
     // slow tool. It reports what it has after the timeout even if it found nothing.
     private let rescanHold: TimeInterval = 1.5
     private let rescanTimeout: TimeInterval = 8
-
-    private static var guidanceConfiguration: LabelGuidanceService.Configuration {
-        var configuration = LabelGuidanceService.Configuration()
-        configuration.speaksResult = AssistantConfiguration.elevenLabsAgentID == nil
-        return configuration
-    }
 
     var body: some View {
         GeometryReader { geo in
             ARCameraPreview(session: camera.session)
                 .overlay {
                     ScanAreaOutline(
-                        imageSize: rescanReader.uprightImageSize,
+                        imageSize: reader.uprightImageSize,
                         viewSize: geo.size,
-                        foundText: guidance.readiness.characterCount > 0 || !rescanReader.lines.isEmpty,
+                        foundText: !reader.lines.isEmpty,
                         progress: ringProgress
                     )
                 }
@@ -47,47 +52,43 @@ struct ExploreScreen: View {
         .ignoresSafeArea()
         .overlay(alignment: .bottom) { statusPill }
         .animation(.easeInOut, value: agent.status)
-        .animation(.easeInOut, value: guidance.state)
+        .animation(.easeInOut, value: holdStartedAt != nil)
         .animation(.easeInOut, value: summaryStarted)
+        .sensoryFeedback(.impact(weight: .light), trigger: holdCount)
         .sensoryFeedback(.success, trigger: summaryStarted) { _, started in started }
         .sensoryFeedback(.impact(weight: .light), trigger: agent.status) { old, new in new == .listening && old != .listening }
         .onAppear {
             agent.onEndRequested = { onBack() }
             agent.onRescan = { await performRescan() }
-            agent.onEnded = { agentWentAway() }
             Task { await camera.start() }
         }
         .onChange(of: camera.state) { _, state in
-            if state == .running { startReading() } else { stopReading() }
-        }
-        .onChange(of: guidance.state) { _, state in
-            if state == .result, let reading = guidance.reading { beginSummary(with: reading) }
+            if state == .running { startFrames() } else { stopFrames() }
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 Task { await camera.resumeAfterAppLifecyclePause() }
             } else {
-                stopListening()
                 camera.pauseForAppLifecycle()
             }
         }
+        .task {
+            // Whatever pushed this screen is still talking ("Explore object selected").
+            await Speaker.shared.waitUntilIdle()
+            guard !Task.isCancelled else { return }
+            // The read runs *underneath* this line rather than after it. The camera is already up, and
+            // anyone who is going to hold something out is holding it out while the line plays — waiting
+            // it out threw those scans away and started the countdown three seconds later than it had to.
+            Speaker.shared.speak("Hold the item in front of the camera so I can read it.")
+            if let lines = await scanForText(hold: holdDuration, hints: true, timeout: nil) {
+                beginSummary(with: lines)
+            }
+        }
         .onDisappear {
-            listenLoop?.cancel()
             stopListening()
             agent.stop()
-            guidance.stop()
-            stopReading()
+            stopFrames()
             camera.stop()
-        }
-    }
-
-    // MARK: - Status
-
-    private var ringProgress: CGFloat {
-        switch guidance.state {
-        case .capturing, .interpreting, .result: 1
-        case .guiding: CGFloat(guidance.readiness.score)
-        case .idle, .failed: 0
         }
     }
 
@@ -95,102 +96,106 @@ struct ExploreScreen: View {
     private var statusPill: some View {
         if !rescanning, agent.isRunning {
             ListeningIndicator(status: agent.status)
-        } else if rescanning {
-            ListeningIndicator(text: "Reading again…", systemImage: "text.viewfinder")
-        } else if summaryStarted {
+        } else if !rescanning, summaryStarted {
             ListeningIndicator(text: "Text detected", systemImage: "checkmark.circle.fill")
+        } else if holdStartedAt != nil {
+            ListeningIndicator(text: "Hold steady… \(secondsLeft)", systemImage: "timer")
         } else {
-            switch guidance.state {
-            case let .guiding(decision):
-                ListeningIndicator(text: Self.label(for: decision), systemImage: Self.icon(for: decision))
-            case .capturing, .interpreting:
-                ListeningIndicator(text: "Hold steady…", systemImage: "timer")
-            case .failed:
-                ListeningIndicator(text: "Say try again, or go back", systemImage: "arrow.clockwise")
-            case .idle, .result:
-                ListeningIndicator(text: "Looking for text…", systemImage: "text.viewfinder")
+            ListeningIndicator(text: "Looking for text…", systemImage: "text.viewfinder")
+        }
+    }
+
+    // Waits for text, runs the countdown once it is found, and returns what was read. With `hints`, it also nudges
+    // the user if nothing readable shows up. With a `timeout`, it gives up and returns whatever there is.
+    // Returns nil if the screen went away.
+    private func scanForText(hold: TimeInterval, hints: Bool, timeout: TimeInterval?) async -> [String]? {
+        currentHold = hold
+        let began = Date()
+        var lastTextSeen = Date()
+        var emptySince = Date()
+        var hintsGiven = 0
+
+        while !Task.isCancelled {
+            // The microphone opens as soon as nothing is coming out of the speaker, and never before:
+            // the opening line and the hints below both name a `backKeywords` phrase, and the listener
+            // hears the speaker. Not during a rescan — by then the agent owns the microphone.
+            if !listening, !summaryStarted, !Speaker.shared.isBusy { await startListening() }
+
+            let now = Date()
+            if !reader.lines.isEmpty {
+                lastTextSeen = now
+                emptySince = now
+            } else if Speaker.shared.isBusy {
+                // Time spent listening to Iris isn't time spent failing to get a read. Without this the
+                // opening line — which the scan now runs underneath — counts toward the first hint, and a
+                // hint counts toward the one after it.
+                emptySince = now
             }
-        }
-    }
 
-    private static func label(for decision: LabelGuidanceDecision) -> String {
-        switch decision {
-        case .searching: "Looking for text…"
-        case .turnLeft: "Turn it left"
-        case .turnRight: "Turn it right"
-        case .moveCloser: "Move it closer"
-        case .needsLight: "Too dark · Find light"
-        case .holdSteady: "Hold it steady"
-        case .ready: "Hold still…"
-        }
-    }
-
-    private static func icon(for decision: LabelGuidanceDecision) -> String {
-        switch decision {
-        case .searching: "text.viewfinder"
-        case .turnLeft: "arrow.counterclockwise"
-        case .turnRight: "arrow.clockwise"
-        case .moveCloser: "plus.magnifyingglass"
-        case .needsLight: "lightbulb.fill"
-        case .holdSteady, .ready: "hand.raised.fill"
-        }
-    }
-
-    // MARK: - Flow
-
-    private func startReading() {
-        // Whatever pushed this screen is still talking ("Explore selected"); Turn to Read's opening line
-        // queues behind it.
-        Task {
-            await Speaker.shared.waitUntilIdle()
-            guard camera.state == .running, !summaryStarted else { return }
-            guidance.start(frames: camera.makeFrameStream(), target: { nil })
-        }
-        let frames = camera.makeFrameStream()
-        frameTask?.cancel()
-        frameTask = Task {
-            for await frame in frames {
-                guard !Task.isCancelled else { return }
-                if rescanning { rescanReader.process(frame: frame) }
-            }
-        }
-        startListenLoop()
-    }
-
-    private func stopReading() {
-        frameTask?.cancel()
-        frameTask = nil
-        guidance.stop()
-    }
-
-    /// The microphone opens whenever nothing is coming out of the speaker, and never before: the
-    /// spoken lines would otherwise be heard as commands. Not once the agent has the microphone.
-    private func startListenLoop() {
-        listenLoop?.cancel()
-        listenLoop = Task {
-            while !Task.isCancelled {
-                if !listening, !summaryStarted || agentEnded, !Speaker.shared.isBusy {
-                    await startListening()
-                } else if listening, Speaker.shared.isBusy {
-                    stopListening()
+            if let holdBegan = holdStartedAt {
+                if now.timeIntervalSince(lastTextSeen) >= textLostGrace {
+                    resetHold()
+                } else {
+                    let elapsed = now.timeIntervalSince(holdBegan)
+                    secondsLeft = max(0, Int((hold - elapsed).rounded(.up)))
+                    if elapsed >= hold { return reader.lines }
                 }
-                try? await Task.sleep(for: .milliseconds(150))
+            } else if !reader.lines.isEmpty {
+                startHold(at: now)
+            } else if hints {
+                let wait = hintsGiven == 0 ? firstHintAfter : laterHintEvery
+                if hintsGiven < maxHints, now.timeIntervalSince(emptySince) >= wait {
+                    hintsGiven += 1
+                    emptySince = now
+                    speakHint("I can't read any text yet. Try holding the label closer, or say go back.")
+                }
             }
+
+            if let timeout, now.timeIntervalSince(began) >= timeout { return reader.lines }
+            try? await Task.sleep(for: .milliseconds(100))
         }
+        return nil
     }
 
-    @State private var agentEnded = false
+    // The agent asked for another scan: clear what was read, show the countdown again, and return the new text.
+    private func performRescan() async -> [String] {
+        let began = Date()
+        print("Rescan started")
+        rescanning = true
+        reader.reset()
+        resetHold()
+        let lines = await scanForText(hold: rescanHold, hints: false, timeout: rescanTimeout) ?? []
+        resetHold()
+        rescanning = false
+        print("Rescan finished: \(lines.count) lines in \(String(format: "%.1f", Date().timeIntervalSince(began))) s")
+        return lines
+    }
+
+    private func startHold(at date: Date) {
+        holdStartedAt = date
+        secondsLeft = Int(currentHold)
+        holdCount += 1
+        withAnimation(.linear(duration: currentHold)) { ringProgress = 1 }
+    }
+
+    private func resetHold() {
+        holdStartedAt = nil
+        withAnimation(.easeOut(duration: 0.2)) { ringProgress = 0 }
+    }
+
+    // The hint mentions "go back", so the microphone goes off while it plays or the listener would hear
+    // it. The scan loop opens it again once the queue is empty.
+    private func speakHint(_ text: String) {
+        stopListening()
+        Speaker.shared.speak(text)
+    }
 
     private func startListening() async {
         guard !listening else { return }
         listening = true
-        await listener.start(commands: ["back": backKeywords, "again": retryKeywords]) { command in
-            listening = false
-            switch command {
-            case "again": retry()
-            default: onBack()
-            }
-        }
+        await listener.start(commands: ["back": backKeywords]) { _ in onBack() }
+        // The screen can go away while the session is being set up, and `onDisappear` has then already
+        // stopped a listener that wasn't running yet.
         if Task.isCancelled { stopListening() }
     }
 
@@ -199,85 +204,48 @@ struct ExploreScreen: View {
         listener.stop()
     }
 
-    private func retry() {
-        guard camera.state == .running else { return }
-        summaryStarted = false
-        agentEnded = false
-        agent.stop()
-        guidance.start(frames: camera.makeFrameStream(), target: { nil })
-    }
-
-    // The agent takes over the microphone, so our own listener stops first.
-    private func beginSummary(with reading: LabelReading) {
-        guard !summaryStarted else { return }
+    // The agent takes over the microphone, so our own listener stops first. Connecting takes a moment anyway, so
+    // it starts right away instead of waiting for "Text detected." to finish.
+    private func beginSummary(with lines: [String]) {
         summaryStarted = true
+        holdStartedAt = nil
+        withAnimation(.easeOut(duration: 0.3)) { ringProgress = 0 }
         stopListening()
-        guard AssistantConfiguration.elevenLabsAgentID != nil, reading.hasAnyText else {
-            // No agent (or nothing read): Turn to Read has already said what it could.
-            agentEnded = true
-            return
-        }
         Speaker.shared.speak("Text detected.")
-        agent.start(initialMessage: Self.summaryRequest(for: reading), prompt: Self.persona)
+        agent.start(initialMessage: Self.summaryRequest(for: lines))
     }
 
-    /// The agent never connected or dropped: say what Turn to Read made of the label instead.
-    private func agentWentAway() {
-        guard summaryStarted, !agentEnded else { return }
-        agentEnded = true
-        guidance.readSummary()
-    }
-
-    // The agent asked for another scan: clear what was read, read again, and return the new text.
-    private func performRescan() async -> [String] {
-        rescanning = true
-        rescanReader.reset()
-        let began = Date()
-        while !Task.isCancelled {
-            let elapsed = Date().timeIntervalSince(began)
-            if !rescanReader.lines.isEmpty, elapsed >= rescanHold { break }
-            if elapsed >= rescanTimeout { break }
-            try? await Task.sleep(for: .milliseconds(100))
+    /// Forwards camera frames to the reader, which throttles itself.
+    private func startFrames() {
+        let frames = camera.makeFrameStream()
+        frameTask?.cancel()
+        frameTask = Task {
+            for await frame in frames {
+                guard !Task.isCancelled else { return }
+                reader.process(frame: frame)
+            }
         }
-        rescanning = false
-        return rescanReader.lines
     }
 
-    static func summaryRequest(for reading: LabelReading) -> String {
-        let text = reading.allLines.map { "- \($0)" }.joined(separator: "\n")
-        var facts: [String] = []
-        if let title = reading.title { facts.append("Name: \(title)\(reading.titleIsUncertain ? " (uncertain)" : "")") }
-        if let strength = reading.strength { facts.append("Strength: \(strength)") }
-        if let directions = reading.directions { facts.append("Directions: \(directions)") }
-        if let date = reading.discardOrExpiration { facts.append("Discard or expiration: \(date)") }
-        if !reading.warnings.isEmpty { facts.append("Warnings: " + reading.warnings.joined(separator: "; ")) }
-        let factLines = facts.isEmpty ? "" : "\nFields matched in that text:\n" + facts.map { "- \($0)" }.joined(separator: "\n") + "\n"
+    private func stopFrames() {
+        frameTask?.cancel()
+        frameTask = nil
+    }
+
+    static func summaryRequest(for lines: [String]) -> String {
+        let text = lines.map { "- \($0)" }.joined(separator: "\n")
         return """
         Scanned label text, in reading order (may contain misread characters):
         \(text)
-        \(factLines)
+
         Summarize this item in one or two short sentences, then wait.
         """
     }
-
-    /// Iris sends its own persona so the safety rule
-    /// always applies (the agent retries without it if overrides aren't allowed).
-    static let persona = """
-    You are Iris, a voice guide for someone who cannot see. They are holding an item up to their phone's \
-    camera, and you are given the text read off its label. Tell them what it is and the one or two \
-    things on it that actually matter — the brand, a flavour or a strength, a warning, a date — then \
-    stop and let them ask. Answer in at most three short spoken sentences, plainly, with no lists and \
-    no markdown, and never read the whole label out unless they ask you to. Never mention text, \
-    scanning, OCR or the camera: just say what the thing is. If what you were given is garbled or \
-    empty, say so and offer to look again — `rescan` is a tool you can call for that, and it takes a \
-    few seconds. Never say an item is safe to eat, drink, take or use; for food, medicine, doses, \
-    allergens or dates, say what the label says and suggest checking with a pharmacist, doctor or \
-    someone they trust.
-    """
 }
 
-/// Outlines the part of the picture that is being read, and fills during the read. The camera image fills
-/// the screen and is cropped to fit, so the outline is computed the same way.
+/// Outlines the part of the picture that is being read, and fills in green during the countdown. The camera image
+/// fills the screen and is cropped to fit, so the outline is computed the same way (see SegmentationOverlay in
+/// ContentView).
 private struct ScanAreaOutline: View {
     let imageSize: CGSize
     let viewSize: CGSize
@@ -287,7 +255,7 @@ private struct ScanAreaOutline: View {
     private var rect: CGRect {
         let scale = max(viewSize.width / imageSize.width, viewSize.height / imageSize.height)
         let content = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
-        let region = LabelTextReader.region
+        let region = TextReader.region
         return CGRect(
             x: region.minX * content.width - (content.width - viewSize.width) / 2,
             y: (1 - region.maxY) * content.height - (content.height - viewSize.height) / 2,
@@ -307,7 +275,6 @@ private struct ScanAreaOutline: View {
             .frame(width: rect.width, height: rect.height)
             .position(x: rect.midX, y: rect.midY)
             .animation(.easeInOut, value: foundText)
-            .animation(.easeInOut, value: progress)
             .allowsHitTesting(false)
     }
 }
