@@ -1,0 +1,58 @@
+name: Reachly
+
+options:
+  bundleIdPrefix: com.reachly
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+    SUPPORTS_MACCATALYST: NO
+
+targets:
+  Reachly:
+    type: application
+    platform: iOS
+    sources:
+      - path: Reachly
+        excludes:
+          - Resources/Info.plist
+    info:
+      path: Reachly/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Reachly
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        NSCameraUsageDescription: "Reachly uses the camera to help locate nearby objects and guide your hand toward them."
+        NSMicrophoneUsageDescription: "Reachly uses the microphone so you can control exploration with your voice."
+        NSSpeechRecognitionUsageDescription: "Reachly uses speech recognition to understand spoken object searches and navigation commands."
+        UIApplicationSupportsIndirectInputEvents: true
+        UILaunchScreen:
+          UIColorName: ReachlyBackground
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.reachly.ios
+        PRODUCT_NAME: Reachly
+        ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+schemes:
+  Reachly:
+    build:
+      targets:
+        Reachly: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+

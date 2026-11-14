@@ -1,0 +1,38 @@
+# Xcode build products
+build/
+DerivedData/
+.build/
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Local Xcode state
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.moved-aside
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager local state
+.swiftpm/
+Packages/
+
+# Secrets and local configuration
+.env
+.env.local
+.env.*.local
+**/Secrets.swift
+**/Local.xcconfig
+*.p8
+*.p12
+*.mobileprovision
+
+# macOS and editor files
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
