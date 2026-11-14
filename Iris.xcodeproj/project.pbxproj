@@ -803,7 +803,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios;
 				PRODUCT_NAME = Iris;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -944,7 +944,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios.tests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Iris.app/Iris";
 			};
 			name = Debug;
@@ -961,7 +961,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios.tests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Iris.app/Iris";
 			};
 			name = Release;
@@ -985,7 +985,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios;
 				PRODUCT_NAME = Iris;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

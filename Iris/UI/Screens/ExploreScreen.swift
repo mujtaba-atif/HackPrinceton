@@ -46,7 +46,6 @@ struct ExploreScreen: View {
         }
         .ignoresSafeArea()
         .overlay(alignment: .bottom) { statusPill }
-        .navigationBarBackButtonHidden(true)
         .animation(.easeInOut, value: agent.status)
         .animation(.easeInOut, value: guidance.state)
         .animation(.easeInOut, value: summaryStarted)

@@ -37,15 +37,16 @@ targets:
         CFBundleDisplayName: Iris
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
-        NSCameraUsageDescription: "Iris uses the camera to help locate nearby objects and guide your hand toward them."
-        NSMicrophoneUsageDescription: "Iris uses the microphone so you can control exploration with your voice."
-        NSSpeechRecognitionUsageDescription: "Iris uses speech recognition to understand spoken object searches and navigation commands."
+        NSCameraUsageDescription: "Camera is used to detect hands and objects with AR."
+        NSMicrophoneUsageDescription: "Iris listens for your voice commands."
+        NSSpeechRecognitionUsageDescription: "Iris uses speech recognition to understand your voice commands."
         UIApplicationSupportsIndirectInputEvents: true
-        UIRequiresFullScreen: true
-        UILaunchScreen:
-          UIColorName: IrisBackground
+        CADisableMinimumFrameDuration: true
+        UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
     configFiles:
       Debug: Config/Iris.xcconfig
       Release: Config/Iris.xcconfig

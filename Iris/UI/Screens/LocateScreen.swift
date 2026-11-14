@@ -54,7 +54,6 @@ struct LocateScreen: View {
                 .ignoresSafeArea()
         }
         .overlay(alignment: .bottom) { statusBlob }
-        .navigationBarBackButtonHidden(true)
         .animation(.easeInOut, value: beepController.phase)
         .animation(.easeInOut, value: guidanceStarted)
         .animation(.easeInOut, value: conversation.stage)
