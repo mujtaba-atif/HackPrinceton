@@ -1,10 +1,18 @@
-name: Reachly
+name: Iris
 
 options:
-  bundleIdPrefix: com.reachly
+  bundleIdPrefix: com.iris
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
+
+packages:
+  ElevenLabs:
+    url: https://github.com/elevenlabs/elevenlabs-swift-sdk.git
+    exactVersion: 3.3.1
+  LiveKit:
+    url: https://github.com/livekit/client-sdk-swift.git
+    majorVersion: 2.0.0
 
 settings:
   base:
@@ -15,61 +23,68 @@ settings:
     SUPPORTS_MACCATALYST: NO
 
 targets:
-  Reachly:
+  Iris:
     type: application
     platform: iOS
     sources:
-      - path: Reachly
+      - path: Iris
         excludes:
           - Resources/Info.plist
     info:
-      path: Reachly/Resources/Info.plist
+      path: Iris/Resources/Info.plist
       properties:
-        CFBundleDisplayName: Reachly
+        ElevenLabsAgentID: $(ELEVENLABS_AGENT_ID)
+        CFBundleDisplayName: Iris
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
-        NSCameraUsageDescription: "Reachly uses the camera to help locate nearby objects and guide your hand toward them."
-        NSMicrophoneUsageDescription: "Reachly uses the microphone so you can control exploration with your voice."
-        NSSpeechRecognitionUsageDescription: "Reachly uses speech recognition to understand spoken object searches and navigation commands."
+        NSCameraUsageDescription: "Iris uses the camera to help locate nearby objects and guide your hand toward them."
+        NSMicrophoneUsageDescription: "Iris uses the microphone so you can control exploration with your voice."
+        NSSpeechRecognitionUsageDescription: "Iris uses speech recognition to understand spoken object searches and navigation commands."
         UIApplicationSupportsIndirectInputEvents: true
         UIRequiresFullScreen: true
         UILaunchScreen:
-          UIColorName: ReachlyBackground
+          UIColorName: IrisBackground
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+    configFiles:
+      Debug: Config/Iris.xcconfig
+      Release: Config/Iris.xcconfig
+    dependencies:
+      - package: ElevenLabs
+      - package: LiveKit
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.reachly.ios
-        PRODUCT_NAME: Reachly
+        PRODUCT_BUNDLE_IDENTIFIER: com.iris.ios
+        PRODUCT_NAME: Iris
         ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         ENABLE_USER_SCRIPT_SANDBOXING: YES
 
-  ReachlyTests:
+  IrisTests:
     type: bundle.unit-test
     platform: iOS
     sources:
-      - path: ReachlyTests
+      - path: IrisTests
     dependencies:
-      - target: Reachly
+      - target: Iris
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
-        PRODUCT_BUNDLE_IDENTIFIER: com.reachly.ios.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.iris.ios.tests
 
 schemes:
-  Reachly:
+  Iris:
     build:
       targets:
-        Reachly: all
+        Iris: all
     run:
       config: Debug
     test:
       config: Debug
       targets:
-        - ReachlyTests
+        - IrisTests
     archive:
       config: Release
 
