@@ -5,8 +5,9 @@ Iris is a native iOS accessibility app designed to help blind and visually impai
 Iris runs on its own camera, detection, hand-tracking, depth and label-reading features, and it is voice-first:
 
 - **Home → Main.** Iris introduces itself and listens ("continue"), then asks whether to **Locate** something or **Explore** something you're holding. Every screen understands "go back".
-- **Locate**. Say what you want to find. Iris outlines it with on-device segmentation (YOLO26n-seg), then guides your hand to it in three steps with a stereo tone, water ripples and short spoken cues, measuring fingertip to object with Vision hand pose and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
+- **Locate**. Say what you want to find. Iris outlines it with on-device segmentation (YOLO26n-seg), then guides your hand to it in three steps with a stereo tone, glass waves and short spoken cues, measuring fingertip to object with Vision hand pose and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
 - **Explore**. Hold an item up and keep it steady for a two-second countdown while Iris reads the label, then the ElevenLabs agent summarizes it and answers questions.
+- **Design.** The look follows the Iris design in `Design/Iris`: its palette, Nunito type, characters, glass cards and camera waves, with the same motion curves and timings. Reduced Motion stops continuous movement and hides confetti.
 - **Voice.** Every spoken line uses your ElevenLabs voice (the agent's voice), with the on-device voice as a fallback when there is no key or no network.
 
 See [docs/IRIS.md](docs/IRIS.md) for the flows, the ElevenLabs setup and on-device testing. Developer screens — the original Explore screen (object list, depth readout, **Turn to Read** label sheet) and the hand-tracking debug screen — are available in Debug builds: long-press the home screen for 2 seconds.
@@ -60,13 +61,11 @@ Iris/
 │   ├── Guidance/           Guidance boundary
 │   └── Voice/              Speaker (ElevenLabs voice + on-device fallback), keyword listener, target parsing
 ├── Models/                 Shared domain and readiness models
-├── Resources/              Info.plist and asset catalogs
+├── Resources/              Info.plist, asset catalogs and the Nunito fonts (OFL)
 ├── Secrets.swift.example   Template for the git-ignored ElevenLabs keys
 └── UI/
-    ├── Art/                Vector artwork and Iris lettering
-    ├── Motion/             Eyes, floating, water pour and leaf-fall transitions, bubble title
-    ├── Water/              Audio-reactive water, guidance ripples, conversation water
-    ├── Status/             Status blob and listening pill
+    ├── Glass/              Iris design: palette, fonts, SVG artwork, keyframe motion, crew, cards, camera waves, outline
+    ├── Status/             Glass status panel and listening pill
     ├── Screens/            Loading, Home, Main, Locate, Explore
     ├── Exploration/        Original Explore screen (developer)
     ├── Home/               Original home screen (developer)
