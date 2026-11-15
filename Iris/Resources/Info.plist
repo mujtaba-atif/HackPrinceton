@@ -28,6 +28,15 @@
 	<string>Iris listens for your voice commands.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Iris uses speech recognition to understand your voice commands.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/Nunito-SemiBold.ttf</string>
+		<string>Fonts/Nunito-Bold.ttf</string>
+		<string>Fonts/Nunito-ExtraBold.ttf</string>
+		<string>Fonts/Nunito-Black.ttf</string>
+		<string>Fonts/NunitoSans-Bold.ttf</string>
+		<string>Fonts/NunitoSans-ExtraBold.ttf</string>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>

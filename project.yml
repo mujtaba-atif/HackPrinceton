@@ -30,7 +30,11 @@ targets:
       - path: Iris
         excludes:
           - Resources/Info.plist
+          - Resources/Fonts
           - Secrets.swift.example
+      - path: Iris/Resources/Fonts
+        type: folder
+        buildPhase: resources
     info:
       path: Iris/Resources/Info.plist
       properties:
@@ -43,6 +47,13 @@ targets:
         UIApplicationSupportsIndirectInputEvents: true
         CADisableMinimumFrameDuration: true
         UILaunchScreen: {}
+        UIAppFonts:
+          - Fonts/Nunito-SemiBold.ttf
+          - Fonts/Nunito-Bold.ttf
+          - Fonts/Nunito-ExtraBold.ttf
+          - Fonts/Nunito-Black.ttf
+          - Fonts/NunitoSans-Bold.ttf
+          - Fonts/NunitoSans-ExtraBold.ttf
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
