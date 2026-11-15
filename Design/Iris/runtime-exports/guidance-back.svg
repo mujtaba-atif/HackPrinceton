@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800" fill="none"><title>Iris guidance arrows: back</title><style><![CDATA[.guidance-chevron{color:var(--step-color)}
+.guidance-chevron-aura{fill:currentColor;stroke:currentColor;stroke-width:5px;opacity:.2;filter:blur(3px)}
+.guidance-chevron-face{fill:currentColor;fill-opacity:.88}
+.guidance-chevron-rim{fill:none;stroke:#C1EDFF;stroke-width:.8;stroke-opacity:.45;stroke-linejoin:round}]]></style><g transform="translate(4 230) scale(.9)" style="filter:drop-shadow(0 0 7px #279FFF55)"><g class="guidance-chevron" data-step="0" transform="translate(40 24) scale(0.44)" style="--step-color:rgb(188,238,255);--step-index:0">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g><g class="guidance-chevron" data-step="1" transform="translate(40 78) scale(0.62)" style="--step-color:rgb(109,191,247);--step-index:1">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g><g class="guidance-chevron" data-step="2" transform="translate(40 142) scale(0.8)" style="--step-color:rgb(52,122,216);--step-index:2">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g><g class="guidance-chevron" data-step="3" transform="translate(40 220) scale(1)" style="--step-color:rgb(32,76,175);--step-index:3">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g></g><g transform="translate(284 230) scale(.9)" style="filter:drop-shadow(0 0 7px #279FFF55)"><g class="guidance-chevron" data-step="0" transform="translate(40 24) scale(0.44)" style="--step-color:rgb(188,238,255);--step-index:0">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g><g class="guidance-chevron" data-step="1" transform="translate(40 78) scale(0.62)" style="--step-color:rgb(109,191,247);--step-index:1">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g><g class="guidance-chevron" data-step="2" transform="translate(40 142) scale(0.8)" style="--step-color:rgb(52,122,216);--step-index:2">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g><g class="guidance-chevron" data-step="3" transform="translate(40 220) scale(1)" style="--step-color:rgb(32,76,175);--step-index:3">
+    <g class="guidance-chevron-heading" transform="rotate(180 0 15)">
+    <path class="guidance-chevron-aura" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="M-32 18L0 0L32 18L32 30L0 12L-32 30Z" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g></g></svg>

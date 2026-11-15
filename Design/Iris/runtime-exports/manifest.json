@@ -1,0 +1,100 @@
+{
+  "revision": 25,
+  "provenance": "Generated from local runtime modules; these are not direct Figma node exports.",
+  "livePreview": "https://app-vv74nvdykzsio2xxoy5pgrvgmdczd43ramggdbyipubmjv56i7pp.makeproxy-c.figma.site/?screen=guidance",
+  "sourceFiles": [
+    {
+      "file": "../guidance.js",
+      "sha256": "dfaab85bb4f521a1accd4ae70fb64c04d116e7f8c54221442c960635bc40f4ab"
+    },
+    {
+      "file": "../tracking.js",
+      "sha256": "8cae2ecfc7caa3ef4cb94684ed7659bd1be03d5cb9b8899a05247a694c3e43ba"
+    },
+    {
+      "file": "../landing-motion.js",
+      "sha256": "4bd9750d95da5478bc9f4ab2dddf1c18b30233600cb5168947940fbd3458e72d"
+    },
+    {
+      "file": "../landing-motion.css",
+      "sha256": "c5bafd2393bec2a6b7cea519fba0044b4bbecfc96fa86f0b270e7d9e9b2cdba2"
+    },
+    {
+      "file": "../style.css",
+      "sha256": "9dbba7157ba489c7b1d498a8bacbd7f9c86f68bebdff6a5e0b10f9c4a27d5da6"
+    },
+    {
+      "file": "../landing-reference.png",
+      "sha256": "18fa00c806970b05755cef71cbff2f30deb41889da866fca08d7bda2cdeef1ca"
+    },
+    {
+      "file": "../fonts/iris-3.ttf",
+      "sha256": "c5776505c7b3df3c3ca763477b795d6bbc6517760bede0462ab77d1fb44954a6"
+    }
+  ],
+  "assets": [
+    {
+      "file": "guidance-forward.svg",
+      "description": "Two four-chevron trails at 0 degrees, 0.8 meter proximity palette; animations paused.",
+      "width": 360,
+      "height": 800,
+      "sha256": "ff7039fc07832245768aefbede79b8f7eb8760325e831a9d654d025002930ac2"
+    },
+    {
+      "file": "guidance-left.svg",
+      "description": "Two four-chevron trails at -90 degrees, 0.8 meter proximity palette; animations paused.",
+      "width": 360,
+      "height": 800,
+      "sha256": "c89b15be06a8817b4b7e7c1fb28af40807239aefef1179b2b6317b3a86523bd3"
+    },
+    {
+      "file": "guidance-right.svg",
+      "description": "Two four-chevron trails at 90 degrees, 0.8 meter proximity palette; animations paused.",
+      "width": 360,
+      "height": 800,
+      "sha256": "c9e5a31e12df591dd9bcbe51508b616e8430248903815461ae5b10c97316b8ca"
+    },
+    {
+      "file": "guidance-back.svg",
+      "description": "Two four-chevron trails at 180 degrees, 0.8 meter proximity palette; animations paused.",
+      "width": 360,
+      "height": 800,
+      "sha256": "369ce63ba21152b2b3fad6a9c03df99ae1597ee105b93f2c70e241cfa5bfaeec"
+    },
+    {
+      "file": "hand-distance-0.8m.svg",
+      "description": "Production tracking geometry with bare 31.5 in label and embedded Nunito font.",
+      "width": 360,
+      "height": 800,
+      "sha256": "7ba9eea57dadf2c677170ea41daca876f6804b30bae340408fb41bcfad6f51f8"
+    },
+    {
+      "file": "hand-distance-0.3m.svg",
+      "description": "Production tracking geometry with bare 11.8 in label and embedded Nunito font.",
+      "width": 360,
+      "height": 800,
+      "sha256": "59e26620a13a2525e9264c70e265d2a9b7859699e380fe66241868e5e215d202"
+    },
+    {
+      "file": "hand-distance-0m.svg",
+      "description": "Production tracking geometry with bare 0.0 in label and embedded Nunito font.",
+      "width": 360,
+      "height": 800,
+      "sha256": "655c5745afc8170e666ac07bc5c884358aa9397bf8da2d56bcbcdf630bc7ed48"
+    },
+    {
+      "file": "hand-distance-held.svg",
+      "description": "Last valid 0.3 m sample held during hand loss: number and connector remain; skeleton is hidden.",
+      "width": 360,
+      "height": 800,
+      "sha256": "4394244d621f6f2b4b4c4c7fa032bf846925126b5ed6727640b2ed2d5ca9b54e"
+    },
+    {
+      "file": "landing-static.svg",
+      "description": "Still/reduced-motion state from the landing generator. The original artwork is embedded PNG pixels, not redrawn vector characters.",
+      "width": 852,
+      "height": 1846,
+      "sha256": "6b8b74293f558a52dc3da1be693baebc95c2942085ba6990ae4047f86af43ce9"
+    }
+  ]
+}

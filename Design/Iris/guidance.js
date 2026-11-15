@@ -1,9 +1,15 @@
 /* Browser-only guidance demo. Distances are supplied in meters, never inferred from pixels. */
 (function(root){
  'use strict';
- const directions={forward:0,back:180,left:-18,right:18,reached:0};
+ const directions={forward:0,back:180,left:-90,right:90,reached:0};
  const instructions={forward:'Reach forward',back:'Ease your hand back',left:'Move your hand left',right:'Move your hand right',reached:'Object reached'};
- const arrowPath='M22 4L41 45L29 39L29 228L22 240L15 228L15 39L3 45Z';
+ const chevronPath='M-32 18L0 0L32 18L32 30L0 12L-32 30Z';
+ const steps=[
+  {y:24,scale:.44,curve:1,base:[188,238,255],bright:[240,252,255]},
+  {y:78,scale:.62,curve:.68,base:[109,191,247],bright:[189,238,255]},
+  {y:142,scale:.8,curve:.34,base:[52,122,216],bright:[89,190,255]},
+  {y:220,scale:1,curve:0,base:[32,76,175],bright:[25,158,255]}
+ ];
  const palette=[[0,[237,249,255]],[.35,[151,222,255]],[.7,[34,93,221]],[1,[20,157,255]]];
 
  function reading(distance){
@@ -22,6 +28,9 @@
  function state(options={}){
   const {distance=.8,handVisible=true,targetVisible=true}=options;
   let direction=Object.hasOwn(directions,options.direction)?options.direction:'forward';
+  // Signed target bearing: left is negative, straight ahead is zero, right is positive.
+  const bearing=Number.isFinite(options.bearing)?Math.max(-180,Math.min(180,options.bearing)):directions[direction];
+  if(direction!=='reached')direction=Math.abs(bearing)>135?'back':bearing<-.5?'left':bearing>.5?'right':'forward';
   const result=reading(distance);
   const mode=!targetVisible?'searching':!handVisible?'lost':!result.available?'unavailable':distance===0||direction==='reached'?'reached':'tracking';
   if(mode==='reached')direction='reached';
@@ -31,44 +40,50 @@
   const value=active?result.value:'—';
   const unit=active?'in':'';
   const secondary=mode==='searching'?'No target selected':mode==='lost'?'Hand not visible':mode==='unavailable'?'Distance unavailable':mode==='reached'?'Ready to pick up':result.secondary;
-  return {mode,direction,progress,angle:directions[direction],color:colorAt(progress),value,unit,secondary,instruction,
+  return {mode,direction,progress,angle:mode==='tracking'?bearing:0,color:colorAt(progress),value,unit,secondary,instruction,
    description:active?`Demo distance from hand to object: ${result.value} inches. ${instruction}.`:`Demo hand-to-object distance unavailable. ${instruction}.`};
  }
 
+ function chevronStep(index,s){
+  const step=steps[index];
+  const color=`rgb(${step.base.map((value,i)=>Math.round(value+(step.bright[i]-value)*s.progress)).join(',')})`;
+  return {transform:`translate(40 ${step.y}) scale(${step.scale})`,color};
+ }
+
  function arrow(side,s){
-  const id='iris-guidance-'+side;
-  const height=s.progress*240;
-  return `<div class="guidance-arrow ${side}"><svg class="guidance-arrow-core" viewBox="0 0 44 244" fill="none" aria-hidden="true">
-   <defs><clipPath id="${id}-clip"><path d="${arrowPath}"/></clipPath><linearGradient id="${id}-fill" x1="22" y1="240" x2="22" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#159FFF"/><stop offset=".42" stop-color="#245FE8"/><stop offset=".77" stop-color="#8CD9FF"/><stop offset="1" stop-color="#F4FCFF"/></linearGradient></defs>
-   <path class="guidance-aura" d="${arrowPath}" stroke="currentColor" stroke-width="10" opacity=".16"/>
-   <path class="guidance-base" d="${arrowPath}" fill="currentColor" fill-opacity=".12" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-   <g clip-path="url(#${id}-clip)"><rect class="guidance-fill" x="0" y="${244-height}" width="44" height="${height}" fill="url(#${id}-fill)"/><path class="guidance-sweep" d="M0 215H44V244H0Z" fill="#EDFAFF" opacity=".7"/></g>
-   <path class="guidance-shine" d="M8 38L22 10L36 38M19 55V220" stroke="#F1FCFF" stroke-opacity=".8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg></div>`;
+  return `<div class="guidance-arrow ${side}"><svg class="guidance-arrow-core" viewBox="0 0 80 260" fill="none" aria-hidden="true">${steps.map((_,index)=>{
+   const step=chevronStep(index,s);
+   return `<g class="guidance-chevron" data-step="${index}" transform="${step.transform}" style="--step-color:${step.color};--step-index:${index}">
+    <g class="guidance-chevron-heading">
+    <path class="guidance-chevron-aura" d="${chevronPath}" stroke="var(--step-color)" stroke-width="6" stroke-linejoin="round" opacity=".18"/>
+    <path class="guidance-chevron-face" d="${chevronPath}" fill="var(--step-color)" stroke="#D7F6FF" stroke-opacity=".22" stroke-width=".8" stroke-linejoin="round"/>
+    <path class="guidance-chevron-rim" d="M-32 18L0 0L32 18" stroke="#EDFBFF" stroke-opacity=".72" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g></g>`;
+  }).join('')}</svg></div>`;
  }
 
  function render(options={}){
   const s=state(options);
-  return `<div class="guidance-arrows" data-mode="${s.mode}" data-direction="${s.direction}" style="--guidance-progress:${s.progress};--guidance-angle:${s.angle}deg;--guidance-color:${s.color}" aria-hidden="true">${arrow('left',s)}${arrow('right',s)}</div>
-   <section class="distance-hud" data-mode="${s.mode}" aria-label="${s.description}"><span class="distance-heading"><i></i>HAND → OBJECT</span><div class="distance-reading"><strong class="distance-value">${s.value}</strong><span class="distance-unit">${s.unit}</span></div><span class="distance-secondary">${s.secondary}</span><span class="distance-instruction">${s.instruction}</span></section>`;
+  return `<div class="guidance-arrows" data-mode="${s.mode}" data-direction="${s.direction}" style="--guidance-progress:${s.progress};--guidance-angle:${s.angle}deg;--guidance-color:${s.color}" aria-hidden="true">${arrow('left',s)}${arrow('right',s)}</div>`;
  }
 
  function update(container,options={}){
   if(!container)return;
-  const s=state(options),arrows=container.querySelector('.guidance-arrows'),hud=container.querySelector('.distance-hud');
+  const s=state(options),arrows=container.querySelector('.guidance-arrows');
   if(arrows){
    arrows.dataset.mode=s.mode;arrows.dataset.direction=s.direction;
    arrows.style.setProperty('--guidance-progress',s.progress);
-   arrows.style.setProperty('--guidance-angle',s.angle+'deg');
+   const current=parseFloat(arrows.style.getPropertyValue('--guidance-angle'))||0;
+   const turn=((s.angle-current)%360+540)%360-180;
+   arrows.style.setProperty('--guidance-angle',(current+turn)+'deg');
    arrows.style.setProperty('--guidance-color',s.color);
-   for(const fill of arrows.querySelectorAll('.guidance-fill')){fill.setAttribute('y',244-s.progress*240);fill.setAttribute('height',s.progress*240)}
-  }
-  if(hud){
-   hud.dataset.mode=s.mode;hud.setAttribute('aria-label',s.description);
-   for(const [key,value] of Object.entries({value:s.value,unit:s.unit,secondary:s.secondary,instruction:s.instruction})){
-    const element=hud.querySelector('.distance-'+key);if(element)element.textContent=value;
+   for(const chevron of arrows.querySelectorAll('.guidance-chevron')){
+    const step=chevronStep(Number(chevron.dataset.step),s);
+    chevron.setAttribute('transform',step.transform);
+    chevron.style.setProperty('--step-color',step.color);
    }
   }
+
  }
 
  const api={reading,render,update};

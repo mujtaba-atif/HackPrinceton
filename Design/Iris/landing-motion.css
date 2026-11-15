@@ -1,0 +1,58 @@
+/* Original artwork with visible, slow layered waves and white shooting-star trails. */
+.home.iris-landing{background:#031638;isolation:isolate}
+.iris-landing .landing-atmosphere{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;user-select:none}
+.iris-landing .landing-atmosphere-svg{display:block;width:100%;height:100%;overflow:hidden}
+.iris-landing .landing-wave-top-image,.iris-landing .landing-wave-bottom-image,.iris-landing .landing-crew-image,.iris-landing .landing-flow-ribbon{transform-box:view-box;will-change:transform}
+.iris-landing .landing-wave-top-image{transform-origin:160px 100px;animation:iris-landing-source-top 8s ease-in-out -2s infinite}
+.iris-landing .landing-wave-bottom-image{transform-origin:426px 1690px;animation:iris-landing-source-bottom 9s ease-in-out -5s infinite}
+.iris-landing .landing-crew-image{transform-origin:426px 1100px;animation:iris-landing-scene-float 7s ease-in-out -1.7s infinite}
+.iris-landing .landing-flow-top{transform-origin:160px 150px;animation:iris-landing-ribbon-top 7s ease-in-out -3s infinite}
+.iris-landing .landing-flow-top-secondary{transform-origin:220px 150px;opacity:.65;animation:iris-landing-ribbon-top 9s ease-in-out -6s infinite reverse}
+.iris-landing .landing-flow-bottom{transform-origin:426px 1690px;animation:iris-landing-ribbon-bottom 8s ease-in-out -1s infinite}
+.iris-landing .landing-flow-bottom-secondary{transform-origin:426px 1690px;opacity:.7;animation:iris-landing-ribbon-bottom 10s ease-in-out -5s infinite reverse}
+.iris-landing .landing-title-sheen{opacity:0;animation:iris-landing-purple-pass 5.5s ease-in-out infinite}
+.iris-landing .landing-star-streak{opacity:0;animation:iris-landing-star-streak 4.8s linear var(--streak-delay,0s) infinite}
+.iris-landing .landing-star-flash{opacity:0;animation:iris-landing-star-flash 4.8s ease-in-out var(--streak-delay,0s) infinite}
+@keyframes iris-landing-source-top{
+ 0%,100%{transform:translate(-7px,-22px) skewX(-.7deg)}
+ 50%{transform:translate(9px,26px) skewX(1.2deg)}
+}
+@keyframes iris-landing-source-bottom{
+ 0%,100%{transform:translate(10px,26px) skewY(-.7deg)}
+ 50%{transform:translate(-12px,-26px) skewY(.8deg)}
+}
+@keyframes iris-landing-scene-float{
+ 0%,100%{transform:translate(2px,18px)}
+ 50%{transform:translate(-3px,-20px)}
+}
+@keyframes iris-landing-ribbon-top{
+ 0%,100%{transform:translate(-5px,-26px) skewX(-2deg);opacity:.55}
+ 50%{transform:translate(10px,30px) skewX(2.5deg);opacity:.9}
+}
+@keyframes iris-landing-ribbon-bottom{
+ 0%,100%{transform:translate(10px,28px) skewY(-1.2deg);opacity:.6}
+ 50%{transform:translate(-12px,-32px) skewY(1.4deg);opacity:.95}
+}
+@keyframes iris-landing-purple-pass{
+ 0%,9%{transform:translateX(0);opacity:0}
+ 15%{opacity:.8}
+ 42%,100%{transform:translateX(1200px);opacity:0}
+}
+@keyframes iris-landing-star-streak{
+ 0%{transform:translateX(-150px);opacity:0}
+ 4%{opacity:1}
+ 14%{transform:translateX(0);opacity:1}
+ 28%{transform:translateX(180px);opacity:0}
+ 100%{transform:translateX(180px);opacity:0}
+}
+@keyframes iris-landing-star-flash{
+ 0%,8%,27%,100%{opacity:0}
+ 14%{opacity:.95}
+ 19%{opacity:.45}
+}
+body.reduced .iris-landing .landing-atmosphere *{animation:none!important;transition:none!important}
+body.reduced .iris-landing .landing-star-streak,body.reduced .iris-landing .landing-star-flash,body.reduced .iris-landing .landing-title-sheen,body.reduced .iris-landing .landing-flow-ribbon{opacity:0!important}
+@media(prefers-reduced-motion:reduce){
+ .iris-landing .landing-atmosphere *{animation:none!important;transition:none!important}
+ .iris-landing .landing-star-streak,.iris-landing .landing-star-flash,.iris-landing .landing-title-sheen,.iris-landing .landing-flow-ribbon{opacity:0!important}
+}
