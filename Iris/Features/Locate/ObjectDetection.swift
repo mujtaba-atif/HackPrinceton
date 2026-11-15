@@ -12,6 +12,7 @@ struct Detection: Identifiable {
 }
 
 struct EdgeMeasurement {
+    let timestamp: TimeInterval // Monotonic camera frame time, used to reject stale haptic input.
     let fingertip: CGPoint // index fingertip, normalized 0-1, Vision coords
     let edge: CGPoint    // nearest point on the mask's outer contour, Vision coords
     let distance: Float? // meters, 3D via LiDAR; nil when depth is unavailable
@@ -692,6 +693,7 @@ class ObjectDetector: ObservableObject {
         }
         let screenGap = insideMask ? 0 : hypot(finger.tip.x - edge.x, finger.tip.y - edge.y)
         return EdgeMeasurement(
+            timestamp: frame.timestamp,
             fingertip: finger.tip,
             edge: edge,
             distance: distance,

@@ -4,6 +4,32 @@ import AVFoundation
 import QuartzCore
 import UIKit
 
+/// Emits at most one pulse per fresh measurement. No timer can keep vibrating after tracking stops.
+struct ProximityHapticCadence {
+    private var lastPulse: TimeInterval?
+    private var lastSample: TimeInterval?
+
+    mutating func pulse(distance: Float?, timestamp: TimeInterval, now: TimeInterval) -> CGFloat? {
+        guard timestamp.isFinite, now.isFinite,
+              now >= timestamp, now - timestamp <= 0.35,
+              lastSample.map({ timestamp > $0 }) ?? true else { return nil }
+        lastSample = timestamp
+        guard let distance, distance.isFinite, distance >= 0, distance <= 0.5 else { return nil }
+
+        // 50 cm: a gentle pulse every 1.2 s. At 5 cm or closer: a firmer pulse every 0.25 s.
+        let closeness = min(1, max(0, (0.5 - Double(distance)) / 0.45))
+        let interval = 1.2 - 0.95 * closeness
+        guard lastPulse.map({ now - $0 >= interval }) ?? true else { return nil }
+        lastPulse = now
+        return CGFloat(0.35 + 0.55 * closeness)
+    }
+
+    mutating func reset() {
+        lastPulse = nil
+        lastSample = nil
+    }
+}
+
 /// Hands the tone's level and stereo position to the audio render thread, which can't touch main-actor
 /// state. Aligned 32-bit stores, so the render callback takes no lock (where one risks priority
 /// inversion).
@@ -105,6 +131,8 @@ final class DistanceBeepController: ObservableObject {
     /// Not `@Published`: see `GuidanceCue`.
     let cue = GuidanceCue()
     private let directionFeedback = UIImpactFeedbackGenerator(style: .medium)
+    private let proximityFeedback = UIImpactFeedbackGenerator(style: .medium)
+    private var proximityCadence = ProximityHapticCadence()
     private let readReadyFeedback = UINotificationFeedbackGenerator()
     private var sourceNode: AVAudioSourceNode?
     private var startingTone = false
@@ -116,7 +144,7 @@ final class DistanceBeepController: ObservableObject {
     /// happen — three steps — because every line after it is "step one of three", and a count that
     /// starts without being introduced is one more thing to work out while being led somewhere.
     private var greeting: String {
-        "Hold your hand up in front of the camera, and I'll guide you to the \(objectName) in three steps."
+        "Hold your hand up in front of the camera, and I'll guide you to the \(objectName) in three steps. The phone pulses faster as your hand gets closer."
     }
     /// Set when a one-shot line was held back because something else was mid-sentence, so it lands
     /// right after rather than on top of it. Retried on each update until it is spoken.
@@ -179,6 +207,8 @@ final class DistanceBeepController: ObservableObject {
     func begin() {
         guard !active else { return }
         active = true
+        proximityCadence.reset()
+        proximityFeedback.prepare()
         lastCue = nil
         lastSpoken = Date()
         lastMeasured = CACurrentMediaTime()
@@ -201,6 +231,7 @@ final class DistanceBeepController: ObservableObject {
 
     /// The target, once the user has said it. Only changes the wording of the prompts.
     func setTarget(_ name: String) {
+        proximityCadence.reset()
         objectName = name
         print("Guidance: target is \(name)")
     }
@@ -214,6 +245,10 @@ final class DistanceBeepController: ObservableObject {
         objectCenter: CGPoint?
     ) {
         guard active else { return }
+        // Separate from speech and headphone routing: touch remains available while prompts play.
+        if !objectFound && !approaching && objectCenter != nil {
+            updateProximity(leftEdge, rightEdge)
+        }
         // An audio-session interruption (a route change, or the recognizer restarting under us) stops
         // the engine; this is where it comes back, rather than staying dead for the rest of the screen.
         startToneIfNeeded()
@@ -301,11 +336,31 @@ final class DistanceBeepController: ObservableObject {
             self.routeObserver = nil
         }
         active = false
+        proximityCadence.reset()
         phase = .idle
         pendingPhaseLine = nil
         lastCue = nil
         lastSpoken = .distantPast
         silence()
+    }
+
+    private func updateProximity(_ left: EdgeMeasurement?, _ right: EdgeMeasurement?) {
+        let now = CACurrentMediaTime()
+        let candidates = [left, right].compactMap { $0 }.filter {
+            guard let distance = $0.distance, let gap = $0.depthGap else { return false }
+            return distance.isFinite && distance >= 0 && gap.isFinite
+                && now >= $0.timestamp && now - $0.timestamp <= 0.35
+        }
+        // Inside the silhouette, the detector clamps overshoot to zero. Keep its absolute depth
+        // gap so a hand behind the object does not produce the strongest proximity feedback.
+        guard let measurement = candidates.min(by: {
+            max($0.distance!, abs($0.depthGap!)) < max($1.distance!, abs($1.depthGap!))
+        }), let intensity = proximityCadence.pulse(
+            distance: max(measurement.distance!, abs(measurement.depthGap!)),
+            timestamp: measurement.timestamp, now: now
+        ) else { return }
+        proximityFeedback.impactOccurred(intensity: intensity)
+        proximityFeedback.prepare()
     }
 
     func shutdown() {

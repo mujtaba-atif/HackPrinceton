@@ -115,6 +115,8 @@ final class Speaker: NSObject, ObservableObject, AVAudioPlayerDelegate, AVSpeech
         if session.category != .playAndRecord || session.mode != .measurement || session.categoryOptions != options {
             try session.setCategory(.playAndRecord, mode: .measurement, options: options)
         }
+        // Locate keeps voice commands listening while proximity pulses guide the user's hand.
+        try session.setAllowHapticsAndSystemSoundsDuringRecording(true)
         try session.setActive(true)
     }
 

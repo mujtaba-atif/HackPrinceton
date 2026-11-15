@@ -188,6 +188,42 @@ final class IrisDesignTests: XCTestCase {
 
     // MARK: Guidance waves
 
+    func testProximityPulsesBecomeFasterAndStrongerNearObject() throws {
+        var cadence = ProximityHapticCadence()
+        let far = try XCTUnwrap(cadence.pulse(distance: 0.5, timestamp: 10, now: 10))
+        XCTAssertNil(cadence.pulse(distance: 0.5, timestamp: 10.5, now: 10.5))
+        XCTAssertNotNil(cadence.pulse(distance: 0.5, timestamp: 11.3, now: 11.3))
+        let near = try XCTUnwrap(cadence.pulse(distance: 0.02, timestamp: 11.6, now: 11.6))
+        XCTAssertGreaterThan(near, far)
+        XCTAssertNil(cadence.pulse(distance: 0.02, timestamp: 11.7, now: 11.7))
+        XCTAssertNotNil(cadence.pulse(distance: 0.02, timestamp: 11.9, now: 11.9))
+    }
+
+    func testProximityRequiresValidFreshMetricDistance() {
+        let invalidDistances: [Float?] = [nil, -.infinity, .infinity, .nan, -0.1, 0.51]
+        for distance in invalidDistances {
+            var cadence = ProximityHapticCadence()
+            XCTAssertNil(cadence.pulse(distance: distance, timestamp: 10, now: 10))
+        }
+        var cadence = ProximityHapticCadence()
+        XCTAssertNil(cadence.pulse(distance: 0.1, timestamp: 10, now: 11))
+        XCTAssertNil(cadence.pulse(distance: 0.1, timestamp: 12, now: 11))
+        XCTAssertNil(cadence.pulse(distance: 0.1, timestamp: .nan, now: 11))
+        XCTAssertNotNil(cadence.pulse(distance: 0.1, timestamp: 11, now: 11))
+        XCTAssertNil(cadence.pulse(distance: 0.1, timestamp: 11, now: 11.3), "Republishing one sample cannot vibrate twice")
+        XCTAssertNil(cadence.pulse(distance: 0.1, timestamp: 10.9, now: 11.1), "Reject out-of-order results")
+    }
+
+    func testProximityDropoutDoesNotCauseBurstAndResetStartsNewSession() {
+        var cadence = ProximityHapticCadence()
+        XCTAssertNotNil(cadence.pulse(distance: 0, timestamp: 10, now: 10))
+        XCTAssertNil(cadence.pulse(distance: nil, timestamp: 10.05, now: 10.05))
+        XCTAssertNil(cadence.pulse(distance: 0, timestamp: 10.1, now: 10.1))
+        XCTAssertNotNil(cadence.pulse(distance: 0, timestamp: 10.3, now: 10.3))
+        cadence.reset()
+        XCTAssertNotNil(cadence.pulse(distance: 0.5, timestamp: 10.4, now: 10.4))
+    }
+
     func testSurgeSwellsAndEbbsEachPeriod() {
         XCTAssertEqual(CameraGlass.swell(0), 0, accuracy: 1e-6)
         XCTAssertEqual(CameraGlass.swell(0.35), 1, accuracy: 1e-6)

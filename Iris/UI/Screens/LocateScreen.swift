@@ -116,6 +116,7 @@ struct LocateScreen: View {
                 .combineLatest(detector.$rightHandEdge, detector.$objectFound)
                 .combineLatest(detector.$approaching, detector.$objectClose)
         ) { measurements, approaching, objectClose in
+            guard camera.state == .running, scenePhase == .active else { return }
             let (leftEdge, rightEdge, objectFound) = measurements
             beepController.update(
                 leftEdge: leftEdge,
