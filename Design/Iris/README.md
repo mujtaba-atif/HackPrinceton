@@ -102,8 +102,6 @@ Select the latest code layer in Figma and press Play to interact. The native
 screens are editable. This UI package and the current SVG exports are included
 on the `UI/UX` branch with the user's authorization.
 
-The original study adapted selected UI artwork from the user-selected
-`amiezeng/Probe` branch `riba/more-ui-stuff`. No repository was cloned or forked.
 Revision 02 keeps the mascot and eye-card motif, while introducing original card
 layouts, Locate / Explore labels, glass materials, and different choreography.
 Harvey's current website informed the layered panels, fine borders, and soft
@@ -164,7 +162,6 @@ Font Licenses are included in `fonts/`.
 - PageTransition.swift, Floating.swift, EyeMotion.swift, WaterVisualizer.swift
 - ContentView.swift, AnalyzeView.swift, StatusBlob.swift, ListeningIndicator.swift
 
-Source: https://github.com/amiezeng/Probe/tree/riba/more-ui-stuff
 Video reference: https://www.youtube.com/watch?v=IKNUVaGHbME&t=109s
 Material inspiration: https://www.harvey.ai/
 Text-motion inspiration: https://render.com/
