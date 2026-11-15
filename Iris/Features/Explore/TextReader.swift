@@ -7,6 +7,8 @@ final class TextReader: ObservableObject {
     /// The part of the frame that is read, as fractions of the image. Symmetric, so it doesn't depend on rotation.
     static let region = CGRect(x: 0.2, y: 0.2, width: 0.6, height: 0.6)
 
+    enum Recognition: Equatable { case searching, reading, ready }
+    @Published private(set) var recognition: Recognition = .searching
     @Published private(set) var lines: [String] = []
     @Published private(set) var uprightImageSize = CGSize(width: 1440, height: 1920)
 
@@ -32,13 +34,15 @@ final class TextReader: ObservableObject {
     private var generation = 0
     // Touched only on `queue`.
     private var consolidator = TextConsolidator()
+    private var readiness = RecognitionReadiness()
 
     /// Forgets everything read so far, so a rescan starts from an empty window.
     func reset() {
         generation += 1
         // Queued behind any scan already running, so it empties whatever that scan adds.
-        queue.async { [weak self] in self?.consolidator.reset() }
+        queue.async { [weak self] in self?.consolidator.reset(); self?.readiness = RecognitionReadiness() }
         lines = []
+        recognition = .searching
     }
 
     func process(frame: CameraFrame) {
@@ -86,9 +90,12 @@ final class TextReader: ObservableObject {
 
         consolidator.add(readings)
         let consolidated = consolidator.consolidated()
+        let recognition = readiness.update(hasVisibleText: !readings.isEmpty, consolidated: consolidated)
 
         DispatchQueue.main.async { [weak self] in
-            guard let self, generation == self.generation, consolidated != self.lines else { return }
+            guard let self, generation == self.generation else { return }
+            self.recognition = recognition
+            guard consolidated != self.lines else { return }
             self.lines = consolidated
             if consolidated.isEmpty {
                 print("OCR: no text")
@@ -97,5 +104,24 @@ final class TextReader: ObservableObject {
                 consolidated.forEach { print("  \($0)") }
             }
         }
+    }
+}
+
+/// Recognition events, not a countdown: two matching consolidated OCR results make a read ready.
+/// Empty camera results return to searching and require new evidence before another read is ready.
+struct RecognitionReadiness {
+    private var previous: [String] = []
+    private var matchingScans = 0
+
+    mutating func update(hasVisibleText: Bool, consolidated: [String]) -> TextReader.Recognition {
+        guard hasVisibleText else {
+            previous = []
+            matchingScans = 0
+            return .searching
+        }
+        guard !consolidated.isEmpty else { return .reading }
+        matchingScans = consolidated == previous ? matchingScans + 1 : 1
+        previous = consolidated
+        return matchingScans >= 2 ? .ready : .reading
     }
 }

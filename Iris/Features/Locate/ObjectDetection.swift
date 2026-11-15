@@ -39,6 +39,20 @@ struct FoundTracker {
     private var pendingSince: TimeInterval? // start of the current run toward flipping `found`
     private var lastMeasurement: TimeInterval?
 
+    init(
+        contactDistance: Float = 0.025,
+        releaseDistance: Float = 0.05,
+        dwell: TimeInterval = 0.3,
+        release: TimeInterval = 0.5,
+        lostTimeout: TimeInterval = 1.5
+    ) {
+        self.contactDistance = contactDistance
+        self.releaseDistance = releaseDistance
+        self.dwell = dwell
+        self.release = release
+        self.lostTimeout = lostTimeout
+    }
+
     // distance: meters, nil when there's no measurement; time: seconds (e.g. the camera frame's timestamp).
     mutating func update(distance: Float?, time: TimeInterval) -> Bool {
         guard let distance else {
@@ -85,6 +99,8 @@ extension VNHumanHandPoseObservation.JointName {
 
 class ObjectDetector: ObservableObject {
     @Published var detections: [Detection] = []
+    /// Confident, named joints preserve the skeleton topology when individual fingers are occluded.
+    @Published var handSkeletons: [[VNHumanHandPoseObservation.JointName: CGPoint]] = []
     @Published var handPoint: CGPoint? = nil   // normalized 0-1, Vision coords
     @Published var handJointPoints: [CGPoint] = []
     @Published var leftHandJointPoints: [CGPoint] = []
@@ -368,6 +384,7 @@ class ObjectDetector: ObservableObject {
             guard let results = request.results as? [VNHumanHandPoseObservation],
                   !results.isEmpty else {
                 DispatchQueue.main.async {
+                    self?.handSkeletons = []
                     self?.handPoint = nil
                     self?.handJointPoints = []
                     self?.leftHandJointPoints = []
@@ -383,6 +400,10 @@ class ObjectDetector: ObservableObject {
                 return
             }
 
+            let skeletons = results.map { observation in
+                ((try? observation.recognizedPoints(.all)) ?? [:])
+                    .filter { $0.value.confidence > 0.3 }.mapValues(\.location)
+            }.filter { !$0.isEmpty }
             var leftPoints: [CGPoint] = []
             var rightPoints: [CGPoint] = []
             var firstWrist: CGPoint?
@@ -435,6 +456,7 @@ class ObjectDetector: ObservableObject {
             }
 
             DispatchQueue.main.async {
+                self?.handSkeletons = skeletons
                 self?.leftHandJointPoints = leftPoints
                 self?.rightHandJointPoints = rightPoints
                 self?.handJointPoints = leftPoints.isEmpty ? rightPoints : leftPoints

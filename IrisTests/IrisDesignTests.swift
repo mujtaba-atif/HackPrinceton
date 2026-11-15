@@ -28,9 +28,15 @@ final class IrisDesignTests: XCTestCase {
     func testEveryArtworkParsesWithItsAnimatedGroups() {
         let card = IrisArtwork.locateCard
         XCTAssertEqual(card.viewBox, CGRect(x: 0, y: 0, width: 305, height: 177))
-        XCTAssertNotNil(card.group("findEyeAssembly"))
-        let pupils = try! XCTUnwrap(card.group("findPupils"))
-        XCTAssertEqual(pupils.bounds.midX, 189, accuracy: 0.5, "the two pupils sit either side of the card's middle")
+        XCTAssertFalse(card.root.flattenedShapes.isEmpty)
+        XCTAssertEqual(IrisArtwork.revision, 18)
+        XCTAssertEqual(IrisArtwork.locatePanel.viewBox.size, CGSize(width: 360, height: 448))
+        XCTAssertEqual(IrisArtwork.explorePanel.viewBox.size, CGSize(width: 360, height: 448))
+        XCTAssertNotNil(IrisArtwork.treasureMap.group("mapCompassNeedle"))
+        XCTAssertNotNil(IrisArtwork.treasureMap.group("mapCourier"))
+        XCTAssertNotNil(IrisArtwork.treasureMap.group("mapX"))
+        XCTAssertNotNil(IrisArtwork.edgeLights.group("edgeRayL1"))
+        XCTAssertNotNil(IrisArtwork.edgeLights.group("edgeRayR2"))
 
         for hero in [IrisArtwork.skye, IrisArtwork.pip, IrisArtwork.nova, IrisArtwork.echo] {
             XCTAssertEqual(hero.viewBox.size, CGSize(width: 120, height: 150))
@@ -38,10 +44,38 @@ final class IrisDesignTests: XCTestCase {
             XCTAssertNotNil(eyes.find("mini-gaze"), "the gaze moves inside the blinking eyes")
             XCTAssertFalse(hero.outline.isEmpty)
         }
-        XCTAssertNotNil(IrisArtwork.waveTop.group("wave-deep"))
-        XCTAssertNotNil(IrisArtwork.waveTop.group("wave-light"))
-        XCTAssertNotNil(IrisArtwork.waveSide.group("side-ribbon"))
         XCTAssertFalse(IrisArtwork.exploreCard.root.flattenedShapes.isEmpty)
+    }
+
+    func testSplitPanelsHaveNoDeadZoneOrOverlappingTapRegion() {
+        let rect = CGRect(x: 0, y: 0, width: 360, height: 800)
+        let locate = DiscoverySplit(explore: false).path(in: rect)
+        let explore = DiscoverySplit(explore: true).path(in: rect)
+        for x in stride(from: 5.0, to: 360, by: 10) {
+            let boundary = 448 - x * 96 / 360
+            XCTAssertTrue(locate.contains(CGPoint(x: x, y: boundary - 1)))
+            XCTAssertFalse(explore.contains(CGPoint(x: x, y: boundary - 1)))
+            XCTAssertTrue(explore.contains(CGPoint(x: x, y: boundary + 1)))
+            XCTAssertFalse(locate.contains(CGPoint(x: x, y: boundary + 1)))
+        }
+    }
+
+    func testReadingRequiresRecognitionEvidenceAndRecoversFromLostText() {
+        var readiness = RecognitionReadiness()
+        XCTAssertEqual(readiness.update(hasVisibleText: false, consolidated: []), .searching)
+        XCTAssertEqual(readiness.update(hasVisibleText: true, consolidated: []), .reading)
+        XCTAssertEqual(readiness.update(hasVisibleText: true, consolidated: ["Water"]), .reading)
+        XCTAssertEqual(readiness.update(hasVisibleText: true, consolidated: ["Water", "500 ml"]), .reading)
+        XCTAssertEqual(readiness.update(hasVisibleText: true, consolidated: ["Water", "500 ml"]), .ready)
+        XCTAssertEqual(readiness.update(hasVisibleText: false, consolidated: ["Water", "500 ml"]), .searching)
+        XCTAssertEqual(readiness.update(hasVisibleText: true, consolidated: ["Water", "500 ml"]), .reading)
+    }
+
+    func testVectorTransformsAndDashPatternsPreserveDesignGeometry() {
+        let art = VectorArt(svg: ##"<svg viewBox="0 0 100 100"><g transform="translate(20 10)"><path d="M0 0L10 0L10 10Z" fill="none" stroke="#FFFFFF" stroke-dasharray="3 4"/></g></svg>"##)
+        let shape = art.root.flattenedShapes[0]
+        XCTAssertEqual(shape.path.boundingRect, CGRect(x: 20, y: 10, width: 10, height: 10))
+        XCTAssertEqual(shape.strokeStyle.dash, [3, 4])
     }
 
     func testColorsParse() {

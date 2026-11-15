@@ -5,9 +5,9 @@ Iris is a native iOS accessibility app designed to help blind and visually impai
 Iris runs on its own camera, detection, hand-tracking, depth and label-reading features, and it is voice-first:
 
 - **Home → Main.** Iris introduces itself and listens ("continue"), then asks whether to **Locate** something or **Explore** something you're holding. Every screen understands "go back".
-- **Locate**. Say what you want to find. Iris outlines it with on-device segmentation (YOLO26n-seg), then guides your hand to it in three steps with a stereo tone, glass waves and short spoken cues, measuring fingertip to object with Vision hand pose and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
-- **Explore**. Hold an item up and keep it steady for a two-second countdown while Iris reads the label, then the ElevenLabs agent summarizes it and answers questions.
-- **Design.** The look follows the Iris design in `Design/Iris`: its palette, Nunito type, characters, glass cards and camera waves, with the same motion curves and timings. Reduced Motion stops continuous movement and hides confetti.
+- **Locate**. Say what you want to find. Iris outlines it with on-device segmentation (YOLO26n-seg), then guides your hand to it in three steps with a stereo tone, optical edge lights and short spoken cues, measuring fingertip to object with Vision hand pose and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
+- **Explore**. Hold an item up while Iris reads the label live, then the ElevenLabs agent summarizes it and answers questions.
+- **Design.** The look follows the Iris design in `Design/Iris`: its palette, Nunito type, characters, diagonal choices and camera edge lights, with the same motion curves and timings. Reduced Motion stops continuous movement and hides confetti.
 - **Voice.** Every spoken line uses your ElevenLabs voice (the agent's voice), with the on-device voice as a fallback when there is no key or no network.
 
 See [docs/IRIS.md](docs/IRIS.md) for the flows, the ElevenLabs setup and on-device testing. Developer screens — the original Explore screen (object list, depth readout, **Turn to Read** label sheet) and the hand-tracking debug screen — are available in Debug builds: long-press the home screen for 2 seconds.
@@ -22,7 +22,7 @@ Fill in the API key (`sk_…`), the public agent ID and the agent's voice ID. A 
 
 ## Iris UI package
 
-The `UI/UX` branch includes the Iris design and runnable browser preview in
+The `main` branch includes the Iris design and runnable browser preview in
 [`Design/Iris`](Design/Iris/README.md), with SVG artwork, fonts and licenses,
 glass cards, characters, animations, phone-motion controls, and camera overlays.
 The [asset guide](Design/Iris/ASSETS.md) maps these files to the UI.
@@ -39,12 +39,16 @@ Open <http://127.0.0.1:4173/>. No package installation or build step is needed.
 - [Animated Figma preview, revision 18](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858)
 - [Figma SVG exports and source-node manifest](Design/Iris/figma-exports/manifest.json)
 
-The browser preview demonstrates revision 18 of the Iris UI. The native app in
-`Iris/` implements earlier design revisions alongside its live camera, detection,
-hand-tracking, depth, and voice features. This package updates the browser
-reference and reusable assets; it does not regenerate the native artwork or
-replace those feature implementations. Camera recognition, hand tracking,
-physical distances, and voice responses in the browser preview are simulated.
+The browser preview and native app share revision 18 artwork, diagonal
+Locate/Explore panels, map/lens motion, optical camera rails, and green object
+highlights. `scripts/sync_iris_artwork.py` generates the native vector bundle
+from `Design/Iris/assets.json`; use `--check` to detect drift.
+
+The browser's camera, recognition, hand tracking, distances, and voice are
+simulated. The native app uses its existing live camera, Vision/LiDAR, OCR,
+and voice pipelines. Native reading advances on recognition evidence without
+a visible countdown. See [UI parity notes](docs/UI-PARITY.md) for reviewed flows
+and the remaining on-phone verification.
 
 ## Requirements
 

@@ -96,6 +96,28 @@ final class VoiceAssistantTests: XCTestCase {
         XCTAssertFalse(tracker.update(distance: nil, time: 5))
     }
 
+    func testFoundTrackerSupportsDepthAlignmentThresholdsAndTrackingLoss() {
+        var tracker = FoundTracker(
+            contactDistance: 0.06,
+            releaseDistance: 0.12,
+            dwell: 0.3,
+            release: 0.5,
+            lostTimeout: 2
+        )
+        XCTAssertFalse(tracker.update(distance: 0.05, time: 0))
+        XCTAssertTrue(tracker.update(distance: 0.05, time: 0.35))
+        XCTAssertTrue(tracker.update(distance: 0.10, time: 0.5), "depth alignment uses the wider release band")
+        XCTAssertTrue(tracker.update(distance: 0.13, time: 0.6))
+        XCTAssertFalse(tracker.update(distance: 0.13, time: 1.2))
+
+        XCTAssertFalse(tracker.update(distance: 0.05, time: 2))
+        XCTAssertTrue(tracker.update(distance: 0.05, time: 2.35))
+        XCTAssertTrue(tracker.update(distance: nil, time: 4), "brief tracking loss preserves alignment")
+        XCTAssertFalse(tracker.update(distance: nil, time: 4.5), "tracking loss resets after the configured timeout")
+        XCTAssertFalse(tracker.update(distance: 0.05, time: 5), "contact must dwell again after tracking loss")
+        XCTAssertTrue(tracker.update(distance: 0.05, time: 5.35))
+    }
+
     func testObjectMaskEdgeCenterAndContains() throws {
         // 6 × 4 grid (row 0 = top) with a 2 × 2 block in the middle.
         var pixels = [Bool](repeating: false, count: 24)

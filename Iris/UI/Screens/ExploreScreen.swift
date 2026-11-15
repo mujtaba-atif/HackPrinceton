@@ -7,34 +7,21 @@ struct ExploreScreen: View {
     @StateObject private var camera = IrisCameraController()
     @State private var frameTask: Task<Void, Never>?
     @Environment(\.scenePhase) private var scenePhase
-    // 4 Hz rather than the default 2: the countdown can't start until the consolidator has seen a line
-    // three times, and at 2 Hz that alone was a second and a half of holding still before anything moved.
+    // Four recognition events per second feed the shared OCR readiness gate.
     @StateObject private var reader = TextReader(scanInterval: 0.25)
     @StateObject private var agent = AgentSession()
     @State private var summaryStarted = false
     @State private var listening = false
     @State private var rescanning = false
-    @State private var currentHold: TimeInterval = 2
-    @State private var holdStartedAt: Date?
-    @State private var secondsLeft = 0
-    @State private var ringProgress: CGFloat = 0
-    @State private var holdCount = 0
-
+    @StateObject private var segmenter = SegmentationDetector()
+    @StateObject private var detector = ObjectDetector()
+    @State private var outline: [CGPoint]?
     private let backKeywords = ["go back", "back", "return", "previous", "exit", "leave", "quit", "cancel"]
-    // Once text is found the user holds still for this long, then the agent starts with whatever was read.
-    // The countdown is evidence, not ceremony: at 4 Hz two seconds is eight more scans on top of the three
-    // that found the text, which is the consolidator's whole window. Five seconds bought a fuller read of
-    // the small print at the cost of holding a can out at arm's length for the better part of seven.
-    private let holdDuration: TimeInterval = 2
-    // The countdown restarts if the text has been out of view for this long.
-    private let textLostGrace: TimeInterval = 1
     // Hints when nothing readable is in view.
     private let firstHintAfter: TimeInterval = 8
     private let laterHintEvery: TimeInterval = 12
     private let maxHints = 2
-    // A rescan is quicker than the first scan, because the agent is waiting for the result and gives up on a
-    // slow tool. It reports what it has after the timeout even if it found nothing.
-    private let rescanHold: TimeInterval = 1.5
+    // A rescan reports the available evidence within the agent tool's response window.
     private let rescanTimeout: TimeInterval = 8
 
     @State private var celebrations = 0
@@ -54,9 +41,15 @@ struct ExploreScreen: View {
                            startPoint: .top, endPoint: .bottom)
                 .allowsHitTesting(false)
             CameraGlass(mode: .explore)
-            // The reading area. The hold-steady countdown fills it with light from the bottom up.
-            ObjectOutline(path: scanAreaPath(in: stage), style: outlineStyle,
-                          scanning: !summaryStarted || rescanning, fill: Double(ringProgress))
+            if let path = scanAreaPath(in: stage) {
+                ObjectOutline(path: path, style: outlineStyle, scanning: !summaryStarted || rescanning)
+            }
+            if camera.state == .running {
+                HandGuidanceOverlay(skeletons: detector.handSkeletons,
+                    outlines: [detector.leftHandJointPoints, detector.rightHandJointPoints],
+                    measurements: [detector.leftHandEdge, detector.rightHandEdge].compactMap { $0 },
+                    imageSize: segmenter.uprightImageSize)
+            }
             Sprinkles(count: 6, quiet: true, unit: stage.unit)
             Confetti(trigger: celebrations, unit: stage.unit)
             GlassBackButton(action: onBack)
@@ -69,9 +62,8 @@ struct ExploreScreen: View {
             if started { celebrations += 1 }
         }
         .animation(.easeInOut, value: agent.status)
-        .animation(.easeInOut, value: holdStartedAt != nil)
+        .animation(.easeInOut, value: reader.recognition)
         .animation(.easeInOut, value: summaryStarted)
-        .sensoryFeedback(.impact(weight: .light), trigger: holdCount)
         .sensoryFeedback(.success, trigger: summaryStarted) { _, started in started }
         .sensoryFeedback(.impact(weight: .light), trigger: agent.status) { old, new in new == .listening && old != .listening }
         .onAppear {
@@ -79,6 +71,10 @@ struct ExploreScreen: View {
             agent.onRescan = { await performRescan() }
             agent.onEnded = { agentWentAway() }
             Task { await camera.start() }
+        }
+        .onReceive(segmenter.$objectMask) { mask in
+            detector.objectMask = mask
+            outline = mask.flatMap { MaskContour.outline(of: $0) }
         }
         .onChange(of: camera.state) { _, state in
             if state == .running { startFrames() } else { stopFrames() }
@@ -94,11 +90,9 @@ struct ExploreScreen: View {
             // Whatever pushed this screen is still talking ("Explore object selected").
             await Speaker.shared.waitUntilIdle()
             guard !Task.isCancelled else { return }
-            // The read runs *underneath* this line rather than after it. The camera is already up, and
-            // anyone who is going to hold something out is holding it out while the line plays — waiting
-            // it out threw those scans away and started the countdown three seconds later than it had to.
+            // Recognition proceeds while the opening instruction plays.
             Speaker.shared.speak("Hold the item in front of the camera so I can read it.")
-            if let lines = await scanForText(hold: holdDuration, hints: true, timeout: nil) {
+            if let lines = await scanForText(hints: true, timeout: nil) {
                 beginSummary(with: lines)
             }
         }
@@ -118,10 +112,10 @@ struct ExploreScreen: View {
             ListeningIndicator(status: agent.status)
         } else if !rescanning, summaryStarted {
             ListeningIndicator(text: "Text detected", systemImage: "checkmark.circle.fill")
-        } else if holdStartedAt != nil {
-            ListeningIndicator(text: "Hold steady… \(secondsLeft)", systemImage: "timer")
+        } else if reader.recognition == .reading || reader.recognition == .ready {
+            ListeningIndicator(text: "Reading live…")
         } else {
-            ListeningIndicator(text: "Looking for text…", systemImage: "text.viewfinder")
+            ListeningIndicator(text: "Looking for text…")
         }
     }
 
@@ -130,52 +124,26 @@ struct ExploreScreen: View {
         return reader.lines.isEmpty ? .explore : .reading
     }
 
-    /// `TextReader.region` (Vision coordinates, origin bottom left) on screen, the camera image being
-    /// aspect-filled.
-    private func scanAreaPath(in stage: Stage) -> Path {
-        let region = TextReader.region
-        let normalized = CGRect(x: region.minX, y: 1 - region.maxY, width: region.width, height: region.height)
-        let rect = MaskContour.aspectFill(normalized, image: reader.uprightImageSize, view: stage.size)
-        return Path(roundedRect: rect, cornerRadius: 28 * stage.unit, style: .continuous)
+    /// A real segmented silhouette replaces the former rectangular reading target.
+    private func scanAreaPath(in stage: Stage) -> Path? {
+        guard let outline, outline.count > 2 else { return nil }
+        var path = Path()
+        path.addLines(outline.map { MaskContour.aspectFill($0, image: segmenter.uprightImageSize, view: stage.size) })
+        path.closeSubpath()
+        return path
     }
 
-    // Waits for text, runs the countdown once it is found, and returns what was read. With `hints`, it also nudges
-    // the user if nothing readable shows up. With a `timeout`, it gives up and returns whatever there is.
-    // Returns nil if the screen went away.
-    private func scanForText(hold: TimeInterval, hints: Bool, timeout: TimeInterval?) async -> [String]? {
-        currentHold = hold
+    /// Readiness comes from matching OCR results; there is no hold timer or capture action.
+    private func scanForText(hints: Bool, timeout: TimeInterval?) async -> [String]? {
         let began = Date()
-        var lastTextSeen = Date()
         var emptySince = Date()
         var hintsGiven = 0
-
         while !Task.isCancelled {
-            // The microphone opens as soon as nothing is coming out of the speaker, and never before:
-            // the opening line and the hints below both name a `backKeywords` phrase, and the listener
-            // hears the speaker. Not during a rescan — by then the agent owns the microphone.
             if !listening, !summaryStarted, !Speaker.shared.isBusy { await startListening() }
-
             let now = Date()
-            if !reader.lines.isEmpty {
-                lastTextSeen = now
+            if reader.recognition == .ready, !reader.lines.isEmpty { return reader.lines }
+            if reader.recognition != .searching || Speaker.shared.isBusy {
                 emptySince = now
-            } else if Speaker.shared.isBusy {
-                // Time spent listening to Iris isn't time spent failing to get a read. Without this the
-                // opening line — which the scan now runs underneath — counts toward the first hint, and a
-                // hint counts toward the one after it.
-                emptySince = now
-            }
-
-            if let holdBegan = holdStartedAt {
-                if now.timeIntervalSince(lastTextSeen) >= textLostGrace {
-                    resetHold()
-                } else {
-                    let elapsed = now.timeIntervalSince(holdBegan)
-                    secondsLeft = max(0, Int((hold - elapsed).rounded(.up)))
-                    if elapsed >= hold { return reader.lines }
-                }
-            } else if !reader.lines.isEmpty {
-                startHold(at: now)
             } else if hints {
                 let wait = hintsGiven == 0 ? firstHintAfter : laterHintEvery
                 if hintsGiven < maxHints, now.timeIntervalSince(emptySince) >= wait {
@@ -184,37 +152,18 @@ struct ExploreScreen: View {
                     speakHint("I can't read any text yet. Try holding the label closer, or say go back.")
                 }
             }
-
             if let timeout, now.timeIntervalSince(began) >= timeout { return reader.lines }
             try? await Task.sleep(for: .milliseconds(100))
         }
         return nil
     }
 
-    // The agent asked for another scan: clear what was read, show the countdown again, and return the new text.
     private func performRescan() async -> [String] {
-        let began = Date()
-        print("Rescan started")
         rescanning = true
         reader.reset()
-        resetHold()
-        let lines = await scanForText(hold: rescanHold, hints: false, timeout: rescanTimeout) ?? []
-        resetHold()
+        let lines = await scanForText(hints: false, timeout: rescanTimeout) ?? []
         rescanning = false
-        print("Rescan finished: \(lines.count) lines in \(String(format: "%.1f", Date().timeIntervalSince(began))) s")
         return lines
-    }
-
-    private func startHold(at date: Date) {
-        holdStartedAt = date
-        secondsLeft = Int(currentHold)
-        holdCount += 1
-        withAnimation(.linear(duration: currentHold)) { ringProgress = 1 }
-    }
-
-    private func resetHold() {
-        holdStartedAt = nil
-        withAnimation(.easeOut(duration: 0.2)) { ringProgress = 0 }
     }
 
     // The hint mentions "go back", so the microphone goes off while it plays or the listener would hear
@@ -243,8 +192,6 @@ struct ExploreScreen: View {
     private func beginSummary(with lines: [String]) {
         readLines = lines
         summaryStarted = true
-        holdStartedAt = nil
-        withAnimation(.easeOut(duration: 0.3)) { ringProgress = 0 }
         stopListening()
         Speaker.shared.speak("Text detected.")
         agent.start(initialMessage: Self.summaryRequest(for: lines))
@@ -277,6 +224,8 @@ struct ExploreScreen: View {
             for await frame in frames {
                 guard !Task.isCancelled else { return }
                 reader.process(frame: frame)
+                segmenter.process(frame: frame)
+                detector.process(frame: frame)
             }
         }
     }

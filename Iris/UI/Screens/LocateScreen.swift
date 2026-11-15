@@ -60,7 +60,7 @@ struct LocateScreen: View {
                            startPoint: .top, endPoint: .bottom)
                 .allowsHitTesting(false)
 
-            // Guidance rides on the waves (see `CameraGlass`), and after the handoff the conversation does.
+            // Shared optical rails remain continuous through guidance and conversation.
             CameraGlass(mode: .locate, cue: beepController.cue, mood: conversation.mood)
 
             if let path = outlinePath(in: stage.size) {
@@ -68,6 +68,12 @@ struct LocateScreen: View {
                               scanning: conversation.stage == .reading)
             }
 
+            if guidanceStarted, camera.state == .running {
+                HandGuidanceOverlay(skeletons: detector.handSkeletons,
+                    outlines: [detector.leftHandJointPoints, detector.rightHandJointPoints],
+                    measurements: [detector.leftHandEdge, detector.rightHandEdge].compactMap { $0 },
+                    imageSize: segmenter.uprightImageSize)
+            }
             Sprinkles(count: 6, quiet: true, unit: stage.unit)
             Confetti(trigger: celebrations, unit: stage.unit)
             GlassBackButton(action: onBack)
@@ -174,24 +180,26 @@ struct LocateScreen: View {
     private var statusBlob: some View {
         switch conversation.stage {
         case .idle:
-            if guidanceStarted {
-                StatusBlob(
-                    measurement: guidanceDistance.map { ObjectDetector.inches($0) },
-                    goal: guidanceGoal,
-                    text: guidanceLabel,
-                    systemImage: guidanceIcon,
-                    highlighted: detector.approaching ? detector.objectClose : detector.objectFound
-                )
+            if !guidanceStarted {
+                StatusBlob(text: "Looking… · Tell Iris what to locate")
+            } else if detector.objectClose {
+                StatusBlob(text: "Close enough · Ready to explore")
+            } else if detector.approaching {
+                StatusBlob(text: "Got it! · Bring it closer to read")
+            } else if outline == nil {
+                StatusBlob(text: "Keep looking · Slowly move your phone around")
+            } else if detector.handSkeletons.isEmpty {
+                StatusBlob(text: "Hand not visible · Bring your hand into view")
             } else {
-                StatusBlob(text: "Looking… · Tell Iris what to locate",
-                           systemImage: listener.isListening ? "mic.fill" : "viewfinder")
+                StatusBlob(measurement: guidanceDistance.map { String(format: "%.1f m", $0) },
+                           text: tooClose ? "Too close · Move it back" : guidanceDetail)
             }
         case .reading:
-            StatusBlob(text: "Reading the label…", systemImage: "text.viewfinder")
+            ListeningIndicator(text: "Reading live…")
         case .talking:
-            StatusBlob(status: conversation.agentStatus)
+            ListeningIndicator(status: conversation.agentStatus)
         case .ended:
-            StatusBlob(text: "Say go back to finish", systemImage: "mic.fill")
+            ListeningIndicator(text: "Say go back to finish")
         }
     }
 
@@ -232,25 +240,17 @@ struct LocateScreen: View {
         if detector.leftHandEdge != nil || detector.rightHandEdge != nil {
             return [detector.leftHandEdge?.distance, detector.rightHandEdge?.distance].compactMap { $0 }.min()
         }
-        return [detector.leftHandDistance, detector.rightHandDistance].compactMap { $0 }.min()
+        return nil // Camera-to-hand depth is not a fingertip-to-object measurement.
     }
 
-    /// Where that distance has to get to, on the step that has one: the object is in the hand and being
-    /// brought up to the camera, and "closer" means closer to a number.
-    private var guidanceGoal: String? {
-        guard detector.approaching, !detector.objectClose else { return nil }
-        return "→ " + String(format: "%.0f in", ObjectDetector.readDistance * 39.3701)
-    }
-
-    /// The step, in the words the voice used to announce it — `Phase` owns both so they can't drift.
-    /// The one thing said here that isn't a step is being too close for the camera to focus, which is
-    /// checked first: it is why the read isn't happening, even while still debounced as close enough.
-    private var guidanceLabel: String {
-        tooClose ? "Too close · Move it back" : beepController.phase.label
-    }
-
-    private var guidanceIcon: String {
-        tooClose ? "exclamationmark.circle.fill" : beepController.phase.icon
+    private var guidanceDetail: String {
+        switch beepController.cue.direction {
+        case .left: "Move your hand left"
+        case .right: "Move your hand right"
+        case .back: "Move your hand back"
+        case .forward: "Move your hand forward"
+        case nil: guidanceDistance == nil ? "Distance unavailable" : "Hand → " + target
+        }
     }
 
     private var tooClose: Bool {

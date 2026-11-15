@@ -69,11 +69,13 @@ when connecting a real tracking pipeline. Phone shake input in `motion.js` is a
 separate optional device-sensor feature and requires permission and a secure
 browser context on supporting phones.
 
-The native SwiftUI app is in `Iris/`. It implements earlier Iris design revisions
-and includes live camera, detection, hand-tracking, depth, and voice features.
-These files provide the revision 18 design reference and assets; they do not
-automatically update the artwork embedded in `Iris/UI/Glass/IrisArtwork.swift`
-or replace the native feature implementations.
+The native SwiftUI app in `Iris/` uses the same revision 18 vector artwork.
+Run `python3 scripts/sync_iris_artwork.py` after updating `assets.json`, or use
+`--check` to confirm the generated `Iris/UI/Glass/IrisArtwork.swift` is current.
+The native renderer preserves SVG group transforms, gradients and dash patterns
+so the map, compass, route marker and camera rails can animate independently.
+Live Vision joints and segmentation contours replace the browser's demo pose;
+LiDAR provides meter values, and unavailable depth remains unavailable.
 
 ## Review checklist
 

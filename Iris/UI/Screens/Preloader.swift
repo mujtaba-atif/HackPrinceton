@@ -40,7 +40,8 @@ final class Preloader: ObservableObject {
     /// Touching each piece of artwork parses its SVG.
     private nonisolated static func buildArtwork() {
         let art = [IrisArtwork.locateCard, IrisArtwork.exploreCard, IrisArtwork.skye, IrisArtwork.pip,
-                   IrisArtwork.nova, IrisArtwork.echo, IrisArtwork.waveTop, IrisArtwork.waveSide]
+                   IrisArtwork.nova, IrisArtwork.echo, IrisArtwork.treasureMap, IrisArtwork.edgeLights,
+                   IrisArtwork.locatePanel, IrisArtwork.explorePanel]
         _ = art.map(\.viewBox)
     }
 
