@@ -20,6 +20,32 @@ cp Iris/Secrets.swift.example Iris/Secrets.swift   # git-ignored
 
 Fill in the API key (`sk_…`), the public agent ID and the agent's voice ID. A build creates the file from the template if it's missing, so the app always builds; without a key it speaks with the on-device voice.
 
+## Iris UI package
+
+The `UI/UX` branch includes the Iris design and runnable browser preview in
+[`Design/Iris`](Design/Iris/README.md), with SVG artwork, fonts and licenses,
+glass cards, characters, animations, phone-motion controls, and camera overlays.
+The [asset guide](Design/Iris/ASSETS.md) maps these files to the UI.
+
+Run the preview from the repository root:
+
+```sh
+python3 -m http.server 4173 --bind 127.0.0.1 --directory Design/Iris
+```
+
+Open <http://127.0.0.1:4173/>. No package installation or build step is needed.
+
+- [Editable Figma design](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg)
+- [Animated Figma preview, revision 18](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858)
+- [Figma SVG exports and source-node manifest](Design/Iris/figma-exports/manifest.json)
+
+The browser preview demonstrates revision 18 of the Iris UI. The native app in
+`Iris/` implements earlier design revisions alongside its live camera, detection,
+hand-tracking, depth, and voice features. This package updates the browser
+reference and reusable assets; it does not regenerate the native artwork or
+replace those feature implementations. Camera recognition, hand tracking,
+physical distances, and voice responses in the browser preview are simulated.
+
 ## Requirements
 
 - macOS with Xcode installed

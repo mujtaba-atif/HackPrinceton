@@ -1,0 +1,73 @@
+{
+  "figmaFileKey": "zLF4VopCM0YI8eZAH2Aexg",
+  "designUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg",
+  "codePreviewUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858",
+  "revision": 18,
+  "format": "Static SVG exports, with text outlined. Animation and interactions live in the HTML/CSS/JS preview.",
+  "assets": [
+    {
+      "file": "locate-art.svg",
+      "nodeId": "35:446",
+      "name": "Locate · diagonal float and wandering eyes",
+      "width": 305,
+      "height": 177,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=35-446"
+    },
+    {
+      "file": "explore-art.svg",
+      "nodeId": "4:329",
+      "name": "Explore · diagonal float",
+      "width": 305,
+      "height": 177,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=4-329"
+    },
+    {
+      "file": "locate-explore-screen.svg",
+      "nodeId": "4:275",
+      "name": "03 / Locate & Explore · diagonal split",
+      "width": 360,
+      "height": 800,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=4-275"
+    },
+    {
+      "file": "camera-edge-lights.svg",
+      "nodeId": "199:435",
+      "name": "Iris / Camera edge lights",
+      "width": 360,
+      "height": 800,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=199-435"
+    },
+    {
+      "file": "hand-distance-0.8m.svg",
+      "nodeId": "200:478",
+      "name": "Iris / Hand tracking / 0.8 m",
+      "width": 360,
+      "height": 800,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=200-478"
+    },
+    {
+      "file": "hand-distance-0.3m.svg",
+      "nodeId": "200:540",
+      "name": "Iris / Hand tracking / 0.3 m",
+      "width": 360,
+      "height": 800,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=200-540"
+    },
+    {
+      "file": "hand-distance-0m.svg",
+      "nodeId": "200:602",
+      "name": "Iris / Hand tracking / 0.0 m",
+      "width": 360,
+      "height": 800,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=200-602"
+    },
+    {
+      "file": "object-highlight.svg",
+      "nodeId": "76:340",
+      "name": "State=Locate",
+      "width": 360,
+      "height": 800,
+      "figmaUrl": "https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=76-340"
+    }
+  ]
+}

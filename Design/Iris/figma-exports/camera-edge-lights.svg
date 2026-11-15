@@ -1,0 +1,56 @@
+<svg width="360" height="800" viewBox="0 0 360 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Iris / Camera edge lights">
+<g id="Four optical rails / editable vectors">
+<g id="edgePanelL1">
+<path id="Vector" d="M12 164L21 162L43 350L34 352L12 164Z" fill="#B5DEFA" fill-opacity="0.05" stroke="#DDF4FF" stroke-opacity="0.2" stroke-width="0.8"/>
+<path id="Vector_2" d="M13 165L35 349" stroke="#72C7F5" stroke-opacity="0.18" stroke-width="2"/>
+</g>
+<g id="edgePanelL2">
+<path id="Vector_3" d="M7 452L14 453L32 621L25 622L7 452Z" fill="#B5DEFA" fill-opacity="0.04" stroke="#DDF4FF" stroke-opacity="0.16" stroke-width="0.7"/>
+</g>
+<g id="edgePanelR1">
+<path id="Vector_4" d="M336 130L344 131L320 312L312 311L336 130Z" fill="#B5DEFA" fill-opacity="0.04" stroke="#DDF4FF" stroke-opacity="0.2" stroke-width="0.8"/>
+<path id="Vector_5" d="M343 131L319 310" stroke="#72C7F5" stroke-opacity="0.18" stroke-width="2"/>
+</g>
+<g id="edgePanelR2">
+<path id="Vector_6" d="M339 430L347 431L331 636L323 635L339 430Z" fill="#B5DEFA" fill-opacity="0.04" stroke="#DDF4FF" stroke-opacity="0.16" stroke-width="0.7"/>
+</g>
+<g id="edgeRayL1">
+<path id="Vector_7" d="M18 211L27 289" stroke="url(#paint0_linear_199_435)" stroke-width="1.8" stroke-linecap="round"/>
+<path id="Vector_8" opacity="0.13" d="M19 232L24 271" stroke="#E7F5FF" stroke-width="3.5"/>
+</g>
+<g id="edgeRayL2">
+<path id="Vector_9" d="M14 502L22 578" stroke="url(#paint1_linear_199_435)" stroke-width="1.4" stroke-linecap="round"/>
+</g>
+<g id="edgeRayR1">
+<path id="Vector_10" d="M337 167L327 245" stroke="url(#paint2_linear_199_435)" stroke-width="1.8" stroke-linecap="round"/>
+<path id="Vector_11" opacity="0.13" d="M334 190L329 225" stroke="#E7F5FF" stroke-width="3.5"/>
+</g>
+<g id="edgeRayR2">
+<path id="Vector_12" d="M342 483L336 566" stroke="url(#paint3_linear_199_435)" stroke-width="1.4" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_199_435" x1="18" y1="211" x2="18" y2="289" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAF5FF" stop-opacity="0"/>
+<stop offset="0.48" stop-color="#FAFCFF" stop-opacity="0.85"/>
+<stop offset="1" stop-color="#72C7F5" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint1_linear_199_435" x1="14" y1="502" x2="14" y2="578" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAF5FF" stop-opacity="0"/>
+<stop offset="0.48" stop-color="#FAFCFF" stop-opacity="0.85"/>
+<stop offset="1" stop-color="#72C7F5" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint2_linear_199_435" x1="327" y1="167" x2="327" y2="245" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAF5FF" stop-opacity="0"/>
+<stop offset="0.48" stop-color="#FAFCFF" stop-opacity="0.85"/>
+<stop offset="1" stop-color="#72C7F5" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="paint3_linear_199_435" x1="336" y1="483" x2="336" y2="566" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DAF5FF" stop-opacity="0"/>
+<stop offset="0.48" stop-color="#FAFCFF" stop-opacity="0.85"/>
+<stop offset="1" stop-color="#72C7F5" stop-opacity="0"/>
+</linearGradient>
+</defs>
+</svg>
