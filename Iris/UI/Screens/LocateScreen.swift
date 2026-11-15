@@ -21,12 +21,31 @@ struct LocateScreen: View {
     @State private var listenTask: Task<Void, Never>?
     @State private var startTask: Task<Void, Never>?
     @State private var frameTask: Task<Void, Never>?
+    /// Working out how to find the target (`prepareSearch`), and the wait for a new name after one Iris
+    /// couldn't picture. Both held so leaving the screen cancels them: a stray one would start guidance,
+    /// and its voice and tone, on a screen that has already gone.
+    @State private var searchTask: Task<Void, Never>?
+    @State private var askTask: Task<Void, Never>?
     @State private var guidanceStarted = false
     /// What this screen guides to, once named.
     @State private var target: String?
-    /// Set when the target is found by appearance rather than by the detector; restarts with the camera.
-    @State private var searchAppearance: TargetAppearance?
+    /// The target as the screen says it (`AppearanceSearchPhrases.speakable`): never a word that would
+    /// be heard as "go back".
+    @State private var spokenTarget = "object"
+
+    /// How the target is being found. `nil` until `prepareSearch` has decided, during which the
+    /// detector must not pick a stand-in: "pill bottle" would otherwise select the first bottle it saw.
+    enum SearchMode: Equatable {
+        /// The detector has a class for it; its selected detection is the target.
+        case detector
+        /// Found by how it looks; the appearance search's confirmed match is the target. Restarts with the camera.
+        case appearance(TargetAppearance)
+    }
+    @State private var searchMode: SearchMode?
     @State private var announcedMatch = false
+    @State private var lastHintAt: TimeInterval = -.infinity
+    /// Seconds between "it may be over to the left" lines while nothing has been confirmed.
+    private let hintGap: TimeInterval = 8
 
     private let backKeywords = ["go back", "back", "return", "previous", "exit", "leave", "quit", "cancel"]
     private let question = "What would you like me to locate?"
@@ -73,9 +92,18 @@ struct LocateScreen: View {
             if state == .running { startPipelines() } else { stopPipelines() }
         }
         .onChange(of: appearanceSearch.match != nil) { _, found in
-            guard found, !announcedMatch, let match = appearanceSearch.match, let target else { return }
+            guard found, !announcedMatch, let match = appearanceSearch.match else { return }
             announcedMatch = true
-            Speaker.shared.speak(AppearanceSearchPhrases.found(target, match: match))
+            Speaker.shared.speak(AppearanceSearchPhrases.found(spokenTarget, match: match))
+        }
+        .onChange(of: appearanceSearch.hint) { _, hint in
+            // A window of the frame looked like it, but nothing has been confirmed: say which way to turn
+            // the camera, now and then, so the search isn't silent while the user sweeps the room.
+            guard let hint, appearanceSearch.match == nil, !Speaker.shared.isBusy else { return }
+            let now = ProcessInfo.processInfo.systemUptime
+            guard now - lastHintAt >= hintGap else { return }
+            lastHintAt = now
+            Speaker.shared.speak(AppearanceSearchPhrases.hint(spokenTarget, box: hint))
         }
         .onChange(of: beepController.phase) { _, phase in
             // The last step is done: the object is in the user's hand and close enough to read.
@@ -147,10 +175,16 @@ struct LocateScreen: View {
     /// Only the target's box, so the screen shows what is being guided to rather than everything detected.
     private var targetOnly: DetectionSnapshot {
         var snapshot = detection.snapshot
-        if let selected = snapshot.selectedTarget {
-            snapshot.objects = snapshot.objects.filter { $0.id == selected.object.id }
-        } else if target != nil {
+        switch searchMode {
+        case .detector:
+            if let selected = snapshot.selectedTarget {
+                snapshot.objects = snapshot.objects.filter { $0.id == selected.object.id }
+            }
+        case .appearance:
             snapshot.objects = []
+        case nil:
+            // Everything, while there is no target yet; nothing while Iris is still deciding how to find it.
+            if target != nil { snapshot.objects = [] }
         }
         return snapshot
     }
@@ -193,7 +227,7 @@ struct LocateScreen: View {
             try? await Task.sleep(for: .seconds(namingGrace))
             guard !Task.isCancelled, target == nil else { return }
             listener.stop()
-            let fallback = detection.latestObjects.first?.name ?? "object"
+            let fallback = detection.latestObjects.first?.name ?? Self.anyObject
             beginGuidance(to: fallback)
         }
         await listener.start(
@@ -205,10 +239,13 @@ struct LocateScreen: View {
             onUtterance: { heard in
                 grace.cancel()
                 let name = TargetParser.extract(from: heard)
-                beginGuidance(to: name.isEmpty ? (detection.latestObjects.first?.name ?? "object") : name)
+                beginGuidance(to: name.isEmpty ? (detection.latestObjects.first?.name ?? Self.anyObject) : name)
             }
         )
     }
+
+    /// The target when nothing has been named and nothing is detected: whatever the detector finds first.
+    private static let anyObject = "object"
 
     /// Hands the screen to `DistanceBeepController` for good — it owns the voice and the tone from
     /// here — and leaves the recogniser listening for one word.
@@ -216,35 +253,50 @@ struct LocateScreen: View {
         guard !guidanceStarted else { return }
         guidanceStarted = true
         target = name
+        spokenTarget = AppearanceSearchPhrases.speakable(name, avoiding: backKeywords)
         print("Locate: guiding to \(name)")
-        beepController.setTarget(name)
+        beepController.setTarget(spokenTarget)
         listenForBack()
-        Task {
-            guard await prepareSearch(for: name) else { return }
+        searchTask?.cancel()
+        searchTask = Task {
+            guard await prepareSearch(for: name), !Task.isCancelled else { return }
             beepController.begin()
         }
     }
 
     /// Decides how to find the target. The detector handles its own classes; anything else is described
     /// (catalog, then the on-device language model) and searched for by appearance. Returns false when
-    /// nothing is known about it, after asking the user to describe it instead.
+    /// nothing is known about it, after asking the user to describe it instead — the screen is never
+    /// left silent with a name it can't use.
     private func prepareSearch(for name: String) async -> Bool {
         let quick = AppearanceCatalog.appearance(for: name, classifierLabels: AppearanceScanner.classifierLabels)
-        if quick?.usesDetector == true { return true }
-        if quick == nil || quick?.source == .words, AppearanceDescriber.languageModelAvailable {
-            Speaker.shared.speak(AppearanceSearchPhrases.thinking(about: name))
+        // "object" is the stand-in when no one has named anything and nothing is detected yet: there is
+        // nothing to describe, so the detector guides to whatever it finds, as it always did. Describing
+        // it would fail, re-ask, and fall back to it again every `namingGrace`, for good.
+        if name == Self.anyObject || quick?.usesDetector == true {
+            searchMode = .detector
+            return true
         }
-        guard let appearance = await AppearanceDescriber.describe(name), !Task.isCancelled else { return false }
-        if appearance.usesDetector { return true }
-        guard appearance.isSearchable else {
-            Speaker.shared.speak(AppearanceSearchPhrases.unknown(name))
+        if quick == nil || quick?.source == .words, AppearanceDescriber.languageModelAvailable {
+            Speaker.shared.speak(AppearanceSearchPhrases.thinking(about: spokenTarget))
+        }
+        let described = await AppearanceDescriber.describe(name)
+        guard !Task.isCancelled else { return false }
+        guard let appearance = described, appearance.isSearchable || appearance.usesDetector else {
+            Speaker.shared.speak(AppearanceSearchPhrases.unknown(spokenTarget))
             askAgain()
             return false
         }
-        searchAppearance = appearance
+        if appearance.usesDetector {
+            searchMode = .detector
+            return true
+        }
+        var spoken = appearance
+        spoken.name = spokenTarget
+        searchMode = .appearance(appearance)
         announcedMatch = false
         if camera.state == .running { startAppearanceSearch(appearance) }
-        Speaker.shared.speak(AppearanceSearchPhrases.searching(for: appearance))
+        Speaker.shared.speak(AppearanceSearchPhrases.searching(for: spoken))
         return true
     }
 
@@ -252,9 +304,11 @@ struct LocateScreen: View {
     private func askAgain() {
         guidanceStarted = false
         target = nil
+        searchMode = nil
         listenTask?.cancel()
         listener.stop()
-        Task { await askForTarget(askingFirst: false) }
+        askTask?.cancel()
+        askTask = Task { await askForTarget(askingFirst: false) }
     }
 
     /// The screen's own way out, for as long as the agent doesn't have the microphone.
@@ -276,7 +330,7 @@ struct LocateScreen: View {
                 conversation.process(frame: frame)
                 guard frame.timestamp - lastMeasured >= measureInterval else { continue }
                 lastMeasured = frame.timestamp
-                if searchAppearance == nil { selectTargetIfNeeded() }
+                if searchMode == .detector { selectTargetIfNeeded() }
                 tracker.update(frame: frame, target: guidanceTargetBox, hands: hands.snapshot.hands)
                 beepController.update(
                     leftEdge: tracker.leftHandEdge,
@@ -288,12 +342,19 @@ struct LocateScreen: View {
                 )
             }
         }
-        if let searchAppearance, !appearanceSearch.isActive { startAppearanceSearch(searchAppearance) }
+        if case .appearance(let appearance) = searchMode, !appearanceSearch.isActive {
+            startAppearanceSearch(appearance)
+        }
     }
 
-    /// The detector's selected object, or what the appearance search found.
+    /// The detector's selected object, or what the appearance search found; nothing until Iris has
+    /// decided which.
     private var guidanceTargetBox: CGRect? {
-        searchAppearance == nil ? detection.selectedTarget?.currentBoundingBox : appearanceSearch.match?.box
+        switch searchMode {
+        case .detector: detection.selectedTarget?.currentBoundingBox
+        case .appearance: appearanceSearch.match?.box
+        case nil: nil
+        }
     }
 
     private func startAppearanceSearch(_ appearance: TargetAppearance) {
@@ -319,6 +380,8 @@ struct LocateScreen: View {
     }
 
     private func tearDown() {
+        searchTask?.cancel()
+        askTask?.cancel()
         listenTask?.cancel()
         listener.stop()
         conversation.stop()

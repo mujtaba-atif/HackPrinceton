@@ -29,6 +29,24 @@ final class TargetAppearanceTests: XCTestCase {
         XCTAssertEqual(AppearanceCatalog.detectorClass(for: "bottles"), "bottle")
     }
 
+    /// The model writes some class names run together; the words in them still count.
+    func testRunTogetherClassNamesMatchTheirWords() {
+        XCTAssertEqual(AppearanceCatalog.detectorClass(for: "tv"), "tvmonitor")
+        XCTAssertEqual(AppearanceCatalog.detectorClass(for: "television"), "tvmonitor")
+        XCTAssertEqual(AppearanceCatalog.detectorClass(for: "the table"), "diningtable")
+        XCTAssertEqual(AppearanceCatalog.detectorClass(for: "plant"), "pottedplant")
+    }
+
+    /// The last word is the thing itself, so "glass" and "orange" there are names, not looks.
+    func testTheLastWordIsTheNameNotADescription() throws {
+        XCTAssertEqual(try XCTUnwrap(AppearanceCatalog.appearance(for: "wine glass")).source, .detector("wine glass"))
+        XCTAssertEqual(try XCTUnwrap(AppearanceCatalog.appearance(for: "orange")).source, .detector("orange"))
+        let bottle = try XCTUnwrap(AppearanceCatalog.appearance(for: "glass bottle"))
+        XCTAssertEqual(bottle.detectorClasses, ["bottle"])
+        XCTAssertEqual(bottle.textures, [.translucent])
+        XCTAssertEqual(try XCTUnwrap(AppearanceCatalog.appearance(for: "orange pills")).colors, [.orange])
+    }
+
     func testDetectorClassesStillUseTheDetector() throws {
         XCTAssertEqual(try XCTUnwrap(AppearanceCatalog.appearance(for: "water bottle")).source, .detector("bottle"))
         XCTAssertEqual(try XCTUnwrap(AppearanceCatalog.appearance(for: "phone")).source, .detector("cell phone"))
@@ -249,6 +267,16 @@ final class AppearanceMatchTrackerTests: XCTestCase {
         XCTAssertNil(tracker.update(best: nil, at: 4.5))
     }
 
+    /// A grid window is a third of the screen; a hand must never be guided to its center.
+    func testGridWindowsNeverBecomeTheMatch() {
+        var tracker = AppearanceMatchTracker()
+        let tile = ScoredRegion(box: AppearanceScanner.tiles[4], kind: .tile, classifierConfidence: 0.3,
+                                appearanceScore: 0.9, score: 0.95)
+        XCTAssertNil(tracker.update(best: tile, at: 1))
+        XCTAssertNil(tracker.update(best: tile, at: 1.4))
+        XCTAssertNil(tracker.update(best: tile, at: 1.8))
+    }
+
     func testFollowsTheMatchAsItMoves() throws {
         var tracker = AppearanceMatchTracker()
         tracker.update(best: region(0.4, score: 0.8), at: 1)
@@ -344,6 +372,21 @@ final class AppearanceSearchPhrasesTests: XCTestCase {
         XCTAssertTrue(AppearanceSearchPhrases.found("keys", match: unsure).contains("check it by touch"))
     }
 
+    func testHintSaysWhichWayToTurnTheCamera() {
+        XCTAssertTrue(AppearanceSearchPhrases.hint("keys", box: AppearanceScanner.tiles[0]).contains("on your left, down low"))
+        XCTAssertTrue(AppearanceSearchPhrases.hint("keys", box: AppearanceScanner.tiles[4]).contains("straight ahead"))
+        XCTAssertTrue(AppearanceSearchPhrases.hint("keys", box: AppearanceScanner.tiles[8]).contains("on your right, up high"))
+    }
+
+    /// A name holding a "go back" word would be heard as the command when Iris said it.
+    func testSpokenNamesDropGoBackWords() {
+        let keywords = ["go back", "back", "return", "previous", "exit", "leave", "quit", "cancel"]
+        XCTAssertEqual(AppearanceSearchPhrases.speakable("back brace", avoiding: keywords), "brace")
+        XCTAssertEqual(AppearanceSearchPhrases.speakable("Exit sign", avoiding: keywords), "sign")
+        XCTAssertEqual(AppearanceSearchPhrases.speakable("back", avoiding: keywords), "object")
+        XCTAssertEqual(AppearanceSearchPhrases.speakable("pill bottle", avoiding: keywords), "pill bottle")
+    }
+
     /// The microphone hears the speaker; Locate's back keywords would leave the screen.
     func testNoLineContainsAGoBackKeyword() throws {
         let keywords = ["back", "return", "previous", "exit", "leave", "quit", "cancel"]
@@ -351,6 +394,7 @@ final class AppearanceSearchPhrasesTests: XCTestCase {
         let match = AppearanceMatch(box: .zero, score: 0.5, lastSeen: 0, classifierBacked: false)
         let lines = [AppearanceSearchPhrases.thinking(about: "stapler"), AppearanceSearchPhrases.searching(for: pills),
                      AppearanceSearchPhrases.found("pills", match: match), AppearanceSearchPhrases.unknown("thing")]
+            + AppearanceScanner.tiles.map { AppearanceSearchPhrases.hint("pills", box: $0) }
         for line in lines {
             let words = line.lowercased().split { !$0.isLetter && $0 != "'" }.map(String.init)
             for keyword in keywords {

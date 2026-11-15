@@ -28,12 +28,16 @@ actor AppearanceScanner {
         (try? VNClassifyImageRequest().supportedIdentifiers()).map(Set.init) ?? []
     }()
 
-    /// - Parameter detections: Boxes of detections whose class is one of the appearance's detector classes.
-    func scan(pixelBuffer: CVPixelBuffer, appearance: TargetAppearance, detections: [CGRect]) -> [ScoredRegion] {
+    /// - Parameters:
+    ///   - detections: Boxes of detections whose class is one of the appearance's detector classes.
+    ///   - includeTiles: Whether to look at the grid windows too. They are for finding the thing in the
+    ///     first place; once a match is being followed they are nine classifier runs per pass for nothing.
+    func scan(pixelBuffer: CVPixelBuffer, appearance: TargetAppearance, detections: [CGRect],
+              includeTiles: Bool = true) -> [ScoredRegion] {
         autoreleasepool {
             var regions = detections.map { ($0, AppearanceRegionKind.detection) }
             regions += salientRegions(in: pixelBuffer).map { ($0, .salient) }
-            if !appearance.classifierLabels.isEmpty {
+            if includeTiles, !appearance.classifierLabels.isEmpty {
                 regions += Self.tiles.map { ($0, .tile) }
             }
             guard !regions.isEmpty, let bitmap = bitmap(from: pixelBuffer) else { return [] }
@@ -143,11 +147,15 @@ actor AppearanceScanner {
 final class AppearanceSearch: ObservableObject {
     @Published private(set) var appearance: TargetAppearance?
     @Published private(set) var match: AppearanceMatch?
+    /// While there is no match: the grid window that looked most like the thing, if one did. Good for
+    /// "it may be over to the left", never for guiding a hand (see `AppearanceMatchTracker.update`).
+    @Published private(set) var hint: CGRect?
     /// The upright camera image size, for drawing the match over the preview.
     @Published private(set) var uprightImageSize: CGSize = .zero
 
-    /// Seconds between passes; each pass classifies up to about 16 regions.
-    var passInterval: TimeInterval = 0.4
+    /// Seconds between passes. A pass classifies up to about 16 regions while searching and about 7
+    /// once a match is being followed, which is when hand tracking needs the Neural Engine most.
+    var passInterval: TimeInterval = 0.5
     private let scanner = AppearanceScanner()
     private var tracker = AppearanceMatchTracker()
     private var task: Task<Void, Never>?
@@ -174,10 +182,14 @@ final class AppearanceSearch: ObservableObject {
                 if self.uprightImageSize != size { self.uprightImageSize = size }
                 let boxes = detections().filter { classes.contains($0.name) }.map(\.boundingBox)
                 let regions = await self.scanner.scan(pixelBuffer: frame.capturedImage, appearance: appearance,
-                                                      detections: boxes)
+                                                      detections: boxes, includeTiles: self.match == nil)
                 guard !Task.isCancelled else { return }
-                let match = self.tracker.update(best: regions.first, at: now)
+                let match = self.tracker.update(best: regions.first { $0.kind != .tile }, at: now)
                 if self.match != match { self.match = match }
+                let hint = match == nil
+                    ? regions.first(where: { $0.kind == .tile && $0.score >= self.tracker.configuration.appearanceOnlyScore })?.box
+                    : nil
+                if self.hint != hint { self.hint = hint }
             }
         }
     }
@@ -187,6 +199,7 @@ final class AppearanceSearch: ObservableObject {
         task = nil
         tracker.reset()
         match = nil
+        hint = nil
         appearance = nil
     }
 }
@@ -238,5 +251,24 @@ enum AppearanceSearchPhrases {
 
     static func unknown(_ name: String) -> String {
         "I don't know what \(name) looks like. Tell me its color and size, like a small blue box."
+    }
+
+    /// Said while there is no match but a window of the frame looked like the thing: which way to move
+    /// the camera so that saliency or a detection can pick it out.
+    static func hint(_ name: String, box: CGRect) -> String {
+        let side = VisibleObject.position(forMidX: box.midX)
+        let height = box.midY > 0.67 ? "up high" : box.midY < 0.33 ? "down low" : nil
+        let place = [side == "ahead" ? nil : side, height].compactMap { $0 }.joined(separator: ", ")
+        let where_ = place.isEmpty ? "straight ahead" : place
+        return "Something like the \(name) may be \(where_). Bring the camera a little closer to it."
+    }
+
+    /// The name as this screen may say it aloud. The microphone hears the speaker, so a name holding one
+    /// of the words that mean "go back" ("back brace", "exit sign") would send the user off the screen
+    /// the moment Iris said it; those words are dropped, and a name made only of them becomes "object".
+    static func speakable(_ name: String, avoiding keywords: [String]) -> String {
+        let forbidden = Set(keywords.flatMap { $0.split(separator: " ").map { String($0).lowercased() } })
+        let kept = name.split(separator: " ").map(String.init).filter { !forbidden.contains($0.lowercased()) }
+        return kept.isEmpty ? "object" : kept.joined(separator: " ")
     }
 }

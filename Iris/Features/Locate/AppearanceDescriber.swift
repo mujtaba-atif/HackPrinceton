@@ -44,19 +44,44 @@ enum AppearanceDescriber {
     private static func describeWithLanguageModel(_ name: String, classifierLabels: Set<String>) async -> TargetAppearance? {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, *), SystemLanguageModel.default.isAvailable {
-            return await withTaskGroup(of: TargetAppearance?.self) { group in
-                group.addTask { await GeneratedLook.describe(name, classifierLabels: classifierLabels) }
-                group.addTask {
+            // Not a task group: a group waits for every child before it returns, and the model's
+            // `respond` doesn't stop when cancelled, so a group "timeout" still sat out the whole
+            // generation. Whichever finishes first answers; a late answer is thrown away.
+            return await withCheckedContinuation { continuation in
+                let once = ResumeOnce(continuation)
+                let model = Task { once.resume(await GeneratedLook.describe(name, classifierLabels: classifierLabels)) }
+                Task {
                     try? await Task.sleep(for: .seconds(modelTimeout))
-                    return nil
+                    if once.resume(nil) {
+                        print("Appearance search: language model took over \(Int(modelTimeout)) s describing \(name)")
+                        model.cancel()
+                    }
                 }
-                let first = await group.next() ?? nil
-                group.cancelAll()
-                return first
             }
         }
         #endif
         return nil
+    }
+
+    /// Resumes a continuation the first time only, from whichever task gets there first.
+    private final class ResumeOnce: @unchecked Sendable {
+        private var continuation: CheckedContinuation<TargetAppearance?, Never>?
+        private let lock = NSLock()
+
+        init(_ continuation: CheckedContinuation<TargetAppearance?, Never>) {
+            self.continuation = continuation
+        }
+
+        /// Returns true when this call was the one that resumed it.
+        @discardableResult
+        func resume(_ value: TargetAppearance?) -> Bool {
+            lock.lock()
+            let continuation = self.continuation
+            self.continuation = nil
+            lock.unlock()
+            continuation?.resume(returning: value)
+            return continuation != nil
+        }
     }
 
     /// Turns the language model's free words into an appearance, keeping only values the search understands.

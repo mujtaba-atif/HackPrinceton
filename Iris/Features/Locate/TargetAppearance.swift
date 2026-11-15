@@ -142,9 +142,17 @@ struct AppearanceWords: Equatable, Sendable {
         self.remainder = remainder
     }
 
+    /// The last word is always the thing's name, never a description of it: in "wine glass" or "orange"
+    /// the glass and the orange are what is wanted, where in "glass bottle" or "orange pills" they
+    /// describe it. English puts the noun last, so that is the rule used.
     init(parsing request: String) {
         var rest: [String] = []
-        for word in VoiceCommandParser.normalize(request).split(separator: " ").map(String.init) {
+        let words = VoiceCommandParser.normalize(request).split(separator: " ").map(String.init)
+        for (index, word) in words.enumerated() {
+            if index == words.count - 1 {
+                rest.append(word)
+                continue
+            }
             var used = false
             if let color = Self.colorWords[word] {
                 if !colors.contains(color) { colors.append(color) }
@@ -331,16 +339,33 @@ enum AppearanceCatalog {
         let candidates = detectorClasses.map {
             VisibleObject(DetectedObject(id: UUID(), name: $0, confidence: 1, boundingBox: .zero))
         }
-        guard let matched = AssistantFacts.match(name, in: candidates)?.name else { return nil }
         let normalized = VoiceCommandParser.normalize(name)
         var words = normalized.split(separator: " ").map(String.init)
         words += words.compactMap { $0.count > 3 && $0.hasSuffix("s") ? String($0.dropLast()) : nil }
+        // What the words mean, by Locate's synonyms: "television" → tv, "plant" → potted plant.
+        let meant = ([normalized] + words).compactMap { AssistantFacts.synonyms[$0] }
+
+        // The run-together classes first: the generic matching below is by substring, and neither
+        // "tv monitor" nor "dining table" is a substring of the class it names.
+        for (compound, spaced) in compoundClassNames {
+            let classWords = Set(spaced.split(separator: " ").map(String.init))
+            if words.contains(where: classWords.contains) { return compound }
+            if meant.contains(where: { Set($0.split(separator: " ").map(String.init)).isSubset(of: classWords) }) {
+                return compound
+            }
+        }
+
+        guard let matched = AssistantFacts.match(name, in: candidates)?.name else { return nil }
         let classWords = matched.split(separator: " ").map(String.init)
         if classWords.contains(where: words.contains) { return matched }
-        let synonyms = AssistantFacts.synonyms
-        if synonyms[normalized] == matched || words.contains(where: { synonyms[$0] == matched }) { return matched }
-        return nil
+        return meant.contains(matched) ? matched : nil
     }
+
+    /// Class names the model writes run together, with the words they are made of, so that "tv",
+    /// "table" and "plant" still count as whole-word matches.
+    private static let compoundClassNames = [
+        "tvmonitor": "tv monitor", "diningtable": "dining table", "pottedplant": "potted plant"
+    ]
 
     /// Classifier identifiers named in the request: "umbrella" → umbrella, "board game" → board_game.
     static func matchingLabels(for name: String, in labels: Set<String>) -> [String] {

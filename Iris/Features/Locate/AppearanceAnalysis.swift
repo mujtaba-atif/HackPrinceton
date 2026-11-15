@@ -246,10 +246,12 @@ struct AppearanceMatchTracker {
         candidate = nil
     }
 
-    /// - Parameter best: The best-scoring region of this pass, if any.
+    /// - Parameter best: The best-scoring region of this pass, if any. A grid window is never a match: it
+    ///   is a third of the screen, not the thing, and a hand guided to its center would be guided to
+    ///   whatever happens to be there. Windows are hints (`AppearanceSearch.hint`) and nothing more.
     @discardableResult
     mutating func update(best: ScoredRegion?, at time: TimeInterval) -> AppearanceMatch? {
-        if let best, best.score >= threshold(for: best) {
+        if let best, best.kind != .tile, best.score >= threshold(for: best) {
             if var current = match, isSame(current.box, best.box) {
                 current.box = blend(current.box, best.box)
                 current.score = max(best.score, current.score * 0.8)
