@@ -36,8 +36,8 @@ final class ObjectConversation: ObservableObject {
     /// The screen takes its listener back so "go back" still works.
     var onEnded: (() -> Void)?
 
-    /// Reads the middle 60% of the frame (`TextReader.region`) — which is roughly the part
-    /// `ConversationWater`'s rim leaves clear, so what is being read is what is not under water.
+    /// Reads the middle 60% of the frame (`TextReader.region`) — roughly the part of the screen in
+    /// the middle, clear of the camera waves.
     private let reader = TextReader()
     private let agent = AgentSession()
     private var statusSink: AnyCancellable?

@@ -101,7 +101,7 @@ final class Speaker: NSObject, ObservableObject, AVAudioPlayerDelegate, AVSpeech
     //
     // .defaultToSpeaker keeps playback on the loudspeaker; recording mode otherwise uses the earpiece.
     // .measurement keeps iOS's own processing off the input — automatic gain control above all. The
-    // water in `WaterVisualizer` is drawn from raw levels, and AGC winds a silent room up to a voice's
+    // ripples on the options screen are drawn from raw levels, and AGC winds a silent room up to a voice's
     // reading (and pumps it over a few seconds, which reads as syllables); it is also the mode Apple's
     // own speech-recognition sample records in.
     //

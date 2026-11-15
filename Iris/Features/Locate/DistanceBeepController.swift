@@ -101,7 +101,7 @@ final class DistanceBeepController: ObservableObject {
 
     private let audioEngine = AVAudioEngine()
     private let tone = ToneLevel()
-    /// The same direction the tone is carrying, for `GuidanceRipple` to draw over the camera feed.
+    /// The same direction the tone is carrying, for `CameraGlass` to show on its waves.
     /// Not `@Published`: see `GuidanceCue`.
     let cue = GuidanceCue()
     private let directionFeedback = UIImpactFeedbackGenerator(style: .medium)

@@ -40,146 +40,132 @@ struct LocateScreen: View {
     /// frame until then, so none of the above changes.
     @StateObject private var conversation = ObjectConversation()
 
+    /// The object's silhouette from the live segmentation mask, normalized to the upright image.
+    @State private var outline: [CGPoint]?
+    /// Bumped on first contact with the object, for the confetti.
+    @State private var celebrations = 0
+
     var body: some View {
-        // Full-screen geometry so the overlay covers the same area as the camera preview.
-        GeometryReader { geo in
-            ZStack {
-                MainArt.background.color
-                    .ignoresSafeArea()
+        StageView { stage in
+            IrisPalette.ink
+            ARCameraPreview(session: camera.session)
+            // The design's shade: a little darker at the top and bottom, where the controls sit.
+            LinearGradient(stops: [.init(color: Color(rgba: 0x061B3740), location: 0),
+                                   .init(color: .clear, location: 0.32),
+                                   .init(color: .clear, location: 0.6),
+                                   .init(color: Color(rgba: 0x061B3750), location: 1)],
+                           startPoint: .top, endPoint: .bottom)
+                .allowsHitTesting(false)
 
-                ARCameraPreview(session: camera.session)
-                    .ignoresSafeArea()
+            // Guidance rides on the waves (see `CameraGlass`), and after the handoff the conversation does.
+            CameraGlass(mode: .locate, cue: beepController.cue, mood: conversation.mood)
 
-                // Over the camera feed but under the detection overlay: it's a hint at the edges of
-                // the screen, not something to read through.
-                GuidanceRipple(cue: beepController.cue)
-                    .ignoresSafeArea()
+            if let path = outlinePath(in: stage.size) {
+                ObjectOutline(path: path, style: outlineStyle, label: outlineLabel,
+                              scanning: conversation.stage == .reading)
+            }
 
-                SegmentationOverlay(
-                    segments: segmenter.segments,
-                    maskImage: segmenter.maskImage,
-                    imageSize: segmenter.uprightImageSize,
-                    viewSize: geo.size
-                ) { contentSize in
-                    BoundingBoxOverlay(
-                        detections: detector.detections,
-                        handPoint: detector.handPoint,
-                        leftHandJointPoints: detector.leftHandJointPoints,
-                        rightHandJointPoints: detector.rightHandJointPoints,
-                        leftHandHoldingObject: detector.leftHandHoldingObject,
-                        rightHandHoldingObject: detector.rightHandHoldingObject,
-                        viewSize: contentSize,
-                        selectedPoint: detector.selectedPoint,
-                        leftHandCenter: detector.leftHandCenter,
-                        rightHandCenter: detector.rightHandCenter,
-                        leftHandEdge: detector.leftHandEdge,
-                        rightHandEdge: detector.rightHandEdge,
-                        objectFound: detector.objectFound,
-                        approaching: detector.approaching,
-                        objectCenter: detector.objectCenter,
-                        cameraDistance: detector.cameraDistance,
-                        objectClose: detector.objectClose
-                    )
-                }
-                // Both detectors keep running through the conversation — the pipeline is untouched —
-                // but their masks, boxes and fingertip distances are the guidance's working out, and
-                // the guidance is over. `.opacity` rather than a branch, so it fades rather than cuts.
-                .opacity(conversation.stage == .idle ? 1 : 0)
-
-                // Over everything, because from the handoff on it *is* the screen.
-                ConversationWater(mood: conversation.mood)
-                    .ignoresSafeArea()
-            }
-            .onAppear {
-                conversation.onBack = { onBack() }
-                // The agent is about to take the audio hardware, so both of the things holding it let
-                // go first: the recogniser's microphone and the guidance tone's engine.
-                conversation.onHandOff = {
-                    listenTask?.cancel()
-                    listener.stop()
-                    beepController.shutdown()
-                }
-                // No agent to talk to. It says what it can off the label itself, and the screen takes
-                // its own listener back so "go back" still works.
-                conversation.onEnded = {
-                    Task {
-                        await Speaker.shared.waitUntilIdle()
-                        listenForBack()
-                    }
-                }
-                // `session.run` is heavy and the navigation push is still animating; starting it on top
-                // of the push is what made the way in here stutter.
-                startTask = Task {
-                    try? await Task.sleep(for: .seconds(0.3))
-                    guard !Task.isCancelled else { return }
-                    await camera.start()
-                }
-            }
-            .onChange(of: camera.state) { _, state in
-                if state == .running { startFrames() } else { stopFrames() }
-            }
-            .onReceive(segmenter.$objectMask) { detector.objectMask = $0 }
-            .onReceive(
-                detector.$leftHandEdge
-                    .combineLatest(detector.$rightHandEdge, detector.$objectFound)
-                    .combineLatest(detector.$approaching, detector.$objectClose)
-            ) { measurements, approaching, objectClose in
-                let (leftEdge, rightEdge, objectFound) = measurements
-                beepController.update(
-                    leftEdge: leftEdge,
-                    rightEdge: rightEdge,
-                    objectFound: objectFound,
-                    approaching: approaching,
-                    objectClose: objectClose,
-                    objectCenter: segmenter.objectMask?.center
-                )
-            }
-            // The last step is done: the object is in the user's hand and held close enough to read, so
-            // the screen changes hands. `begin` latches, which matters here — `.ready` can fall back to
-            // `.contact` and return if the object dips out of the frame, and that must not start a
-            // second conversation.
-            .onChange(of: beepController.phase) { _, phase in
-                guard phase == .ready else { return }
-                conversation.begin(objectName: target)
-            }
-            .onChange(of: scenePhase) { _, phase in
-                if phase == .active {
-                    Task { await camera.resumeAfterAppLifecyclePause() }
-                } else {
-                    camera.pauseForAppLifecycle()
-                }
-            }
-            .onDisappear {
-                conversation.stop()
-                beepController.shutdown()
-                startTask?.cancel()
-                stopFrames()
-                camera.stop()
-            }
-            // Haptic tap when the hand reaches the object (`approaching` latches the first found, so grip
-            // flicker while bringing it closer doesn't re-fire), and again once it's close enough to read.
-            .sensoryFeedback(.success, trigger: detector.approaching) { _, active in active }
-            .sensoryFeedback(.success, trigger: detector.objectClose) { _, close in close }
-            .task {
-                await askForTarget()
-            }
-            .onDisappear {
-                listenTask?.cancel()
-                listener.stop()
-            }
+            Sprinkles(count: 6, quiet: true, unit: stage.unit)
+            Confetti(trigger: celebrations, unit: stage.unit)
+            GlassBackButton(action: onBack)
+            statusBlob
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }
         .ignoresSafeArea()
-        .overlay(alignment: .bottom) { statusBlob }
+        .navigationBarBackButtonHidden(true)
+        .onAppear {
+            conversation.onBack = { onBack() }
+            // The agent is about to take the audio hardware, so both of the things holding it let
+            // go first: the recogniser's microphone and the guidance tone's engine.
+            conversation.onHandOff = {
+                listenTask?.cancel()
+                listener.stop()
+                beepController.shutdown()
+            }
+            // No agent to talk to. It says what it can off the label itself, and the screen takes
+            // its own listener back so "go back" still works.
+            conversation.onEnded = {
+                Task {
+                    await Speaker.shared.waitUntilIdle()
+                    listenForBack()
+                }
+            }
+            // `session.run` is heavy and the navigation push is still animating; starting it on top
+            // of the push is what made the way in here stutter.
+            startTask = Task {
+                try? await Task.sleep(for: .seconds(0.3))
+                guard !Task.isCancelled else { return }
+                await camera.start()
+            }
+        }
+        .onChange(of: camera.state) { _, state in
+            if state == .running { startFrames() } else { stopFrames() }
+        }
+        .onReceive(segmenter.$objectMask) { detector.objectMask = $0 }
+        .onReceive(
+            detector.$leftHandEdge
+                .combineLatest(detector.$rightHandEdge, detector.$objectFound)
+                .combineLatest(detector.$approaching, detector.$objectClose)
+        ) { measurements, approaching, objectClose in
+            let (leftEdge, rightEdge, objectFound) = measurements
+            beepController.update(
+                leftEdge: leftEdge,
+                rightEdge: rightEdge,
+                objectFound: objectFound,
+                approaching: approaching,
+                objectClose: objectClose,
+                objectCenter: segmenter.objectMask?.center
+            )
+        }
+        // The last step is done: the object is in the user's hand and held close enough to read, so
+        // the screen changes hands. `begin` latches, which matters here — `.ready` can fall back to
+        // `.contact` and return if the object dips out of the frame, and that must not start a
+        // second conversation.
+        .onChange(of: beepController.phase) { _, phase in
+            guard phase == .ready else { return }
+            conversation.begin(objectName: target)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task { await camera.resumeAfterAppLifecyclePause() }
+            } else {
+                camera.pauseForAppLifecycle()
+            }
+        }
+        .onDisappear {
+            conversation.stop()
+            beepController.shutdown()
+            startTask?.cancel()
+            stopFrames()
+            camera.stop()
+        }
+        // Haptic tap when the hand reaches the object (`approaching` latches the first found, so grip
+        // flicker while bringing it closer doesn't re-fire), and again once it's close enough to read.
+        .sensoryFeedback(.success, trigger: detector.approaching) { _, active in active }
+        .sensoryFeedback(.success, trigger: detector.objectClose) { _, close in close }
+        .task {
+            await askForTarget()
+        }
+        .onDisappear {
+            listenTask?.cancel()
+            listener.stop()
+        }
+        .onReceive(segmenter.$objectMask) { mask in
+            outline = mask.flatMap { MaskContour.outline(of: $0) }
+        }
+        .onChange(of: detector.approaching) { _, reached in
+            if reached { celebrations += 1 }
+        }
         .animation(.easeInOut, value: beepController.phase)
         .animation(.easeInOut, value: guidanceStarted)
         .animation(.easeInOut, value: conversation.stage)
         .animation(.easeInOut, value: conversation.agentStatus)
     }
 
-    /// Whoever has the screen, in writing, in the one blob of water at the bottom of it. For the three
-    /// steps that is the distance the camera is measuring with the step under it — the step the voice
-    /// announces and the chime marks, so a demo can be followed by someone who isn't wearing the
-    /// headphones — and after the handoff the conversation's own state, which has nothing to measure.
+    /// Whoever has the screen, in writing, in the glass panel at the bottom of it. For the three steps
+    /// that is the distance the camera is measuring with the step under it — the step the voice announces
+    /// and the chime marks, so a demo can be followed by someone who isn't wearing the headphones — and
+    /// after the handoff the conversation's own state, which has nothing to measure.
     @ViewBuilder
     private var statusBlob: some View {
         switch conversation.stage {
@@ -189,19 +175,44 @@ struct LocateScreen: View {
                     measurement: guidanceDistance.map { ObjectDetector.inches($0) },
                     goal: guidanceGoal,
                     text: guidanceLabel,
-                    systemImage: guidanceIcon,
                     highlighted: detector.approaching ? detector.objectClose : detector.objectFound
                 )
-            } else if listener.isListening {
-                ListeningIndicator()
+            } else {
+                StatusBlob(text: "Looking… · Tell Iris what to locate")
             }
         case .reading:
-            StatusBlob(text: "Reading the label…", systemImage: "text.viewfinder")
+            StatusBlob(text: "Reading the label…")
         case .talking:
             StatusBlob(status: conversation.agentStatus)
         case .ended:
-            StatusBlob(text: "Say go back to finish", systemImage: "mic.fill")
+            StatusBlob(text: "Say go back to finish")
         }
+    }
+
+    /// The live outline, aspect-filled onto the screen the way the camera preview is. Shown once Iris
+    /// knows what it's looking for.
+    private func outlinePath(in size: CGSize) -> Path? {
+        guard guidanceStarted, let outline, outline.count > 2 else { return nil }
+        let image = segmenter.uprightImageSize
+        var path = Path()
+        path.addLines(outline.map { MaskContour.aspectFill($0, image: image, view: size) })
+        path.closeSubpath()
+        return path
+    }
+
+    private var outlineStyle: ObjectOutline.Style {
+        switch conversation.stage {
+        case .reading: .reading
+        case .talking, .ended: .settled
+        case .idle: detector.approaching || detector.objectFound ? .success : .locate
+        }
+    }
+
+    private var outlineLabel: String? {
+        guard conversation.stage == .idle else { return nil }
+        let name = target.prefix(1).uppercased() + target.dropFirst()
+        if beepController.phase == .ready || detector.objectClose { return "Ready to read" }
+        return detector.approaching || detector.objectFound ? "\(name) found" : name
     }
 
     /// What the blob puts on its big line: how far the hand still has to travel, or — once the object
@@ -230,10 +241,6 @@ struct LocateScreen: View {
     /// checked first: it is why the read isn't happening, even while still debounced as close enough.
     private var guidanceLabel: String {
         tooClose ? "Too close · Move it back" : beepController.phase.label
-    }
-
-    private var guidanceIcon: String {
-        tooClose ? "exclamationmark.circle.fill" : beepController.phase.icon
     }
 
     private var tooClose: Bool {

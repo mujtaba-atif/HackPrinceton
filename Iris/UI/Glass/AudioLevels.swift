@@ -3,7 +3,7 @@ import AVFoundation
 import os
 import SwiftUI
 
-/// A drop of water falling on one of `WaterVisualizer`'s three patches of water. Where it lands, how
+/// A drop of water falling on the options screen's open water (`MainScreen`'s well). Where it lands, how
 /// big it is and how long it takes to fade are all picked at random, so no two sound the same.
 struct WaterDrop: Identifiable {
     let id = UUID()
@@ -38,7 +38,7 @@ struct WaterDrop: Identifiable {
 
 /// Listens on the microphone and reports how loud three bands of what it hears are — bass, mids and
 /// highs, each 0–1 and smoothed — plus the drops of water each band has shaken loose.
-/// `WaterVisualizer` draws them.
+/// `MainScreen`'s water well draws them.
 ///
 /// Loudness is measured against the room rather than against a fixed scale: every band learns the quiet
 /// it is sitting in (`floor`) and only what rises well over that counts, so a fan, a hum or a busy street

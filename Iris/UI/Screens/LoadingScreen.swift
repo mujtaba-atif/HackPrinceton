@@ -1,74 +1,54 @@
 import SwiftUI
 
-/// Shown while `Preloader` builds the artwork and the vision models.
-///
-/// It draws just the home screen's "IRIS" (one small layer, cheap to draw before the rest of the art
-/// is built) with a spinner under it. Once the home screen is mounted and drawn, `handedOver` goes true:
-/// the background, title, spinner and text all drop out at once, and the home screen's own copy of
-/// the title, sitting in exactly the same place (`HomeScreen.loadingTitleDrop`), rises to its spot
-/// while the monster slides up from below.
+/// Shown while `Preloader` loads the vision models: "Iris" with a spinning ring and what it's doing.
+/// When the welcome screen is ready underneath it, `handedOver` fades this out and the welcome screen's
+/// own title plays its light reveal.
 struct LoadingScreen: View {
     /// What the preloader is doing, shown under the title.
     var step = "Getting ready"
     /// The home screen has taken over: nothing here is drawn any more.
     var handedOver = false
 
-    /// Under the title, in artboard points.
-    private static let statusBounds = CGRect(
-        x: HomeArt.artboard.minX,
-        y: HomeScreen.loadingTitleCenter + HomeArt.title.bounds.height / 2 + 70,
-        width: HomeArt.artboard.width,
-        height: 200
-    )
-
-    @State private var spinning = false
-
     var body: some View {
-        ZStack {
-            // The same color as the home screen's, so it can be cut rather than faded: the home screen
-            // is already there underneath in the same place.
-            HomeArt.background.color
-                .opacity(handedOver ? 0 : 1)
-            Artboard(rect: HomeArt.artboard) {
-                Artboard(rect: HomeArt.artboard) {
-                    HomeArt.title
-                }
-                .artboardShift(HomeScreen.loadingTitleDrop)
-                .artFrame(HomeArt.artboard)
-                .opacity(handedOver ? 0 : 1)
-
-                status
-                    .artFrame(Self.statusBounds)
-                    .opacity(handedOver ? 0 : 1)
-                    .animation(.easeOut(duration: 0.25), value: handedOver)
+        StageView { stage in
+            HomeBackdrop()
+            Text("Iris")
+                .font(IrisFont.nunito(stage(78), .black))
+                .tracking(stage(-3))
+                .foregroundStyle(IrisPalette.white)
+                .placed(x: 0, y: 314, width: 360, height: 94, on: stage)
+            VStack(spacing: stage(22)) {
+                Spinner(unit: stage.unit)
+                Text(step)
+                    .font(IrisFont.nunito(stage(18), .bold))
+                    .foregroundStyle(IrisPalette.white)
+                    .contentTransition(.opacity)
+                    .animation(.easeInOut, value: step)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
+            .placed(x: 0, y: 438, width: 360, height: 120, on: stage)
+            Sprinkles(count: 20, unit: stage.unit)
         }
+        .opacity(handedOver ? 0 : 1)
+        .animation(.easeOut(duration: 0.3), value: handedOver)
         .ignoresSafeArea()
         .allowsHitTesting(!handedOver)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Iris is loading")
-        .onAppear {
-            withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) { spinning = true }
-        }
     }
+}
 
-    private var status: some View {
-        VStack(spacing: 26) {
-            ring
-            Text(step)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.85))
-                .animation(.easeInOut, value: step)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-    }
+/// A 44-point ring with a white top quarter, turning once a second.
+private struct Spinner: View {
+    var unit: CGFloat
 
-    private var ring: some View {
+    var body: some View {
         Circle()
-            .trim(from: 0, to: 0.22)
-            .stroke(.white, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-            .frame(width: 44, height: 44)
-            .rotationEffect(.degrees(spinning ? 360 : 0))
+            .trim(from: 0, to: 0.25)
+            .stroke(IrisPalette.white, style: StrokeStyle(lineWidth: 6 * unit))
+            .rotationEffect(.degrees(-135))
+            .frame(width: 38 * unit, height: 38 * unit)
+            .motion(Motion(1, curve: .linear, repeats: true, from: .rest, to: Pose(rotation: 360)))
     }
 }
 

@@ -37,20 +37,33 @@ struct ExploreScreen: View {
     private let rescanHold: TimeInterval = 1.5
     private let rescanTimeout: TimeInterval = 8
 
+    @State private var celebrations = 0
+
     var body: some View {
-        GeometryReader { geo in
+        StageView { stage in
+            IrisPalette.ink
             ARCameraPreview(session: camera.session)
-                .overlay {
-                    ScanAreaOutline(
-                        imageSize: reader.uprightImageSize,
-                        viewSize: geo.size,
-                        foundText: !reader.lines.isEmpty,
-                        progress: ringProgress
-                    )
-                }
+            LinearGradient(stops: [.init(color: Color(rgba: 0x061B3740), location: 0),
+                                   .init(color: .clear, location: 0.32),
+                                   .init(color: .clear, location: 0.6),
+                                   .init(color: Color(rgba: 0x061B3750), location: 1)],
+                           startPoint: .top, endPoint: .bottom)
+                .allowsHitTesting(false)
+            CameraGlass(mode: .explore)
+            // The reading area. The hold-steady countdown fills it with light from the bottom up.
+            ObjectOutline(path: scanAreaPath(in: stage), style: outlineStyle,
+                          scanning: !summaryStarted || rescanning, fill: Double(ringProgress))
+            Sprinkles(count: 6, quiet: true, unit: stage.unit)
+            Confetti(trigger: celebrations, unit: stage.unit)
+            GlassBackButton(action: onBack)
+            statusPill
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }
         .ignoresSafeArea()
-        .overlay(alignment: .bottom) { statusPill }
+        .navigationBarBackButtonHidden(true)
+        .onChange(of: summaryStarted) { _, started in
+            if started { celebrations += 1 }
+        }
         .animation(.easeInOut, value: agent.status)
         .animation(.easeInOut, value: holdStartedAt != nil)
         .animation(.easeInOut, value: summaryStarted)
@@ -97,12 +110,26 @@ struct ExploreScreen: View {
         if !rescanning, agent.isRunning {
             ListeningIndicator(status: agent.status)
         } else if !rescanning, summaryStarted {
-            ListeningIndicator(text: "Text detected", systemImage: "checkmark.circle.fill")
+            ListeningIndicator(text: "Text detected")
         } else if holdStartedAt != nil {
-            ListeningIndicator(text: "Hold steady… \(secondsLeft)", systemImage: "timer")
+            ListeningIndicator(text: "Hold steady… \(secondsLeft)")
         } else {
-            ListeningIndicator(text: "Looking for text…", systemImage: "text.viewfinder")
+            ListeningIndicator(text: "Looking for text…")
         }
+    }
+
+    private var outlineStyle: ObjectOutline.Style {
+        if summaryStarted, !rescanning { return .settled }
+        return reader.lines.isEmpty ? .explore : .reading
+    }
+
+    /// `TextReader.region` (Vision coordinates, origin bottom left) on screen, the camera image being
+    /// aspect-filled.
+    private func scanAreaPath(in stage: Stage) -> Path {
+        let region = TextReader.region
+        let normalized = CGRect(x: region.minX, y: 1 - region.maxY, width: region.width, height: region.height)
+        let rect = MaskContour.aspectFill(normalized, image: reader.uprightImageSize, view: stage.size)
+        return Path(roundedRect: rect, cornerRadius: 28 * stage.unit, style: .continuous)
     }
 
     // Waits for text, runs the countdown once it is found, and returns what was read. With `hints`, it also nudges
@@ -240,42 +267,6 @@ struct ExploreScreen: View {
 
         Summarize this item in one or two short sentences, then wait.
         """
-    }
-}
-
-/// Outlines the part of the picture that is being read, and fills in green during the countdown. The camera image
-/// fills the screen and is cropped to fit, so the outline is computed the same way (see SegmentationOverlay in
-/// LocateScreen).
-private struct ScanAreaOutline: View {
-    let imageSize: CGSize
-    let viewSize: CGSize
-    let foundText: Bool
-    let progress: CGFloat
-
-    private var rect: CGRect {
-        let scale = max(viewSize.width / imageSize.width, viewSize.height / imageSize.height)
-        let content = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
-        let region = TextReader.region
-        return CGRect(
-            x: region.minX * content.width - (content.width - viewSize.width) / 2,
-            y: (1 - region.maxY) * content.height - (content.height - viewSize.height) / 2,
-            width: region.width * content.width,
-            height: region.height * content.height
-        )
-    }
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .stroke(foundText ? Color.green.opacity(0.4) : Color.white.opacity(0.8), lineWidth: 3)
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .trim(from: 0, to: progress)
-                    .stroke(Color.green, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-            }
-            .frame(width: rect.width, height: rect.height)
-            .position(x: rect.midX, y: rect.midY)
-            .animation(.easeInOut, value: foundText)
-            .allowsHitTesting(false)
     }
 }
 
