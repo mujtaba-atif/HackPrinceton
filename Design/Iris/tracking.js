@@ -24,16 +24,13 @@
   </svg>`;
  }
  function render(distance=.8){
-  const g=geometry(distance);
-  return `<div class="hand-tracking" role="img" aria-label="Simulated hand tracking: ${g.distance.toFixed(1)} meters from fingertip to bottle">${vectors(distance)}<span class="hand-distance" style="left:${g.label.x}px;top:${g.label.y}px">${g.distance.toFixed(1)} m</span><span class="hand-tracked"><i></i>Hand tracked</span></div>`;
+  return `<div class="hand-tracking" role="img" aria-label="Simulated hand landmarks and fingertip-to-object connector">${vectors(distance)}<span class="hand-tracked"><i></i>Hand tracked</span></div>`;
  }
  function update(element,distance){
   if(!element)return;
   const g=geometry(distance);
-  element.querySelector('#handPose').setAttribute('transform',`translate(${g.tx} ${g.ty})`);
-  for(const id of ['handDistanceGlow','handDistanceLine'])element.querySelector('#'+id).setAttribute('d',`M244 420L${g.tip.x} ${g.tip.y}`);
-  const label=element.querySelector('.hand-distance');label.textContent=g.distance.toFixed(1)+' m';label.style.left=g.label.x+'px';label.style.top=g.label.y+'px';
-  element.setAttribute('aria-label',`Simulated hand tracking: ${g.distance.toFixed(1)} meters from fingertip to bottle`);
+  element.querySelector('#handPose')?.setAttribute('transform',`translate(${g.tx} ${g.ty})`);
+  for(const id of ['handDistanceGlow','handDistanceLine'])element.querySelector('#'+id)?.setAttribute('d',`M244 420L${g.tip.x} ${g.tip.y}`);
  }
  const api={anchor,points,chains,silhouette,geometry,vectors,render,update};
  if(typeof module==='object'&&module.exports)module.exports=api;else root.IrisTracking=api;

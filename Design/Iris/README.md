@@ -25,6 +25,18 @@ HTML/CSS/JS preview for animations and interactions.
 
 ## Design revisions
 
+Revision 19 replaces the four camera light strips with two original glowing
+blue guidance arrows, one on each side. They point forward or back and tilt
+left or right, while their white, pale-blue, deep-blue and bright-blue light
+changes with approach progress. A persistent HAND → OBJECT card stays in one
+screen position while its inches and centimeter values update. The inches
+are converted from the supplied demo meters using exactly 0.0254 meters per
+inch. Hiding the hand keeps the card visible with an unavailable state instead
+of a stale number. The demo slider and closer/away controls update the hand,
+connector, arrows and card together; directional controls demonstrate steering.
+Open `?screen=guidance` to start directly in this view. These controls simulate
+sensor input; this browser preview does not measure real-world distance.
+
 Revision 18 replaces the large camera waves with four narrow optical light
 strips, two per side, with softly traveling highlights. The camera object mask
 is translucent green and follows the bottle silhouette. A 21-landmark hand
@@ -96,7 +108,16 @@ individual blinks and gentle bounces keep the original playful Iris style.
 
 Local browser preview: http://127.0.0.1:4173/
 
-The latest Figma code layer is [Iris · Camera guidance · v18](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858).
+[Live revision 19 guidance preview](https://app-vv74nvdykzsio2xxoy5pgrvgmdczd43ramggdbyipubmjv56i7pp.makeproxy-c.figma.site/?screen=guidance). Figma refreshed the runtime
+address when the existing code layer was updated. The original preview URL
+no longer resolves; the code layer below remains the stable entry point.
+
+[Verified hosted preview screenshot](review/guidance-v19.jpg). Browser checks
+covered two arrows/no old rails, fixed card bounds as distance changes,
+25.6 in at 65 cm, 11.8 in at 30 cm, hand loss, zero-distance arrival, directional
+changes, and reduced motion. No native app or simulator was run for this update.
+
+The Figma source is [Iris · Camera guidance code layer](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858).
 
 Select the latest code layer in Figma and press Play to interact. The native
 screens are editable. This UI package and the current SVG exports are included
@@ -123,8 +144,9 @@ There is no package installation or build step.
 - Locate springs from the left; Explore springs from the right, with different timing.
 - A textured treasure map with a traveling route marker, turning compass and red X.
 - Map and magnifier sway horizontally, with an optional phone-shake response.
-- Four thin glass light strips animate along the camera edges.
-- Green silhouette highlighting, hand landmarks, a fingertip distance link, and a hand-lost state.
+- Two glowing blue arrows show direction and approach progress along the camera edges.
+- A fixed distance card shows inches and centimeters and remains visible when tracking is lost.
+- Green silhouette highlighting, hand landmarks, a fingertip connector, and simulated direction/distance controls.
 - Ambient blue sprinkles, quieter edge accents over camera views, and success confetti.
 - Looking, spatial guidance, distance, object reached and ready-to-read states.
 - Object-shaped boundaries and an interior scanning light; no rectangular target.
@@ -139,10 +161,11 @@ mask from the camera pipeline, transformed with the same image crop.
 Use the review controls outside the phone to
 trigger the demonstrated voice and camera events.
 
-Native Figma frames include linked navigation, directional entrances, editable
+Native Figma frames retain linked navigation, directional entrances, editable
 character components, map and magnifier motion, camera edge lights, ambient
-particles, and success confetti. Continuous animations and simulated hand
-movement are demonstrated in the runnable code preview.
+particles, and success confetti from the earlier revisions. Revision 19's arrows,
+fixed distance card, continuous animations and simulated hand movement are
+implemented in the runnable code preview.
 The shared Figma card components retain their IDs and instances.
 
 Reduced motion disables continuous movement and hides confetti. The revised
