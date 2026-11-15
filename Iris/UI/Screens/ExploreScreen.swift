@@ -38,6 +38,10 @@ struct ExploreScreen: View {
     private let rescanTimeout: TimeInterval = 8
 
     @State private var celebrations = 0
+    /// What was read for the summary, kept so it can be read out if the agent never answers.
+    @State private var readLines: [String] = []
+    /// The agent couldn't connect, or dropped: Iris read the label out itself and listens for "go back".
+    @State private var agentEnded = false
 
     var body: some View {
         StageView { stage in
@@ -73,6 +77,7 @@ struct ExploreScreen: View {
         .onAppear {
             agent.onEndRequested = { onBack() }
             agent.onRescan = { await performRescan() }
+            agent.onEnded = { agentWentAway() }
             Task { await camera.start() }
         }
         .onChange(of: camera.state) { _, state in
@@ -107,7 +112,9 @@ struct ExploreScreen: View {
 
     @ViewBuilder
     private var statusPill: some View {
-        if !rescanning, agent.isRunning {
+        if agentEnded {
+            ListeningIndicator(text: listening ? "Say go back to finish" : "Iris is speaking…", speaking: !listening)
+        } else if !rescanning, agent.isRunning {
             ListeningIndicator(status: agent.status)
         } else if !rescanning, summaryStarted {
             ListeningIndicator(text: "Text detected", systemImage: "checkmark.circle.fill")
@@ -234,12 +241,32 @@ struct ExploreScreen: View {
     // The agent takes over the microphone, so our own listener stops first. Connecting takes a moment anyway, so
     // it starts right away instead of waiting for "Text detected." to finish.
     private func beginSummary(with lines: [String]) {
+        readLines = lines
         summaryStarted = true
         holdStartedAt = nil
         withAnimation(.easeOut(duration: 0.3)) { ringProgress = 0 }
         stopListening()
         Speaker.shared.speak("Text detected.")
         agent.start(initialMessage: Self.summaryRequest(for: lines))
+    }
+
+    /// The agent couldn't be reached, or went away before it was done. Without this the screen would sit on
+    /// "Text detected" in silence with the microphone already handed over, and someone who can't see it
+    /// would be stuck: so Iris reads the label out itself and opens the microphone for "go back".
+    private func agentWentAway() {
+        guard summaryStarted, !agentEnded else { return }
+        agentEnded = true
+        Speaker.shared.speak(Self.fallbackSummary(for: readLines))
+        Task {
+            await Speaker.shared.waitUntilIdle()
+            await startListening()
+        }
+    }
+
+    /// Said in place of the agent's summary: the label itself, which is what the user wanted to know.
+    static func fallbackSummary(for lines: [String]) -> String {
+        guard !lines.isEmpty else { return "I can't reach the assistant, and I couldn't make out the text. Say go back to try again." }
+        return "I can't reach the assistant, but here's what it says. " + lines.prefix(6).joined(separator: ". ") + "."
     }
 
     /// Forwards camera frames to the reader, which throttles itself.

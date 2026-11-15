@@ -27,11 +27,16 @@ final class TextReader: ObservableObject {
     private var isBusy = false
     private var lastScan: TimeInterval = 0
     private var knowsImageSize = false
+    /// Bumped by `reset`. A scan carries the value it started with, and its result is dropped if a reset
+    /// happened while it was running — otherwise a rescan could get the previous item's text back.
+    private var generation = 0
     // Touched only on `queue`.
     private var consolidator = TextConsolidator()
 
     /// Forgets everything read so far, so a rescan starts from an empty window.
     func reset() {
+        generation += 1
+        // Queued behind any scan already running, so it empties whatever that scan adds.
         queue.async { [weak self] in self?.consolidator.reset() }
         lines = []
     }
@@ -47,13 +52,14 @@ final class TextReader: ObservableObject {
         lastScan = frame.timestamp
         // Keep only the pixel buffer, not the ARFrame, so ARKit's frame pool isn't starved.
         let pixelBuffer = frame.capturedImage
+        let generation = generation
         queue.async { [weak self] in
-            self?.scan(pixelBuffer)
+            self?.scan(pixelBuffer, generation: generation)
             DispatchQueue.main.async { self?.isBusy = false }
         }
     }
 
-    private func scan(_ pixelBuffer: CVPixelBuffer) {
+    private func scan(_ pixelBuffer: CVPixelBuffer, generation: Int) {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
         // Correction can rewrite brand names and numbers; typos in ordinary words are easier to fix later.
@@ -82,7 +88,7 @@ final class TextReader: ObservableObject {
         let consolidated = consolidator.consolidated()
 
         DispatchQueue.main.async { [weak self] in
-            guard let self, consolidated != self.lines else { return }
+            guard let self, generation == self.generation, consolidated != self.lines else { return }
             self.lines = consolidated
             if consolidated.isEmpty {
                 print("OCR: no text")

@@ -19,6 +19,9 @@ struct LocateScreen: View {
     @StateObject private var detector = ObjectDetector()
     @State private var listenTask: Task<Void, Never>?
     @State private var startTask: Task<Void, Never>?
+    /// The wait for the object's name. Held so leaving the screen cancels it: a stray one would start
+    /// guidance (and its voice and tone) on a screen that has already gone.
+    @State private var graceTask: Task<Void, Never>?
     @State private var frameTask: Task<Void, Never>?
     @Environment(\.scenePhase) private var scenePhase
 
@@ -147,6 +150,7 @@ struct LocateScreen: View {
             await askForTarget()
         }
         .onDisappear {
+            graceTask?.cancel()
             listenTask?.cancel()
             listener.stop()
         }
@@ -263,12 +267,14 @@ struct LocateScreen: View {
         await Speaker.shared.waitUntilIdle()
         guard !Task.isCancelled, !guidanceStarted else { return }
 
+        graceTask?.cancel()
         let grace = Task {
             try? await Task.sleep(for: .seconds(namingGrace))
             guard !Task.isCancelled, !guidanceStarted else { return }
             listener.stop()
             beginGuidance()
         }
+        graceTask = grace
         await listener.start(
             commands: ["back": backKeywords],
             onCommand: { _ in

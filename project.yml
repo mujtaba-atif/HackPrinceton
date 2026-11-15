@@ -56,8 +56,6 @@ targets:
           - Fonts/NunitoSans-ExtraBold.ttf
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationLandscapeLeft
-          - UIInterfaceOrientationLandscapeRight
     preBuildScripts:
       - name: Create Secrets.swift
         inputFiles:

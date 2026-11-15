@@ -15,7 +15,7 @@
 4. **Explore**
    1. Iris says "Hold the item in front of the camera so I can read it."
    2. Once text is found, hold steady for **2 seconds** while the reading area fills with light and the pill counts down ("Hold steady… 2"). If nothing is readable, Iris gives a hint: at most two, first after 8 s, then every 12 s.
-   3. Iris says "Text detected." and the agent summarizes the item in one or two sentences.
+   3. Iris says "Text detected." and the agent summarizes the item in one or two sentences. If the agent can't be reached, or drops, Iris reads the label out itself and listens for "go back".
 5. **Anywhere:** "go back" leaves the screen.
    - During a conversation, "goodbye", "go back" or "I'm done" ends it.
    - "Scan again" (or the agent's `rescan` tool) reads the label again.

@@ -160,4 +160,14 @@ final class IrisDesignTests: XCTestCase {
         XCTAssertEqual(CameraGlass.swell(0.999), 0, accuracy: 0.01)
         XCTAssertEqual(CameraGlass.swell(1.35), 1, accuracy: 1e-6, "every period")
     }
+
+    // MARK: Explore without the agent
+
+    func testExploreReadsTheLabelItselfWhenTheAgentIsGone() {
+        let said = ExploreScreen.fallbackSummary(for: ["Oat Milk", "1 Litre", "Best before 12 May"])
+        XCTAssertTrue(said.contains("Oat Milk. 1 Litre. Best before 12 May."))
+        let many = ExploreScreen.fallbackSummary(for: (1...10).map { "Line \($0)" })
+        XCTAssertFalse(many.contains("Line 7"), "at most six lines")
+        XCTAssertTrue(ExploreScreen.fallbackSummary(for: []).contains("go back"), "and says how to leave")
+    }
 }
