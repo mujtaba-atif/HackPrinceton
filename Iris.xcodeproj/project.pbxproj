@@ -112,6 +112,7 @@
 		643B7251FFF93091F9BF533F /* OptionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70ECC760A035014FAEA77D60 /* OptionCards.swift */; };
 		FD40FCB217AEDB601A24B81A /* AudioLevels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572304DD0DBDD723EBF37A55 /* AudioLevels.swift */; };
 		FE82AA3C4F857414D302EB56 /* IrisDesignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CB5A092CBA552031E404DC /* IrisDesignTests.swift */; };
+		D01FADBEDA3CD61EAE0523CA /* DeviceTilt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41092FDAE067343DC2D15FC /* DeviceTilt.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -230,6 +231,7 @@
 		70ECC760A035014FAEA77D60 /* OptionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionCards.swift; sourceTree = "<group>"; };
 		572304DD0DBDD723EBF37A55 /* AudioLevels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevels.swift; sourceTree = "<group>"; };
 		A4CB5A092CBA552031E404DC /* IrisDesignTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisDesignTests.swift; sourceTree = "<group>"; };
+		C41092FDAE067343DC2D15FC /* DeviceTilt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTilt.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -569,6 +571,7 @@
 		B34C856811D5F496E15FE3C3 /* Glass */ = {
 			isa = PBXGroup;
 			children = (
+				C41092FDAE067343DC2D15FC /* DeviceTilt.swift */,
 				572304DD0DBDD723EBF37A55 /* AudioLevels.swift */,
 				70ECC760A035014FAEA77D60 /* OptionCards.swift */,
 				5A922A36F36632F4262D0FEA /* ObjectOutline.swift */,
@@ -714,6 +717,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D01FADBEDA3CD61EAE0523CA /* DeviceTilt.swift in Sources */,
 				FD40FCB217AEDB601A24B81A /* AudioLevels.swift in Sources */,
 				643B7251FFF93091F9BF533F /* OptionCards.swift in Sources */,
 				9517DDA797E775CF094571D1 /* ObjectOutline.swift in Sources */,

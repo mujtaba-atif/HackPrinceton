@@ -49,6 +49,8 @@ struct MainScreen: View {
                         (0.5, Pose(y: -2, rotation: -2)), (0.75, Pose(x: 3, y: 6, rotation: -1.2)), (1, Pose(rotation: -2)),
                     ]), unit: stage.unit)
                     .modifier(RestingTilt(degrees: -2))
+                    .background(FloatRipples(cornerRadius: 23 * stage.unit, delay: 1.35))
+                    .modifier(TiltDrift(drift: 14 * stage.unit))
             }
             .buttonStyle(GlassPressStyle())
             .accessibilityLabel("Locate an object")
@@ -69,6 +71,8 @@ struct MainScreen: View {
                         (0.5, Pose(y: 2, rotation: 2)), (0.75, Pose(x: -3, y: -7, rotation: 1.2)), (1, Pose(rotation: 2)),
                     ]), unit: stage.unit)
                     .modifier(RestingTilt(degrees: 2))
+                    .background(FloatRipples(cornerRadius: 23 * stage.unit, delay: 1.63))
+                    .modifier(TiltDrift(drift: 14 * stage.unit))
             }
             .buttonStyle(GlassPressStyle())
             .accessibilityLabel("Explore an object")

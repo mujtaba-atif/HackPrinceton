@@ -96,11 +96,14 @@ struct VectorArtView: View {
     var animate: (String) -> [Motion] = { _ in [] }
     /// A shared clock for the motions, so separate pieces of one picture stay in step.
     var since: Date?
+    /// How a named group answers the phone (eyes looking and blinking), on top of its motions.
+    var respond: (String) -> EyeResponse? = { _ in nil }
 
     var body: some View {
         GeometryReader { geo in
             let scale = min(geo.size.width / art.viewBox.width, geo.size.height / art.viewBox.height)
-            GroupView(group: group ?? art.root, viewBox: art.viewBox, scale: scale, animate: animate, since: since)
+            GroupView(group: group ?? art.root, viewBox: art.viewBox, scale: scale, animate: animate, since: since,
+                      respond: respond)
                 .frame(width: art.viewBox.width * scale, height: art.viewBox.height * scale)
                 .frame(width: geo.size.width, height: geo.size.height)
         }
@@ -113,6 +116,7 @@ private struct GroupView: View {
     let scale: CGFloat
     let animate: (String) -> [Motion]
     let since: Date?
+    let respond: (String) -> EyeResponse?
 
     /// Consecutive shapes share one `Canvas`; a named group gets its own view so it can move.
     private enum Run {
@@ -156,15 +160,21 @@ private struct GroupView: View {
                         }
                     }
                 case .group(let child):
-                    GroupView(group: child, viewBox: viewBox, scale: scale, animate: animate, since: since)
+                    GroupView(group: child, viewBox: viewBox, scale: scale, animate: animate, since: since, respond: respond)
                 }
             }
         }
-        if let name = group.name, case let motions = animate(name), !motions.isEmpty {
+        if let name = group.name {
             let box = group.bounds
             let anchor = UnitPoint(x: (box.midX - viewBox.minX) / viewBox.width,
                                    y: (box.midY - viewBox.minY) / viewBox.height)
-            content.motion(motions, unit: scale, anchor: anchor, since: since)
+            let response = respond(name) ?? EyeResponse()
+            content
+                .motion(animate(name), unit: scale, anchor: anchor, since: since)
+                .scaleEffect(response.scale, anchor: anchor)
+                .offset(x: response.offset.x * scale, y: response.offset.y * scale)
+                .blink(response.blinks, anchor: anchor)
+                .animation(.spring(duration: 0.3, bounce: 0.45), value: response.scale)
         } else {
             content
         }

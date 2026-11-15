@@ -13,6 +13,9 @@ struct StatusBlob: View {
     var goal: String?
     /// What is happening, in the same words the voice uses.
     var text: String
+    /// An SF Symbol for the step, breathing beside the small line (or the big one when there is no small
+    /// line), so the step reads at a glance.
+    var systemImage: String?
     /// Brightens the rim once the thing it is reporting has been reached.
     var highlighted = false
 
@@ -30,6 +33,7 @@ struct StatusBlob: View {
         let shape = RoundedRectangle(cornerRadius: 29 * unit, style: .continuous)
         VStack(spacing: 2 * unit) {
             HStack(alignment: .firstTextBaseline, spacing: 6 * unit) {
+                if detail == nil, let systemImage { icon(systemImage, size: 22) }
                 Text(head)
                     .font(IrisFont.nunito(34 * unit, .black).monospacedDigit())
                     .tracking(-1 * unit)
@@ -42,10 +46,13 @@ struct StatusBlob: View {
             .lineLimit(1)
             .minimumScaleFactor(0.5)
             if let detail {
-                Text(detail)
-                    .font(IrisFont.nunito(15 * unit, .semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                HStack(spacing: 6 * unit) {
+                    if let systemImage { icon(systemImage, size: 14) }
+                    Text(detail)
+                        .font(IrisFont.nunito(15 * unit, .semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
             }
         }
         .contentTransition(.numericText())
@@ -92,10 +99,19 @@ extension StatusBlob {
     /// The conversation half of the screen.
     init(status: AgentSession.Status) {
         switch status {
-        case .speaking: self.init(text: "Iris is speaking…")
-        case .thinking: self.init(text: "Thinking…")
-        case .connecting: self.init(text: "Connecting…")
-        case .listening, .idle: self.init(text: "Listening…")
+        case .speaking: self.init(text: "Iris is speaking…", systemImage: "speaker.wave.2.fill")
+        case .thinking: self.init(text: "Thinking…", systemImage: "ellipsis")
+        case .connecting: self.init(text: "Connecting…", systemImage: "antenna.radiowaves.left.and.right")
+        case .listening, .idle: self.init(text: "Listening…", systemImage: "mic.fill")
         }
+    }
+
+    private func icon(_ name: String, size: CGFloat) -> some View {
+        Image(systemName: name)
+            .font(.system(size: size * unit, weight: .semibold))
+            .symbolRenderingMode(.hierarchical)
+            .contentTransition(.symbolEffect(.replace))
+            .motion(Motion(0.8, curve: .easeInOut, repeats: true, alternate: true,
+                           from: Pose(scale: 0.92), to: Pose(scale: 1.12)))
     }
 }

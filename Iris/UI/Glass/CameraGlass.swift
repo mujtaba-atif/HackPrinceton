@@ -50,6 +50,8 @@ struct CameraGlass: View {
     /// The waves have swept in; with nothing to show the frame clock can stop (each wave's own sway
     /// keeps running on its own).
     @State private var settled = false
+    /// When the label read turned into the conversation: the waves flash and surge once.
+    @State private var splashAt: Date?
 
     private var idle: Bool { settled && cue?.direction == nil && mood == .still }
 
@@ -86,6 +88,9 @@ struct CameraGlass: View {
         .task {
             try? await Task.sleep(for: .seconds(1.8))
             settled = true
+        }
+        .onChange(of: mood) { old, new in
+            if old == .drawingIn, new != .still, new != .drawingIn { splashAt = .now }
         }
     }
 
@@ -196,11 +201,17 @@ struct CameraGlass: View {
         case .listening: depth = 12 + 8 * (reduceMotion ? 0 : sin(t * 2 * .pi / 3.2))
         case .speaking: depth = 16 + 14 * (reduceMotion ? 0.5 : Self.swell(t / 0.62))
         }
-        let reach = depth * unit
+        // The splash: one bright surge as the reading becomes a conversation (0.95 s).
+        var splash = 0.0
+        if let splashAt, !reduceMotion {
+            let age = Date().timeIntervalSince(splashAt) / 0.95
+            if age < 1 { splash = sin(age * .pi) }
+        }
+        let reach = (depth + 30 * splash) * unit
         push.top = reach
         push.left = reach * 0.5
         push.right = reach * 0.5
-        let glow = mood == .speaking ? 1.15 : 1.05
+        let glow = (mood == .speaking ? 1.15 : 1.05) + 0.35 * splash
         push.topGlow = glow
         push.leftGlow = glow
         push.rightGlow = glow

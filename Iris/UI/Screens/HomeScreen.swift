@@ -82,14 +82,14 @@ struct HomeScreen: View {
                 Sprinkles(count: 20, unit: stage.unit)
                 homeGlass(stage)
                 PrismText(text: "Iris", font: IrisFont.nunito(stage(78), .black), tracking: -3, timing: .brand,
-                          unit: stage.unit)
+                          unit: stage.unit, hops: true)
                     .accessibilityAddTraits(.isHeader)
                     .placed(x: 0, y: 128, width: 360, height: 94, on: stage)
                 PrismText(text: "See beyond the surface", font: IrisFont.nunito(stage(22), .bold), tracking: -0.5,
                           timing: .tagline, unit: stage.unit)
                     .placed(x: 0, y: 216, width: 360, height: 30, on: stage)
                 Crew(stage: stage)
-                SwipeHint(unit: stage.unit, action: proceed)
+                SwipeHint(unit: stage.unit, listening: listener.isListening, action: proceed)
                     .placed(x: 75, y: 704, width: 210, height: 82, on: stage)
             }
         }
@@ -152,9 +152,11 @@ struct RestingTilt: ViewModifier {
     }
 }
 
-/// "swipe up" with two chevrons nudging upward; tapping it continues too.
+/// "swipe up" with two chevrons nudging upward; tapping it continues too. While Iris is listening for
+/// "continue", the label becomes the glass listening pill, so the screen shows the microphone is open.
 private struct SwipeHint: View {
     var unit: CGFloat
+    var listening = false
     var action: () -> Void
 
     var body: some View {
@@ -170,9 +172,19 @@ private struct SwipeHint: View {
                     .frame(height: 34 * unit)
                     .motion(Motion(1.4, curve: .easeInOut, repeats: true, alternate: true, from: .rest, to: Pose(y: -9)),
                             unit: unit)
-                Text("swipe up")
-                    .font(IrisFont.nunito(16 * unit, .black))
-                    .foregroundStyle(IrisPalette.white)
+                ZStack {
+                    if listening {
+                        ListeningIndicator(text: "Listening…")
+                            .padding(.bottom, -32 * unit)
+                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    } else {
+                        Text("swipe up")
+                            .font(IrisFont.nunito(16 * unit, .black))
+                            .foregroundStyle(IrisPalette.white)
+                            .transition(.opacity)
+                    }
+                }
+                .animation(.easeInOut(duration: 0.35), value: listening)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .contentShape(Rectangle())

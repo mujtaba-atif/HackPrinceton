@@ -175,17 +175,19 @@ struct LocateScreen: View {
                     measurement: guidanceDistance.map { ObjectDetector.inches($0) },
                     goal: guidanceGoal,
                     text: guidanceLabel,
+                    systemImage: guidanceIcon,
                     highlighted: detector.approaching ? detector.objectClose : detector.objectFound
                 )
             } else {
-                StatusBlob(text: "Looking… · Tell Iris what to locate")
+                StatusBlob(text: "Looking… · Tell Iris what to locate",
+                           systemImage: listener.isListening ? "mic.fill" : "viewfinder")
             }
         case .reading:
-            StatusBlob(text: "Reading the label…")
+            StatusBlob(text: "Reading the label…", systemImage: "text.viewfinder")
         case .talking:
             StatusBlob(status: conversation.agentStatus)
         case .ended:
-            StatusBlob(text: "Say go back to finish")
+            StatusBlob(text: "Say go back to finish", systemImage: "mic.fill")
         }
     }
 
@@ -241,6 +243,10 @@ struct LocateScreen: View {
     /// checked first: it is why the read isn't happening, even while still debounced as close enough.
     private var guidanceLabel: String {
         tooClose ? "Too close · Move it back" : beepController.phase.label
+    }
+
+    private var guidanceIcon: String {
+        tooClose ? "exclamationmark.circle.fill" : beepController.phase.icon
     }
 
     private var tooClose: Bool {

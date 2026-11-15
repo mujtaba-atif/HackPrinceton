@@ -28,6 +28,7 @@ struct Crew: View {
     ]
 
     @State private var since = Date()
+    private let tilt = DeviceTilt.shared
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -40,6 +41,8 @@ struct Crew: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Four Iris characters: Skye with ears, Pip with glasses, Nova in a lab coat, and Echo with headphones and a scarf")
         .accessibilityAddTraits(.isImage)
+        .onAppear { tilt.start() }
+        .onDisappear { tilt.stop() }
     }
 
     private func character(_ friend: Friend) -> some View {
@@ -60,7 +63,15 @@ struct Crew: View {
             default:
                 []
             }
-        }, since: since)
+        }, since: since, respond: { name in
+            // On top of their own glances, the eyes follow the phone and blink when it's jolted.
+            switch name {
+            case "mini-eyes": EyeResponse(blinks: tilt.blinks)
+            case "mini-gaze": EyeResponse(offset: CGPoint(x: tilt.look.x * 4, y: tilt.look.y * 3),
+                                          scale: tilt.surprised ? 0.8 : 1)
+            default: nil
+            }
+        })
         // huddle-bob, about the feet.
         .motion(Motion(3.8 + i * 0.4, delay: -i * 0.7, curve: .easeInOut, repeats: true, alternate: true,
                        from: Pose(rotation: friend.lean), to: Pose(y: -7, rotation: friend.lean * 0.55)),

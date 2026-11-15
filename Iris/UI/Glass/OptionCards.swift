@@ -34,6 +34,7 @@ private struct CardText: View {
 /// The pupils wander up, left, down and right; the eyes blink twice every 8.6 s.
 struct LocateCard: View {
     @State private var since = Date()
+    private let tilt = DeviceTilt.shared
 
     var body: some View {
         GeometryReader { geo in
@@ -59,7 +60,16 @@ struct LocateCard: View {
                     default:
                         []
                     }
-                }, since: since)
+                }, since: since, respond: { name in
+                    // The pupils also look where the phone tilts; a jolt blinks and widens the eyes.
+                    switch name {
+                    case "findEyeAssembly": EyeResponse(blinks: tilt.blinks)
+                    case "findEyes": EyeResponse(scale: tilt.surprised ? 1.07 : 1)
+                    case "findPupils": EyeResponse(offset: CGPoint(x: tilt.look.x * 10, y: tilt.look.y * 7),
+                                                   scale: tilt.surprised ? 0.8 : 1)
+                    default: nil
+                    }
+                })
                 .clipShape(RoundedRectangle(cornerRadius: 23 * k, style: .continuous))
 
                 CardText(text: "LOCATE", font: IrisFont.nunitoSans(37 * k, .extraBold), size: 37, tracking: 1,
@@ -74,6 +84,8 @@ struct LocateCard: View {
             }
         }
         .aspectRatio(305 / 177, contentMode: .fit)
+        .onAppear { tilt.start() }
+        .onDisappear { tilt.stop() }
     }
 }
 

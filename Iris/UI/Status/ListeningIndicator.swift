@@ -1,10 +1,13 @@
 import SwiftUI
 
-/// The glass pill at the bottom of the screen: what Iris is doing, in a word or two, with a breathing
-/// microphone — or bouncing voice bars while Iris is speaking. It pops up from below when it appears.
+/// The glass pill at the bottom of the screen: what Iris is doing, in a word or two. A breathing
+/// microphone while it listens, bouncing voice bars while it speaks, and otherwise an icon for the state
+/// (a timer for the countdown, a tick once text is read). It pops up from below when it appears.
 struct ListeningIndicator: View {
     var text = "Listening…"
     var speaking = false
+    /// An SF Symbol for a state that isn't listening or speaking; `nil` is the microphone.
+    var systemImage: String?
 
     @Environment(\.irisUnit) private var unit
 
@@ -13,10 +16,19 @@ struct ListeningIndicator: View {
             if speaking {
                 VoiceBars(unit: unit)
             } else {
-                MicGlyph()
-                    .frame(width: 18 * unit, height: 18 * unit)
-                    .motion(Motion(1.6, curve: .easeInOut, repeats: true, alternate: true,
-                                   from: .rest, to: Pose(scale: 1.05)))
+                Group {
+                    if let systemImage {
+                        Image(systemName: systemImage)
+                            .font(.system(size: 15 * unit, weight: .semibold))
+                            .symbolRenderingMode(.hierarchical)
+                            .contentTransition(.symbolEffect(.replace))
+                    } else {
+                        MicGlyph()
+                    }
+                }
+                .frame(width: 18 * unit, height: 18 * unit)
+                .motion(Motion(0.8, curve: .easeInOut, repeats: true, alternate: true,
+                               from: Pose(scale: 0.92), to: Pose(scale: 1.1)))
             }
             Text(text)
                 .font(IrisFont.nunito(15 * unit, .bold))
@@ -56,8 +68,8 @@ extension ListeningIndicator {
     init(status: AgentSession.Status) {
         switch status {
         case .speaking: self.init(text: "Iris is speaking…", speaking: true)
-        case .thinking: self.init(text: "Thinking…")
-        case .connecting: self.init(text: "Connecting…")
+        case .thinking: self.init(text: "Thinking…", systemImage: "ellipsis")
+        case .connecting: self.init(text: "Connecting…", systemImage: "antenna.radiowaves.left.and.right")
         case .listening, .idle: self.init()
         }
     }

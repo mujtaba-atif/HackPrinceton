@@ -110,11 +110,11 @@ struct ExploreScreen: View {
         if !rescanning, agent.isRunning {
             ListeningIndicator(status: agent.status)
         } else if !rescanning, summaryStarted {
-            ListeningIndicator(text: "Text detected")
+            ListeningIndicator(text: "Text detected", systemImage: "checkmark.circle.fill")
         } else if holdStartedAt != nil {
-            ListeningIndicator(text: "Hold steady… \(secondsLeft)")
+            ListeningIndicator(text: "Hold steady… \(secondsLeft)", systemImage: "timer")
         } else {
-            ListeningIndicator(text: "Looking for text…")
+            ListeningIndicator(text: "Looking for text…", systemImage: "text.viewfinder")
         }
     }
 
