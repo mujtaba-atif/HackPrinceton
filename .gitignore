@@ -36,3 +36,7 @@ Packages/
 .idea/
 .vscode/
 
+
+# Demo video project and browser-tool scratch output
+Video/
+.playwright-mcp/
