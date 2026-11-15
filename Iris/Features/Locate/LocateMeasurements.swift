@@ -4,7 +4,7 @@
 import CoreGraphics
 import Foundation
 
-struct EdgeMeasurement {
+struct EdgeMeasurement: Equatable {
     let fingertip: CGPoint // index fingertip, normalized 0-1, Vision coords
     let edge: CGPoint    // nearest point on the mask's outer contour, Vision coords
     let distance: Float? // meters, 3D via LiDAR; nil when depth is unavailable
@@ -17,6 +17,8 @@ struct EdgeMeasurement {
     // hand has to go forward; negative means the hand has overshot past it. `distance` is unsigned and
     // can't tell those apart, which is what forward/back guidance needs. nil without LiDAR depth.
     let depthGap: Float?
+    // Iris: why `depthGap` is missing, so guidance can ask for the right fix (or say nothing).
+    var depthStatus: ReachDepthStatus = .measured
 }
 
 // Debounced "hand reached the object" state from a noisy distance stream. Measured distance never

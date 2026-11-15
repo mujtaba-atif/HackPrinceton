@@ -58,8 +58,19 @@ final class ObjectDepthMemoryTests: XCTestCase {
 // MARK: - Reading around the hand
 
 final class ReachOcclusionTests: XCTestCase {
-    func testNearestAgreeingSurfaceIsTheObjectNotTheWallBehindIt() {
-        let depth = ReachOcclusion.objectDepth(cellDepths: [2.0, 0.61, 2.1, 0.6, 2.05], nearestHandDepth: 0.35)
+    func testMostAgreedSurfaceIsTheObjectNotTheWallBehindIt() {
+        let depth = ReachOcclusion.objectDepth(cellDepths: [2.0, 0.61, 0.6, 0.62, 2.05], nearestHandDepth: 0.35)
+        XCTAssertEqual(try XCTUnwrap(depth), 0.61, accuracy: 0.001)
+    }
+
+    /// The bottom cells of a tabletop object's box are the table in front of it, nearer than the object.
+    func testTableInFrontIsNotMistakenForTheObject() {
+        let depth = ReachOcclusion.objectDepth(cellDepths: [0.45, 0.46, 0.6, 0.61, 0.62, 2.0], nearestHandDepth: 0.35)
+        XCTAssertEqual(try XCTUnwrap(depth), 0.61, accuracy: 0.001)
+    }
+
+    func testTieGoesToTheNearerSurface() {
+        let depth = ReachOcclusion.objectDepth(cellDepths: [0.6, 0.61, 2.0, 2.01], nearestHandDepth: nil)
         XCTAssertEqual(try XCTUnwrap(depth), 0.605, accuracy: 0.001)
     }
 
@@ -163,12 +174,24 @@ final class LocateTrackerReachTests: XCTestCase {
         }
     }
 
-    private func run(_ tracker: LocateTracker, hands: [HandObservation], from start: TimeInterval = 1,
-                     frames: Int = 8, frame: (TimeInterval) throws -> DepthFrame) rethrows {
+    private func run(_ tracker: LocateTracker, hands: [HandObservation], target: CGRect? = nil,
+                     from start: TimeInterval = 1, frames: Int = 8,
+                     frame: (TimeInterval) throws -> DepthFrame) rethrows {
         for index in 0..<frames {
             let time = start + Double(index) * 0.1
-            tracker.update(depth: try frame(time), cameraTransform: matrix_identity_float4x4, target: box, hands: hands)
+            tracker.update(depth: try frame(time), cameraTransform: matrix_identity_float4x4,
+                           target: target ?? box, hands: hands)
         }
+    }
+
+    /// A spread hand whose padded joint box covers `rect` entirely.
+    private func hand(covering rect: CGRect) -> HandObservation {
+        let left = rect.minX + 0.04, right = rect.maxX - 0.04, bottom = rect.minY + 0.04, top = rect.maxY - 0.04
+        let step = (top - bottom) / 3
+        return hand([.indexTip: CGPoint(x: left, y: top), .indexDIP: CGPoint(x: left, y: top - step),
+                     .indexPIP: CGPoint(x: left, y: top - 2 * step), .indexMCP: CGPoint(x: left, y: bottom),
+                     .littleTip: CGPoint(x: right, y: top), .littleDIP: CGPoint(x: right, y: top - step),
+                     .littlePIP: CGPoint(x: right, y: top - 2 * step), .littleMCP: CGPoint(x: right, y: bottom)])
     }
 
     /// The reported bug: fingertips overlap the object on screen while still 25 cm short of it.
@@ -207,6 +230,56 @@ final class LocateTrackerReachTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(tracker.leftHandEdge?.depthGap), 0.25, accuracy: 0.03)
     }
 
+    /// Past the object's front with the hand over it: the remembered depth gives a negative gap, not the
+    /// wall behind it read around the hand.
+    func testOvershootWhileCoveringTheObjectReadsAsPast() throws {
+        let tracker = LocateTracker()
+        try run(tracker, hands: [], frames: 1) { try depthFrame(at: $0, surface: scene(handDepth: 0.7, handArea: .null)) }
+        try run(tracker, hands: [handOverObject], from: 2, frames: 1) {
+            try depthFrame(at: $0, surface: scene(handDepth: 0.7))
+        }
+        XCTAssertEqual(try XCTUnwrap(tracker.leftHandEdge?.depthGap), -0.1, accuracy: 0.02)
+    }
+
+    /// Switching to a different object must not measure against the first one's remembered position.
+    func testSwitchingTargetsForgetsTheOldObject() throws {
+        let tracker = LocateTracker()
+        try run(tracker, hands: [], frames: 1) { try depthFrame(at: $0, surface: scene(handDepth: 0.35, handArea: .null)) }
+        let other = CGRect(x: 0.05, y: 0.7, width: 0.24, height: 0.24)
+        try run(tracker, hands: [hand(covering: other)], target: other, from: 2, frames: 1) { time in
+            try depthFrame(at: time) { other.contains($0) ? 0.35 : 2.0 }
+        }
+        let edge = try XCTUnwrap(tracker.leftHandEdge)
+        XCTAssertNil(edge.depthGap)
+        XCTAssertEqual(edge.depthStatus, .objectUnreadable)
+    }
+
+    /// A closing grip hides the fingertips just as the hand arrives; contact still registers if depth
+    /// showed the hand within reach of the object a moment before.
+    func testGripAfterAMeasuredApproachIsContact() throws {
+        let tracker = LocateTracker()
+        try run(tracker, hands: [handOverObject], frames: 2) { try depthFrame(at: $0, surface: scene(handDepth: 0.52)) }
+        XCTAssertFalse(tracker.objectFound)
+        try run(tracker, hands: [handOverObject], from: 1.2, frames: 6) {
+            try depthFrame(at: $0, confident: false, surface: scene(handDepth: 0.52))
+        }
+        XCTAssertTrue(tracker.objectFound)
+    }
+
+    func testDepthStatusSaysWhichSideIsMissing() throws {
+        let tracker = LocateTracker()
+        try run(tracker, hands: [handOverObject], frames: 1) {
+            try depthFrame(at: $0, hasDepth: false, surface: scene(handDepth: 0.35))
+        }
+        XCTAssertEqual(tracker.leftHandEdge?.depthStatus, .noSensor)
+        try run(tracker, hands: [handOverObject], from: 2, frames: 1) {
+            try depthFrame(at: $0, confident: false, surface: scene(handDepth: 0.35))
+        }
+        XCTAssertEqual(tracker.leftHandEdge?.depthStatus, .handUnreadable)
+        try run(tracker, hands: [handOverObject], from: 3, frames: 1) { try depthFrame(at: $0, surface: scene(handDepth: 0.35)) }
+        XCTAssertEqual(tracker.leftHandEdge?.depthStatus, .measured)
+    }
+
     /// With LiDAR, overlapping the object on screen is never contact by itself.
     func testUnreadableDepthDoesNotFallBackToScreenOverlap() throws {
         let tracker = LocateTracker()
@@ -232,46 +305,68 @@ final class LocateTrackerReachTests: XCTestCase {
 final class ReachCoachTests: XCTestCase {
     func testExplainsHandInFrontOnceThenGivesDistance() {
         var coach = ReachCoach()
-        let first = coach.depthLine(gap: 0.25, handInFront: true, at: 10)
+        let first = coach.depthLine(gap: 0.25, status: .measured, handInFront: true, at: 10)
         XCTAssertEqual(first, .handInFront(inches: 10))
         coach.didSpeak(first!, at: 10)
 
-        XCTAssertNil(coach.depthLine(gap: 0.25, handInFront: true, at: 11), "Too soon after the last line")
-        XCTAssertNil(coach.depthLine(gap: 0.25, handInFront: true, at: 13), "Same advice, reminder not due")
-        let reminder = coach.depthLine(gap: 0.25, handInFront: true, at: 15.5)
+        XCTAssertNil(coach.depthLine(gap: 0.25, status: .measured, handInFront: true, at: 11), "Too soon after the last line")
+        XCTAssertNil(coach.depthLine(gap: 0.25, status: .measured, handInFront: true, at: 13), "Same advice, reminder not due")
+        let reminder = coach.depthLine(gap: 0.25, status: .measured, handInFront: true, at: 15.5)
         XCTAssertEqual(reminder, .further(inches: 10), "Explained once; afterwards just the distance")
     }
 
     func testSignificantProgressIsSaidBeforeTheReminder() {
         var coach = ReachCoach()
         coach.didSpeak(.further(inches: 10), at: 10)
-        XCTAssertEqual(coach.depthLine(gap: 0.1, handInFront: false, at: 13), .almost(inches: 4))
+        XCTAssertEqual(coach.depthLine(gap: 0.1, status: .measured, handInFront: false, at: 13), .almost(inches: 4))
     }
 
     func testOvershootAndToleranceAndSmoothing() {
         var coach = ReachCoach()
-        XCTAssertEqual(coach.depthLine(gap: -0.15, handInFront: true, at: 10), .overshot(inches: 6))
+        XCTAssertEqual(coach.depthLine(gap: -0.15, status: .measured, handInFront: true, at: 10), .overshot(inches: 6))
         var settled = ReachCoach()
-        XCTAssertNil(settled.depthLine(gap: 0.04, handInFront: false, at: 10), "Inside tolerance: step one is done")
+        XCTAssertNil(settled.depthLine(gap: 0.04, status: .measured, handInFront: false, at: 10), "Inside tolerance: step one is done")
         // One wild reading among steady ones is outvoted by the median.
         var smoothed = ReachCoach()
-        _ = smoothed.depthLine(gap: 0.2, handInFront: false, at: 10)
-        _ = smoothed.depthLine(gap: 0.2, handInFront: false, at: 10.1)
-        XCTAssertEqual(smoothed.depthLine(gap: -0.5, handInFront: false, at: 10.2), .further(inches: 8))
+        _ = smoothed.depthLine(gap: 0.2, status: .measured, handInFront: false, at: 10)
+        _ = smoothed.depthLine(gap: 0.2, status: .measured, handInFront: false, at: 10.1)
+        XCTAssertEqual(smoothed.depthLine(gap: -0.5, status: .measured, handInFront: false, at: 10.2), .further(inches: 8))
     }
 
     func testAsksForOpenHandOnlyAfterDepthIsMissingForAWhile() {
         var coach = ReachCoach()
-        XCTAssertNil(coach.depthLine(gap: nil, handInFront: false, at: 10))
-        XCTAssertNil(coach.depthLine(gap: nil, handInFront: false, at: 12))
-        XCTAssertEqual(coach.depthLine(gap: nil, handInFront: false, at: 14), .showFingers)
+        XCTAssertNil(coach.depthLine(gap: nil, status: .handUnreadable, handInFront: false, at: 10))
+        XCTAssertNil(coach.depthLine(gap: nil, status: .handUnreadable, handInFront: false, at: 12))
+        XCTAssertEqual(coach.depthLine(gap: nil, status: .handUnreadable, handInFront: false, at: 14), .showFingers)
+    }
+
+    func testSilentWithoutADepthSensor() {
+        var coach = ReachCoach()
+        for time in stride(from: 10.0, through: 30, by: 1) {
+            XCTAssertNil(coach.depthLine(gap: nil, status: .noSensor, handInFront: true, at: time))
+        }
+    }
+
+    func testAsksToUncoverTheObjectWhenOnlyItsDepthIsMissing() {
+        var coach = ReachCoach()
+        XCTAssertNil(coach.depthLine(gap: nil, status: .objectUnreadable, handInFront: true, at: 10))
+        XCTAssertEqual(coach.depthLine(gap: nil, status: .objectUnreadable, handInFront: true, at: 14), .revealObject)
+        XCTAssertEqual(ReachCoach.text(for: .revealObject, objectName: "bottle"),
+                       "Move your hand aside for a moment, so I can see the bottle.")
+    }
+
+    func testOtherSpeechDelaysTheNextLine() {
+        var coach = ReachCoach()
+        coach.noteSpeech(at: 10)
+        XCTAssertNil(coach.depthLine(gap: 0.3, status: .measured, handInFront: false, at: 11))
+        XCTAssertNotNil(coach.depthLine(gap: 0.3, status: .measured, handInFront: false, at: 12.6))
     }
 
     func testStepChangeHoldsTheNextLine() {
         var coach = ReachCoach()
         coach.stepChanged(at: 10)
-        XCTAssertNil(coach.depthLine(gap: 0.3, handInFront: false, at: 11))
-        XCTAssertNotNil(coach.depthLine(gap: 0.3, handInFront: false, at: 12.6))
+        XCTAssertNil(coach.depthLine(gap: 0.3, status: .measured, handInFront: false, at: 11))
+        XCTAssertNotNil(coach.depthLine(gap: 0.3, status: .measured, handInFront: false, at: 12.6))
     }
 
     func testLateralDirection() {
@@ -294,7 +389,7 @@ final class ReachCoachTests: XCTestCase {
     func testNoLineContainsAGoBackKeyword() {
         let keywords = ["back", "return", "previous", "exit", "leave", "quit", "cancel"]
         let lines: [ReachCoach.Line] = [.handInFront(inches: 10), .further(inches: 20), .almost(inches: 2),
-                                        .overshot(inches: 6), .showFingers, .lateral(towardRight: true),
+                                        .overshot(inches: 6), .showFingers, .revealObject, .lateral(towardRight: true),
                                         .lateral(towardRight: false)]
         for line in lines {
             let words = ReachCoach.text(for: line, objectName: "bottle").lowercased()

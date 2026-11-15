@@ -151,6 +151,9 @@ final class DistanceBeepController: ObservableObject {
     private var lastMeasured: TimeInterval = 0
     /// Spoken distance and direction during the two steering steps.
     private var coach = ReachCoach(configuration: .init(tolerance: DistanceBeepController.depthTolerance))
+    /// From the latest measurement, so step one's opening line doesn't promise distances a phone
+    /// without LiDAR can't give.
+    private var hasDepthSensor = true
     private var hasHeadphones = false
     private var routeObserver: NSObjectProtocol?
 
@@ -256,6 +259,7 @@ final class DistanceBeepController: ObservableObject {
             return
         }
         lastMeasured = now
+        hasDepthSensor = measurement.depthStatus != .noSensor
 
         // The tone's direction lives entirely in the stereo image, so without headphones there is
         // nothing to hear: the phone's own two speakers are at the top and bottom of the case in
@@ -272,7 +276,7 @@ final class DistanceBeepController: ObservableObject {
             // Phase 1: forward is the right ear, past the object is the left, and the coach says how far.
             guard let depthGap = measurement.depthGap else {
                 silence()
-                coachSay(coach.depthLine(gap: nil, handInFront: false, at: now))
+                coachSay(coach.depthLine(gap: nil, status: measurement.depthStatus, handInFront: false, at: now))
                 return
             }
             drive(
@@ -287,7 +291,7 @@ final class DistanceBeepController: ObservableObject {
             )
             // Overlapping the object on screen while still short of it: the hand is in front of the object.
             let inFront = measurement.insideMask && depthGap > Self.depthTolerance
-            coachSay(coach.depthLine(gap: depthGap, handInFront: inFront, at: now))
+            coachSay(coach.depthLine(gap: depthGap, status: .measured, handInFront: inFront, at: now))
         case .lateral:
             // Phase 2: steer to the mask's centre, not to `measurement.edge` — the nearest contour
             // point slides along the silhouette as the hand moves, so it isn't a fixed goal.
@@ -401,7 +405,9 @@ final class DistanceBeepController: ObservableObject {
         // ear for different reasons, so this is the only thing telling the user which axis they are on.
         switch next {
         case .depth:
-            pendingPhaseLine = hasHeadphones
+            pendingPhaseLine = !hasDepthSensor
+                ? "Step one of three. Reach your hand out slowly toward the \(objectName) until you touch it."
+                : hasHeadphones
                 ? "Step one of three. Reach your hand out toward the \(objectName), and follow the tone. I'll tell you how far."
                 : "Step one of three. Reach your hand out slowly toward the \(objectName). I'll tell you how far."
         case .lateral:
@@ -424,16 +430,17 @@ final class DistanceBeepController: ObservableObject {
         guard let line = pendingPhaseLine, speak(line) else { return }
         pendingPhaseLine = nil
         lastSpoken = Date()
-        coach.noteSpeech(at: CACurrentMediaTime())
     }
 
     /// Speaks the coach's line if it has one and nothing else is talking; otherwise it comes up again
     /// on a later update, since the coach only marks a line said once it has been.
     private func coachSay(_ line: ReachCoach.Line?) {
-        guard let line, speak(ReachCoach.text(for: line, objectName: objectName)) else { return }
+        guard let line else { return }
+        let text = ReachCoach.text(for: line, objectName: objectName)
+        guard speak(text) else { return }
         coach.didSpeak(line, at: CACurrentMediaTime())
         lastSpoken = Date()
-        print("Guidance: \(ReachCoach.text(for: line, objectName: objectName))")
+        print("Guidance: \(text)")
     }
 
     /// Two pips, up for a step forward and down for falling back to the one before it. Struck rather
@@ -508,6 +515,9 @@ final class DistanceBeepController: ObservableObject {
     private func speak(_ text: String) -> Bool {
         guard !isTalking else { return false }
         Speaker.shared.speak(text)
+        // Every line counts toward the coach's spacing, not just its own: the greeting, the step lines and
+        // the find/headphones prompts must not be followed straight away by a distance.
+        coach.noteSpeech(at: CACurrentMediaTime())
         return true
     }
 

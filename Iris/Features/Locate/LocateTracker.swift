@@ -40,6 +40,14 @@ final class LocateTracker: ObservableObject {
     private var foundTracker = FoundTracker()
     private var closeTracker = LocateTracker.makeCloseTracker()
     private var objectMemory = ObjectDepthMemory()
+    /// The last target box, to notice the target switching to a different object.
+    private var lastTargetBox: CGRect?
+    /// When a depth measurement last put a fingertip within `nearReachDistance` of the object.
+    private var lastNearReachAt: TimeInterval = -.infinity
+    /// A real reading this close, this recently, lets screen overlap count as contact on LiDAR phones:
+    /// a closing grip hides the fingertips and blocks LiDAR just as the hand arrives.
+    private let nearReachDistance: Float = 0.12
+    private let nearReachMemory: TimeInterval = 1
     private var lastObjectSeen: TimeInterval = 0
     private var lastJoints: [CGPoint] = []
 
@@ -66,6 +74,8 @@ final class LocateTracker: ObservableObject {
         foundTracker = FoundTracker()
         closeTracker = Self.makeCloseTracker()
         objectMemory.reset()
+        lastTargetBox = nil
+        lastNearReachAt = -.infinity
         lastJoints = []
     }
 
@@ -88,6 +98,13 @@ final class LocateTracker: ObservableObject {
             Self.fingers(of: hand).map { finger in (finger, self.depth(at: Self.depthPoint(of: finger), frame: depth)) }
         }
         let nearestHandDepth = fingersPerHand.joined().compactMap(\.1).min()
+        // A box with no overlap with the last one, 0.1 s later, is a different object: forget the old one.
+        if let target {
+            if let lastTargetBox, DetectionGeometry.intersectionOverUnion(lastTargetBox, target) == 0 {
+                objectMemory.reset()
+            }
+            lastTargetBox = target
+        }
         // Straight off the box, for bringing the object to the camera: by then it is in the hand and moving.
         let liveObjectDepth = target.flatMap { objectDepth(in: $0, frame: depth) }
         let reachObjectDepth = target.flatMap {
@@ -105,14 +122,16 @@ final class LocateTracker: ObservableObject {
         }
         let first = perHand.first.flatMap(closest)
         let second = perHand.count > 1 ? closest(perHand[1]) : nil
-        // Probe labels the two hands left and right; which is which doesn't change the guidance.
-        if leftHandEdge?.fingertip != first?.fingertip || (leftHandEdge == nil) != (first == nil) { leftHandEdge = first }
-        if rightHandEdge?.fingertip != second?.fingertip || (rightHandEdge == nil) != (second == nil) { rightHandEdge = second }
+        // Probe labels the two hands left and right; which is which doesn't change the guidance. Compared
+        // whole, not by fingertip alone: a still finger's distance changes as the depth reading does.
+        if leftHandEdge != first { leftHandEdge = first }
+        if rightHandEdge != second { rightHandEdge = second }
 
         var nearest = [first?.distance, second?.distance].compactMap { $0 }.min()
-        // Overlap on screen stands in for contact only on phones without LiDAR. With LiDAR, a hand in front
-        // of the object overlaps it just the same, so a missing depth reading holds the state instead.
-        if nearest == nil, depth.depthMap == nil {
+        if let nearest, nearest <= nearReachDistance { lastNearReachAt = depth.timestamp }
+        // Overlap on screen stands in for contact on phones without LiDAR. With LiDAR, a hand in front of the
+        // object overlaps it just the same, so overlap only counts right after depth showed the hand arriving.
+        if nearest == nil, depth.depthMap == nil || depth.timestamp - lastNearReachAt <= nearReachMemory {
             nearest = screenContactDistance(hands: perHand)
         }
         // A gripping hand hides its fingertips and blocks LiDAR, so a hand still overlapping the object
@@ -128,28 +147,26 @@ final class LocateTracker: ObservableObject {
     /// The object's depth for measuring the reach, never read through the hand.
     ///
     /// 1. No hand over the box: the usual box reading, which is also stored in `objectMemory`.
-    /// 2. A hand over part of it: the cells of the box clear of the hand.
-    /// 3. A hand over all of it: the stored position, projected into the current camera.
+    /// 2. A hand over it: the stored position, projected into the current camera. It came from a clear
+    ///    view, so it beats reading around the hand, which can catch the table in front or, once the
+    ///    hand has gone past the object, mistake the object for the forearm.
+    /// 3. A hand over it and nothing stored: the cells of the box clear of the hand.
     /// Otherwise nil, because a reading through the hand would put the object at the hand.
     private func reachObjectDepth(in box: CGRect, liveDepth: Float?, hands: [CGRect], nearestHandDepth: Float?,
                                   frame: DepthFrame, cameraTransform: simd_float4x4) -> Float? {
-        let remembered = frame.isTrackingNormal
-            ? objectMemory.axialDepth(cameraTransform: cameraTransform, at: frame.timestamp) : nil
+        func remembered() -> Float? {
+            frame.isTrackingNormal ? objectMemory.axialDepth(cameraTransform: cameraTransform, at: frame.timestamp) : nil
+        }
         guard ReachOcclusion.covers(box, hands: hands) else {
             if let liveDepth, frame.isTrackingNormal,
                let point = cameraPoint(at: CGPoint(x: box.midX, y: box.midY), depth: liveDepth, frame: frame) {
                 objectMemory.remember(portraitPoint: point, cameraTransform: cameraTransform, at: frame.timestamp)
             }
-            return liveDepth ?? remembered
+            return liveDepth ?? remembered()
         }
-        let cellDepths = ReachOcclusion.clearCells(of: box, avoiding: hands).compactMap { cell -> Float? in
-            guard let clipped = DetectionGeometry.clippedUnitRect(cell),
-                  case let .measured(axial) = DepthSampler.sample(frame: frame,
-                                                                  sensorRegion: DetectionGeometry.sensorRect(clipped))
-            else { return nil }
-            return Float(axial)
-        }
-        return ReachOcclusion.objectDepth(cellDepths: cellDepths, nearestHandDepth: nearestHandDepth) ?? remembered
+        if let remembered = remembered() { return remembered }
+        let cellDepths = ReachOcclusion.clearCells(of: box, avoiding: hands).compactMap { objectDepth(in: $0, frame: frame) }
+        return ReachOcclusion.objectDepth(cellDepths: cellDepths, nearestHandDepth: nearestHandDepth)
     }
 
     // MARK: - Probe's approach step
@@ -228,7 +245,10 @@ final class LocateTracker: ObservableObject {
             distance: distance,
             insideMask: inside,
             screenGap: inside ? 0 : hypot(finger.tip.x - edge.x, finger.tip.y - edge.y),
-            depthGap: depthGap
+            depthGap: depthGap,
+            depthStatus: frame.depthMap == nil ? .noSensor
+                : tipDepth == nil ? .handUnreadable
+                : depthGap == nil ? .objectUnreadable : .measured
         )
     }
 

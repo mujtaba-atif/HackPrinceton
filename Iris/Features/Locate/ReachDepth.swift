@@ -2,6 +2,17 @@ import CoreGraphics
 import Foundation
 import simd
 
+/// Whether a reach measurement has depth, and if not, which side is missing.
+enum ReachDepthStatus: Equatable {
+    case measured
+    /// No LiDAR: depth will never come, so there's nothing to ask the user to change.
+    case noSensor
+    /// The fingertip's depth couldn't be read (a closed or edge-on hand).
+    case handUnreadable
+    /// The hand is readable but the object isn't (the hand is covering it, with nothing remembered).
+    case objectUnreadable
+}
+
 /// Remembers where the target sits in the room, so its distance survives a hand covering it.
 ///
 /// The object's depth is read as the median depth inside its detection box, and once a hand is between
@@ -113,21 +124,23 @@ enum ReachOcclusion {
         return cells
     }
 
-    /// The object's depth from the cells clear of the hand.
+    /// The object's depth from the cells clear of the hand. Only used when the object's position wasn't
+    /// remembered, since the cells can't tell an object from what is around it as well as a clear view can.
     ///
     /// A forearm crossing in front isn't in the hand's joint box, but it is always nearer the camera than
     /// the fingertips, so anything clearly nearer than them is dropped. Of what's left, the object is the
-    /// nearest surface two cells agree on: the box's edge cells may be wall or table behind it.
+    /// surface the most cells agree on (at least two), nearest first on a tie. Not simply the nearest:
+    /// the box's bottom cells can be the table in front of the object, and its top cells the wall behind.
     static func objectDepth(cellDepths: [Float], nearestHandDepth: Float?) -> Float? {
         let floor = nearestHandDepth.map { $0 - 0.04 } ?? 0
         let depths = cellDepths.filter { $0 >= floor }.sorted()
+        var best: ArraySlice<Float> = []
         for (index, depth) in depths.enumerated() {
             let tolerance = max(0.05, depth * 0.08)
             let cluster = depths[index...].prefix { $0 - depth <= tolerance }
-            if cluster.count >= 2 {
-                return cluster.reduce(0, +) / Float(cluster.count)
-            }
+            if cluster.count > best.count { best = cluster }
         }
-        return nil
+        guard best.count >= 2 else { return nil }
+        return best.reduce(0, +) / Float(best.count)
     }
 }

@@ -20,6 +20,8 @@ struct ReachCoach {
         case overshot(inches: Int)
         /// A hand and the object are visible, but the hand's depth can't be read.
         case showFingers
+        /// The hand's depth is readable, but it covers the object and its position wasn't remembered.
+        case revealObject
         /// Only spoken without headphones, where there is no panned tone to follow.
         case lateral(towardRight: Bool)
     }
@@ -69,14 +71,22 @@ struct ReachCoach {
     /// Step one's advice for this measurement, if a line is due.
     /// - Parameters:
     ///   - gap: Object minus fingertip along the camera axis (meters); positive means reach further.
+    ///   - status: Why `gap` is missing, when it is.
     ///   - handInFront: The fingertip overlaps the object on screen.
-    mutating func depthLine(gap: Float?, handInFront: Bool, at time: TimeInterval) -> Line? {
+    mutating func depthLine(gap: Float?, status: ReachDepthStatus, handInFront: Bool,
+                            at time: TimeInterval) -> Line? {
         guard let gap else {
             recent.removeAll()
+            // No LiDAR: nothing the user does will produce a depth, so asking for anything is noise.
+            guard status != .noSensor else {
+                unmeasuredSince = nil
+                return nil
+            }
             let since = unmeasuredSince ?? time
             unmeasuredSince = since
             guard time - since >= configuration.unmeasuredGrace else { return nil }
-            return due(.showFingers, at: time) ? .showFingers : nil
+            let line: Line = status == .objectUnreadable ? .revealObject : .showFingers
+            return due(line, at: time) ? line : nil
         }
         unmeasuredSince = nil
         recent.append((time, gap))
@@ -123,6 +133,8 @@ struct ReachCoach {
             "You've gone past it. Bring your hand toward you about \(distance(inches))."
         case .showFingers:
             "Hold your hand open with your fingers apart, so I can tell how far it is."
+        case .revealObject:
+            "Move your hand aside for a moment, so I can see the \(objectName)."
         case let .lateral(towardRight):
             "Move your hand to your \(towardRight ? "right" : "left")."
         }
@@ -143,13 +155,14 @@ struct ReachCoach {
 
     // MARK: Pacing
 
-    private enum Kind: Equatable { case forward, overshot, showFingers, left, right }
+    private enum Kind: Equatable { case forward, overshot, showFingers, revealObject, left, right }
 
     private static func kind(_ line: Line) -> Kind {
         switch line {
         case .handInFront, .further, .almost: .forward
         case .overshot: .overshot
         case .showFingers: .showFingers
+        case .revealObject: .revealObject
         case let .lateral(towardRight): towardRight ? .right : .left
         }
     }
@@ -157,7 +170,7 @@ struct ReachCoach {
     private static func inches(of line: Line) -> Int? {
         switch line {
         case let .handInFront(inches), let .further(inches), let .almost(inches), let .overshot(inches): inches
-        case .showFingers, .lateral: nil
+        case .showFingers, .revealObject, .lateral: nil
         }
     }
 
