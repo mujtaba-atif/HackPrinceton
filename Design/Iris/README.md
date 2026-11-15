@@ -198,7 +198,7 @@ The Figma source is [Iris · Camera guidance code layer](https://www.figma.com/d
 
 Select the latest code layer in Figma and press Play to interact. The native
 screens are editable. This UI package and the current SVG exports are included
-on the `UI/UX` branch with the user's authorization.
+on `main` alongside the native revision 18 implementation.
 
 The original study adapted selected UI artwork from the user-selected
 `amiezeng/Probe` branch `riba/more-ui-stuff`. No repository was cloned or forked.

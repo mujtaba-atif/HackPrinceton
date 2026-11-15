@@ -2,33 +2,28 @@ import SwiftUI
 
 /// The object-shaped boundary drawn over the camera: a soft halo with a crisp line on it, traced from
 /// the real segmentation mask in Locate (never a bounding rectangle), and around the reading area in
-/// Explore. A scanning light can run inside it, and a fill can rise inside it (Explore's hold).
+/// Explore. The translucent green tint and scanning light stay clipped to the live silhouette.
 struct ObjectOutline: View, Animatable {
     enum Style {
-        /// Locate, looking at the object: sky blue.
+        /// Locate, looking at the object.
         case locate
-        /// Reached: ice, a heavier line.
+        /// Reached: a brighter green fill.
         case success
-        /// Explore, looking for text: ice.
+        /// Explore, looking for text.
         case explore
-        /// Explore, text found and being read: sky, heavier.
+        /// Explore, text found and being read.
         case reading
-        /// After the read, while Iris talks: sky, faded.
+        /// After the read, while Iris talks: slightly faded.
         case settled
 
         var color: Color {
             switch self {
-            case .locate, .reading, .settled: IrisPalette.sky
-            case .success, .explore: IrisPalette.ice
+            case .locate, .reading, .settled, .explore, .success: Color(rgba: 0x6FF1B1FF)
             }
         }
 
-        var lineWidth: CGFloat {
-            switch self {
-            case .success, .reading: 2.8
-            default: 2.1
-            }
-        }
+        var lineWidth: CGFloat { 2.2 }
+
     }
 
     /// The outline, in this view's coordinates.
@@ -53,6 +48,7 @@ struct ObjectOutline: View, Animatable {
     var body: some View {
         let box = path.boundingRect
         ZStack(alignment: .topLeading) {
+            path.fill(Color(rgba: 0x6FF1B1FF).opacity(style == .success ? 0.25 : 0.19))
             if fill > 0 {
                 Canvas { context, _ in
                     context.clip(to: path)
@@ -72,8 +68,8 @@ struct ObjectOutline: View, Animatable {
             }
             path
                 .trim(from: 0, to: revealed ? 1 : 0)
-                .stroke(style.color, style: StrokeStyle(lineWidth: 7 * unit, lineCap: .round, lineJoin: .round))
-                .opacity(0.13)
+                .stroke(style.color, style: StrokeStyle(lineWidth: 8 * unit, lineCap: .round, lineJoin: .round))
+                .opacity(0.18)
                 .blur(radius: 2 * unit)
             path
                 .trim(from: 0, to: revealed ? 1 : 0)
@@ -84,12 +80,13 @@ struct ObjectOutline: View, Animatable {
                     .foregroundStyle(IrisPalette.white)
                     .padding(.horizontal, 12 * unit)
                     .padding(.vertical, 5 * unit)
-                    .background(IrisPalette.deep, in: RoundedRectangle(cornerRadius: 8 * unit, style: .continuous))
+                    .background(Color(rgba: 0x10372FFF), in: RoundedRectangle(cornerRadius: 8 * unit))
+                    .overlay { RoundedRectangle(cornerRadius: 8 * unit).stroke(Color(rgba: 0x6FF1B166), lineWidth: unit) }
                     .fixedSize()
                     .position(x: box.midX, y: max(80 * unit, box.minY - 22 * unit))
             }
         }
-        .opacity(style == .settled ? 0.6 : 1)
+        .opacity(style == .settled ? 0.85 : 1)
         .animation(.easeInOut(duration: 0.3), value: style)
         .allowsHitTesting(false)
         .accessibilityHidden(true)

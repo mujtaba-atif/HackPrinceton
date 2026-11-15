@@ -19,6 +19,8 @@ final class DeviceTilt {
     private(set) var blinks = 0
     /// True for a moment after a jolt: wide eyes, small pupils.
     private(set) var surprised = false
+    /// The browser's horizontal acceleration response, bounded to one design unit.
+    private(set) var shake: CGFloat = 0
 
     private let manager = CMMotionManager()
     private var users = 0
@@ -46,8 +48,12 @@ final class DeviceTilt {
         guard !UIAccessibility.isReduceMotionEnabled else {
             if look != .zero { look = .zero }
             if lean != .zero { lean = .zero }
+            shake = 0
             return
         }
+        let horizontal = motion.userAcceleration.x * 9.80665
+        let target = -Self.clamp((abs(horizontal) < 0.2 ? 0 : horizontal) / 10)
+        shake += (target - shake) * (1 - exp(-manager.deviceMotionUpdateInterval / 0.065))
         let g = motion.gravity
         // Low-pass, so the eyes glide and the cards float rather than jitter.
         let lookTarget = CGPoint(x: Self.clamp(g.x / 0.25), y: Self.clamp((-g.z - 0.5) / 0.3))

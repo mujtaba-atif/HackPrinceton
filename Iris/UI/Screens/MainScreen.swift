@@ -1,16 +1,9 @@
 import SwiftUI
 
-/// "How can Iris help you?": the Locate card springs in from the left and the Explore card from the
-/// right, each resting at an opposite 2° tilt and floating on its own rhythm. The ripples in the open
-/// water above them answer the microphone, so they stir as the user speaks.
-///
-/// It takes `HomeScreen`'s place as the root of its NavigationStack (don't nest another one here), so
-/// going back is `onBack` rather than `dismiss()` — see `HomeScreen.body`.
+/// The revision 18 discovery screen: two full-width, equal-area choices sharing a diagonal edge.
+/// The whole panel is tappable; camera routes replace the panel with the reference's short fade.
 struct MainScreen: View {
     var onBack: () -> Void = {}
-
-    /// When the Explore card, the last thing to arrive, has landed: its spring's delay plus duration.
-    private static let cardsLanded = 0.38 + 1.25
 
     @State private var audio = AudioLevels()
     @State private var optionChosen = false
@@ -18,142 +11,89 @@ struct MainScreen: View {
     @State private var showAnalyze = false
     @State private var listenTask: Task<Void, Never>?
     @StateObject private var listener = VoiceListener()
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let question = "Are you looking for something, or do you want help exploring something?"
     private let commands: [String: [String]] = [
         "find": ["find", "locate", "position", "pinpoint", "looking for", "search"],
         "understand": ["understand", "analyze", "analyse", "analyzing", "interpret", "explore", "exploring"],
+        "back": ["go back", "back", "return", "previous", "exit"],
         "repeat": ["repeat", "say that again", "one more time", "again", "pardon"]
     ]
 
     var body: some View {
-        StageView { stage in
-            OptionsBackdrop()
-            Sprinkles(count: 20, unit: stage.unit)
-            optionsGlass(stage)
-
-            PrismText(text: "How can Iris help you?", font: IrisFont.nunitoSans(stage(34), .bold), tracking: -0.4,
-                      timing: .question, breakBeforeWord: 3, lineSpacing: -5.6, unit: stage.unit)
-                .accessibilityAddTraits(.isHeader)
-                .placed(x: 10, y: 116, width: 340, height: 88, on: stage)
-
-            WaterWell(audio: audio, unit: stage.unit)
-                .opacity(0.6)
-                .placed(x: 80, y: 215, width: 200, height: 80, on: stage)
-
-            Button(action: chooseFind) {
-                LocateCard()
-                    .shadow(color: Color(rgba: 0x061B3724), radius: 9 * stage.unit, y: 18 * stage.unit)
-                    .motion(Motion(6.4, curve: .easeInOut, repeats: true, [
-                        (0, Pose(rotation: -2)), (0.25, Pose(x: -3, y: -7, rotation: -2.8)),
-                        (0.5, Pose(y: -2, rotation: -2)), (0.75, Pose(x: 3, y: 6, rotation: -1.2)), (1, Pose(rotation: -2)),
-                    ]), unit: stage.unit)
-                    .modifier(RestingTilt(degrees: -2))
-                    .background(FloatRipples(cornerRadius: 23 * stage.unit, delay: 1.35))
-                    .modifier(TiltDrift(drift: 14 * stage.unit))
-            }
-            .buttonStyle(GlassPressStyle())
-            .accessibilityLabel("Locate an object")
-            .accessibilityHint("Or say locate")
-            .motion(Motion(1.15, delay: 0.2, curve: Bezier(0.16, 0.7, 0.2, 1), [
-                (0, Pose(x: -390, y: -35, rotation: -18, scale: 0.7, opacity: 0)),
-                (0.65, Pose(x: 15, rotation: 3, scale: 1.04)),
-                (0.83, Pose(x: -6, rotation: -1, scale: 0.98)),
-                (1, .rest),
-            ]), unit: stage.unit)
-            .placed(x: 14, y: 322, width: 305, height: 177, on: stage)
-
-            Button(action: chooseUnderstand) {
-                ExploreCard()
-                    .shadow(color: Color(rgba: 0x061B3724), radius: 9 * stage.unit, y: 18 * stage.unit)
-                    .motion(Motion(7.2, delay: -0.9, curve: .easeInOut, repeats: true, [
-                        (0, Pose(rotation: 2)), (0.25, Pose(x: 3, y: 6, rotation: 2.8)),
-                        (0.5, Pose(y: 2, rotation: 2)), (0.75, Pose(x: -3, y: -7, rotation: 1.2)), (1, Pose(rotation: 2)),
-                    ]), unit: stage.unit)
-                    .modifier(RestingTilt(degrees: 2))
-                    .background(FloatRipples(cornerRadius: 23 * stage.unit, delay: 1.63))
-                    .modifier(TiltDrift(drift: 14 * stage.unit))
-            }
-            .buttonStyle(GlassPressStyle())
-            .accessibilityLabel("Explore an object")
-            .accessibilityHint("Or say explore")
-            .motion(Motion(1.25, delay: 0.38, curve: Bezier(0.16, 0.7, 0.2, 1), [
-                (0, Pose(x: 390, y: 60, rotation: 19, scale: 0.65, opacity: 0)),
-                (0.65, Pose(x: -15, y: -3, rotation: -3, scale: 1.05)),
-                (0.83, Pose(x: 6, y: 2, rotation: 1, scale: 0.98)),
-                (1, .rest),
-            ]), unit: stage.unit)
-            .placed(x: 41, y: 534, width: 305, height: 177, on: stage)
-
-            GlassBackButton(action: onBack)
-
-            if listener.isListening {
-                ListeningIndicator()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        ZStack {
+            if showFind {
+                LocateScreen(onBack: { Speaker.shared.stop(); showFind = false })
+            } else if showAnalyze {
+                ExploreScreen(onBack: { Speaker.shared.stop(); showAnalyze = false })
+            } else {
+                options
             }
         }
-        .ignoresSafeArea()
-        .animation(.easeInOut, value: listener.isListening)
-        .navigationDestination(isPresented: $showFind) {
-            LocateScreen(onBack: { showFind = false })
-        }
-        .navigationDestination(isPresented: $showAnalyze) {
-            ExploreScreen(onBack: { showAnalyze = false })
-        }
-        .onChange(of: showFind) { _, isShowing in
-            if !isShowing { Speaker.shared.stop() }
-        }
-        .onChange(of: showAnalyze) { _, isShowing in
-            if !isShowing { Speaker.shared.stop() }
-        }
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.3), value: showFind)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.3), value: showAnalyze)
+        .navigationBarBackButtonHidden(true)
+        #if DEBUG
         .task {
-            optionChosen = false
-            #if DEBUG
             switch UserDefaults.standard.string(forKey: "IrisPreviewScreen") {
-            case "locate": showFind = true; return
-            case "explore": showAnalyze = true; return
+            case "locate": showFind = true
+            case "explore": showAnalyze = true
             default: break
             }
-            #endif
-            // Held until the cards have landed: starting to speak costs the main thread a little (see
-            // `Speaker.play`), and mid-spring that shows as a hitch.
-            try? await Task.sleep(for: .seconds(Self.cardsLanded + 0.15))
+        }
+        #endif
+    }
+
+    private var options: some View {
+        StageView { stage in
+            OptionsBackdrop()
+            DiscoveryPanel(explore: false, stage: stage, action: chooseFind)
+            DiscoveryPanel(explore: true, stage: stage, action: chooseUnderstand)
+            Sprinkles(count: 20, unit: stage.unit)
+            optionsGlass(stage)
+            WaterWell(audio: audio, unit: stage.unit)
+                .scaleEffect(0.7)
+                .opacity(0.35)
+                .placed(x: 120, y: 52, width: 200, height: 80, on: stage)
+            GlassBackButton(action: onBack)
+            ListeningIndicator(text: listener.isListening ? "Listening…" : Speaker.shared.isBusy ? "Iris is speaking…" : "Listening…",
+                               speaking: Speaker.shared.isBusy)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        }
+        .ignoresSafeArea()
+        .task {
+            optionChosen = false
+            try? await Task.sleep(for: .milliseconds(150))
             guard !Task.isCancelled, !optionChosen else { return }
             Speaker.shared.speak(question)
             await listenForCommands()
         }
-        .navigationBarBackButtonHidden(true)
         .onAppear { audio.start() }
         .onDisappear {
             audio.stop()
             listenTask?.cancel()
             listener.stop()
-            // Not when this screen is leaving because it pushed Locate or Explore: a push fires this
-            // *after* the destination has appeared and started talking, and stopping here would cut its
-            // first line off. Coming back from either is the `onChange` pair above; this is for going home.
             if !showFind, !showAnalyze { Speaker.shared.stop() }
         }
     }
 
-    /// The two smaller panes on the options screen.
     @ViewBuilder
     private func optionsGlass(_ stage: Stage) -> some View {
         GlassFloat(cornerRadius: 15, sparkle: (20, 16, 11), unit: stage.unit)
+            .modifier(GlassSkew(degrees: -10))
             .motion(Motion(7, curve: .easeInOut, repeats: true, alternate: true,
-                           from: Pose(x: -5, y: -6, rotation: 14), to: Pose(x: 7, y: 13, rotation: 29)),
-                    unit: stage.unit)
+                           from: Pose(x: -5, y: -6, rotation: 14), to: Pose(x: 7, y: 13, rotation: 29)), unit: stage.unit)
             .modifier(RestingTilt(degrees: 19))
-            .placed(x: 285, y: 230, width: 57, height: 55, on: stage)
+            .placed(x: 331, y: 80, width: 57, height: 55, on: stage)
         GlassFloat(unit: stage.unit)
+            .modifier(GlassSkew(degrees: 9))
             .motion(Motion(8, curve: .easeInOut, repeats: true, alternate: true,
-                           from: Pose(x: -6, y: 10, rotation: -22), to: Pose(x: 12, y: -12, rotation: -5)),
-                    unit: stage.unit)
+                           from: Pose(x: -6, y: 10, rotation: -22), to: Pose(x: 12, y: -12, rotation: -5)), unit: stage.unit)
             .modifier(RestingTilt(degrees: -19))
-            .placed(x: -27, y: 448, width: 91, height: 69, on: stage)
+            .placed(x: -48, y: 390, width: 91, height: 69, on: stage)
     }
-}
 
-extension MainScreen {
     private func choose(announcing message: String) {
         optionChosen = true
         listener.stop()
@@ -176,10 +116,9 @@ extension MainScreen {
         guard !Task.isCancelled, !optionChosen else { return }
         await listener.start(commands: commands) { command in
             switch command {
-            case "find":
-                chooseFind()
-            case "understand":
-                chooseUnderstand()
+            case "find": chooseFind()
+            case "understand": chooseUnderstand()
+            case "back": onBack()
             default:
                 Speaker.shared.speak(question)
                 listenTask = Task { await listenForCommands() }
@@ -240,6 +179,4 @@ private struct WaterWell: View {
     }
 }
 
-#Preview {
-    NavigationStack { MainScreen() }
-}
+#Preview { MainScreen() }

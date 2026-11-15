@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		489337445F327B30B451B9D3 /* HandGuidanceOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96B192ED8E0614FB4E20FA8A /* HandGuidanceOverlay.swift */; };
 		02BB1AB061FA6E3CB773A1EF /* SpatialTargetReadout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88330442CC85755923655D6B /* SpatialTargetReadout.swift */; };
 		0C1BDA6C57C3DF6004F53BDA /* IrisTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48C72ED22D64530607CF140 /* IrisTheme.swift */; };
 		15442A1C76D81A8E1CD1121F /* ObjectDetectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9981313BDE0A42F71C952310 /* ObjectDetectionTests.swift */; };
@@ -126,6 +127,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		96B192ED8E0614FB4E20FA8A /* HandGuidanceOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandGuidanceOverlay.swift; sourceTree = "<group>"; };
 		02A4A459CC270C7292EE8EC3 /* PrimaryActionLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryActionLabel.swift; sourceTree = "<group>"; };
 		0A2F4C20AB8488B7BF484637 /* IrisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisApp.swift; sourceTree = "<group>"; };
 		28E02A27E8F639D9973F85E9 /* SpatialTargetEstimate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpatialTargetEstimate.swift; sourceTree = "<group>"; };
@@ -576,6 +578,7 @@
 				70ECC760A035014FAEA77D60 /* OptionCards.swift */,
 				5A922A36F36632F4262D0FEA /* ObjectOutline.swift */,
 				815144D18FC3D2CF1FF3C851 /* GlassWipe.swift */,
+				96B192ED8E0614FB4E20FA8A /* HandGuidanceOverlay.swift */,
 				F92C8CB3A38164E180BE688D /* GlassControls.swift */,
 				D524076CFF2C1EA9928ED592 /* Crew.swift */,
 				9EC656511F3C506D6457A934 /* CameraGlass.swift */,
@@ -722,6 +725,7 @@
 				643B7251FFF93091F9BF533F /* OptionCards.swift in Sources */,
 				9517DDA797E775CF094571D1 /* ObjectOutline.swift in Sources */,
 				0C9693B609DE7575EA347BBB /* GlassWipe.swift in Sources */,
+				489337445F327B30B451B9D3 /* HandGuidanceOverlay.swift in Sources */,
 				D9C55300909A34A331A77627 /* GlassControls.swift in Sources */,
 				81C1C4876F152AEB276A1883 /* Crew.swift in Sources */,
 				B2E2D2E6AB33A7E19EAE9226 /* CameraGlass.swift in Sources */,

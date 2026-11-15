@@ -98,12 +98,15 @@ struct VectorArtView: View {
     var since: Date?
     /// How a named group answers the phone (eyes looking and blinking), on top of its motions.
     var respond: (String) -> EyeResponse? = { _ in nil }
+    var hiddenGroups: Set<String> = []
+    /// Dash travel in SVG units/second, applied only to the named animated strokes.
+    var dashSpeeds: [String: CGFloat] = [:]
 
     var body: some View {
         GeometryReader { geo in
             let scale = min(geo.size.width / art.viewBox.width, geo.size.height / art.viewBox.height)
             GroupView(group: group ?? art.root, viewBox: art.viewBox, scale: scale, animate: animate, since: since,
-                      respond: respond)
+                      respond: respond, hiddenGroups: hiddenGroups, dashSpeeds: dashSpeeds)
                 .frame(width: art.viewBox.width * scale, height: art.viewBox.height * scale)
                 .frame(width: geo.size.width, height: geo.size.height)
         }
@@ -117,6 +120,9 @@ private struct GroupView: View {
     let animate: (String) -> [Motion]
     let since: Date?
     let respond: (String) -> EyeResponse?
+    var hiddenGroups: Set<String> = []
+    var dashSpeeds: [String: CGFloat] = [:]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Consecutive shapes share one `Canvas`; a named group gets its own view so it can move.
     private enum Run {
@@ -151,16 +157,18 @@ private struct GroupView: View {
             ForEach(Array(runs.enumerated()), id: \.offset) { _, run in
                 switch run {
                 case .shapes(let shapes):
-                    Canvas { context, _ in
-                        context.translateBy(x: -viewBox.minX * scale, y: -viewBox.minY * scale)
-                        context.scaleBy(x: scale, y: scale)
-                        for shape in shapes {
-                            var layer = context
-                            shape.draw(in: &layer)
+                    if let name = group.name, let speed = dashSpeeds[name], !reduceMotion {
+                        TimelineView(.animation) { timeline in
+                            draw(shapes, dashPhase: timeline.date.timeIntervalSince(since ?? timeline.date) * speed)
                         }
+                    } else {
+                        draw(shapes, dashPhase: 0)
                     }
                 case .group(let child):
-                    GroupView(group: child, viewBox: viewBox, scale: scale, animate: animate, since: since, respond: respond)
+                    if !hiddenGroups.contains(child.name ?? "") {
+                        GroupView(group: child, viewBox: viewBox, scale: scale, animate: animate, since: since,
+                                  respond: respond, hiddenGroups: hiddenGroups, dashSpeeds: dashSpeeds)
+                    }
                 }
             }
         }
@@ -179,6 +187,18 @@ private struct GroupView: View {
             content
         }
     }
+    private func draw(_ shapes: [VectorShape], dashPhase: CGFloat) -> some View {
+        Canvas { context, _ in
+            context.translateBy(x: -viewBox.minX * scale, y: -viewBox.minY * scale)
+            context.scaleBy(x: scale, y: scale)
+            for var shape in shapes {
+                var layer = context
+                shape.strokeStyle.dashPhase = dashPhase
+                shape.draw(in: &layer)
+            }
+        }
+    }
+
 }
 
 extension VectorGroup {
@@ -209,12 +229,14 @@ private final class SVGParser: NSObject, XMLParserDelegate {
         var strokeWidth: Double = 1
         var lineCap: CGLineCap = .butt
         var lineJoin: CGLineJoin = .miter
+        var dash: [CGFloat] = []
     }
 
     private struct GradientDef {
         var start = CGPoint.zero
         var end = CGPoint(x: 1, y: 0)
         var stops: [Gradient.Stop] = []
+        var userSpace = false
     }
 
     private var stack: [(group: VectorGroup, style: Style)] = []
@@ -222,6 +244,7 @@ private final class SVGParser: NSObject, XMLParserDelegate {
     private var gradientID: String?
     /// Shapes inside `<defs>` are definitions, not drawing.
     private var defsDepth = 0
+    private var transforms: [CGAffineTransform] = [.identity]
 
     init(_ svg: String) {
         super.init()
@@ -246,6 +269,7 @@ private final class SVGParser: NSObject, XMLParserDelegate {
         case "linearGradient":
             gradientID = attributes["id"]
             var def = GradientDef()
+            def.userSpace = attributes["gradientUnits"] == "userSpaceOnUse"
             def.start = CGPoint(x: number(attributes["x1"]) ?? 0, y: number(attributes["y1"]) ?? 0)
             def.end = CGPoint(x: number(attributes["x2"]) ?? 1, y: number(attributes["y2"]) ?? 0)
             if let gradientID { gradients[gradientID] = def }
@@ -261,13 +285,16 @@ private final class SVGParser: NSObject, XMLParserDelegate {
             group.name = attributes["id"] ?? attributes["class"]
             stack.append((group, resolveStyle(attributes, inheriting: parentStyle)))
             pendingOpacity.append(number(attributes["opacity"]) ?? 1)
+            transforms.append(transform(attributes["transform"]).concatenating(transforms.last!))
         case "path", "rect", "circle", "ellipse":
             guard defsDepth == 0, let path = shapePath(element, attributes) else { return }
             let style = resolveStyle(attributes, inheriting: stack.last!.style)
-            var shape = VectorShape(path: path)
-            shape.fill = style.fill.flatMap { paint($0, opacity: style.fillOpacity) }
-            shape.stroke = style.stroke.flatMap { paint($0, opacity: style.strokeOpacity) }
-            shape.strokeStyle = StrokeStyle(lineWidth: style.strokeWidth, lineCap: style.lineCap, lineJoin: style.lineJoin)
+            let matrix = transform(attributes["transform"]).concatenating(transforms.last!)
+            var shape = VectorShape(path: path.applying(matrix))
+            shape.fill = style.fill.flatMap { paint($0, opacity: style.fillOpacity, bounds: path.boundingRect, transform: matrix) }
+            shape.stroke = style.stroke.flatMap { paint($0, opacity: style.strokeOpacity, bounds: path.boundingRect, transform: matrix) }
+            shape.strokeStyle = StrokeStyle(lineWidth: style.strokeWidth, lineCap: style.lineCap,
+                                            lineJoin: style.lineJoin, dash: style.dash)
             shape.opacity = (number(attributes["opacity"]) ?? 1) * pendingOpacity.reduce(1, *)
             let named = attributes["id"] ?? attributes["class"]
             if let named {
@@ -297,6 +324,7 @@ private final class SVGParser: NSObject, XMLParserDelegate {
             guard stack.count > 1 else { return }
             let finished = stack.removeLast().group
             pendingOpacity.removeLast()
+            transforms.removeLast()
             stack[stack.count - 1].group.children.append(.group(finished))
         default:
             break
@@ -310,6 +338,11 @@ private final class SVGParser: NSObject, XMLParserDelegate {
         if let value = number(attributes["fill-opacity"]) { style.fillOpacity = value }
         if let value = number(attributes["stroke-opacity"]) { style.strokeOpacity = value }
         if let value = number(attributes["stroke-width"]) { style.strokeWidth = value }
+        if let value = attributes["stroke-dasharray"] {
+            style.dash = value.split(whereSeparator: { $0 == " " || $0 == "," }).compactMap { token -> CGFloat? in
+                guard let number = Double(token) else { return nil }; return CGFloat(number)
+            }
+        }
         switch attributes["stroke-linecap"] {
         case "round": style.lineCap = .round
         case "square": style.lineCap = .square
@@ -347,19 +380,54 @@ private final class SVGParser: NSObject, XMLParserDelegate {
         }
     }
 
-    private func paint(_ value: String, opacity: Double) -> VectorShape.Paint? {
+    private func paint(_ value: String, opacity: Double, bounds: CGRect, transform: CGAffineTransform) -> VectorShape.Paint? {
         if value.hasPrefix("url(#") {
             let id = String(value.dropFirst(5).dropLast())
             guard let def = gradients[id] else { return nil }
             let stops = def.stops.map { Gradient.Stop(color: $0.color.opacity(opacity), location: $0.location) }
-            return .linear(Gradient(stops: stops), start: def.start, end: def.end)
+            func point(_ p: CGPoint) -> CGPoint {
+                let local = def.userSpace ? p : CGPoint(x: bounds.minX + p.x * bounds.width,
+                                                       y: bounds.minY + p.y * bounds.height)
+                return local.applying(transform)
+            }
+            return .linear(Gradient(stops: stops), start: point(def.start), end: point(def.end))
         }
         return parseColor(value, opacity: opacity).map { .color($0) }
     }
 
     private func number(_ value: String?) -> Double? {
         guard let value else { return nil }
+        if value.hasSuffix("%") { return Double(value.dropLast()).map { $0 / 100 } }
         return Double(value.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: "px", with: ""))
+    }
+
+    /// The map's compass, destination and sparkles are positioned by SVG transforms.
+    private func transform(_ source: String?) -> CGAffineTransform {
+        guard let source, let regex = try? NSRegularExpression(pattern: "([A-Za-z]+)\\(([^)]*)\\)") else { return .identity }
+        var result = CGAffineTransform.identity
+        let ns = source as NSString
+        for match in regex.matches(in: source, range: NSRange(location: 0, length: ns.length)) {
+            let name = ns.substring(with: match.range(at: 1))
+            let values = ns.substring(with: match.range(at: 2))
+                .split(whereSeparator: { $0 == " " || $0 == "," }).compactMap { Double($0) }
+            let next: CGAffineTransform
+            switch name {
+            case "translate" where !values.isEmpty:
+                next = CGAffineTransform(translationX: values[0], y: values.count > 1 ? values[1] : 0)
+            case "scale" where !values.isEmpty:
+                next = CGAffineTransform(scaleX: values[0], y: values.count > 1 ? values[1] : values[0])
+            case "rotate" where !values.isEmpty:
+                let x = values.count > 2 ? values[1] : 0, y = values.count > 2 ? values[2] : 0
+                next = CGAffineTransform(translationX: -x, y: -y)
+                    .concatenating(CGAffineTransform(rotationAngle: values[0] * .pi / 180))
+                    .concatenating(CGAffineTransform(translationX: x, y: y))
+            case "matrix" where values.count == 6:
+                next = CGAffineTransform(a: values[0], b: values[1], c: values[2], d: values[3], tx: values[4], ty: values[5])
+            default: continue
+            }
+            result = next.concatenating(result)
+        }
+        return result
     }
 }
 

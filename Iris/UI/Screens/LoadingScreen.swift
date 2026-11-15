@@ -19,7 +19,7 @@ struct LoadingScreen: View {
                 .placed(x: 0, y: 314, width: 360, height: 94, on: stage)
             VStack(spacing: stage(22)) {
                 Spinner(unit: stage.unit)
-                Text(step)
+                Text("Getting ready")
                     .font(IrisFont.nunito(stage(18), .bold))
                     .foregroundStyle(IrisPalette.white)
                     .contentTransition(.opacity)

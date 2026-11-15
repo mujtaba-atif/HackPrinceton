@@ -6,15 +6,15 @@
 2. **Main.** Iris asks "Are you looking for something, or do you want help exploring something?"
    - Say **find** or **locate** (also "looking for", "search") to open Locate.
    - Say **understand**, **analyze** or **explore** to open Explore.
-   - Say **repeat** to hear the question again, or tap a card.
+   - Say **repeat** to hear the question again, say **go back**, or tap either full-width diagonal panel.
 3. **Locate**
    1. Iris asks "What do you want to find?". Your answer is matched to one of the segmentation model's 80 classes ("water bottle" → bottle, "my phone" → cell phone). If it doesn't match a class, or you say nothing for 12 s, Iris looks for a bottle.
-   2. Three steps follow, each announced and marked by a chime: **reach out** (depth), **move across**, then **take hold**. A stereo tone, the camera's glass waves and haptics steer you: the top wave surges down to reach out or draws back up, and a side wave surges in from the side to move toward. Headphones are needed to hear left and right; the chime and voice work without them.
-   3. The object is outlined from its live segmentation mask, and the glass status panel shows the fingertip-to-object distance in inches. Confetti marks the moment you reach it.
+   2. Three steps follow, each announced and marked by a chime: **reach out** (depth), **move across**, then **take hold**. A stereo tone, spoken cues, the on-screen direction and haptics steer you. Four subtle optical rails frame the camera view. Headphones are needed to hear left and right; the chime and voice work without them.
+   3. The object has a translucent green highlight from its live segmentation mask. Hand landmarks and a fingertip connector share the camera crop, and both distance labels show measured meters. Missing hands suppress the measurement; unavailable depth never becomes a guessed distance. Confetti marks the moment you reach it.
    4. When you've picked the object up and brought it within about 10 inches of the camera, Iris reads the label and hands over to the ElevenLabs agent ("Let me see what you're holding").
 4. **Explore**
    1. Iris says "Hold the item in front of the camera so I can read it."
-   2. Once text is found, hold steady for **2 seconds** while the reading area fills with light and the pill counts down ("Hold steady… 2"). If nothing is readable, Iris gives a hint: at most two, first after 8 s, then every 12 s.
+   2. The pill changes from **Looking for text…** to **Reading live…** as OCR finds text. Two matching consolidated results trigger the summary; there is no visible hold timer or countdown. If nothing is readable, Iris gives a hint: at most two, first after 8 s, then every 12 s.
    3. Iris says "Text detected." and the agent summarizes the item in one or two sentences. If the agent can't be reached, or drops, Iris reads the label out itself and listens for "go back".
 5. **Anywhere:** "go back" leaves the screen.
    - During a conversation, "goodbye", "go back" or "I'm done" ends it.
@@ -49,8 +49,8 @@ Without a key, every line is spoken by the on-device voice. Without an agent ID,
 You need a physical iPhone; LiDAR models get depth-based guidance, and others fall back to on-screen distance. Pick your team under Signing & Capabilities, run the `Iris` scheme, and allow the microphone, speech recognition and camera.
 
 - **Home:** say "continue". On Main, say "locate", then "bottle".
-- **Locate:** with headphones on, follow the steps to the bottle, pick it up and bring it toward the camera until the status panel reads about 10 in. Iris should talk about it.
-- **Explore:** go back to Main, say "explore", and hold a label steady through the countdown. Iris should summarize it.
+- **Locate:** with headphones on, follow the steps to the bottle, pick it up and bring it toward the camera until the status panel says “Close enough”. Iris should talk about it.
+- **Explore:** go back to Main, say "explore", and hold a label in view until recognition is ready. Iris should summarize it.
 - **Voice:** all lines should be in your ElevenLabs voice. Turn on airplane mode and they should switch to the on-device voice.
 - **Background:** background the app on any screen and the microphone indicator should turn off.
 

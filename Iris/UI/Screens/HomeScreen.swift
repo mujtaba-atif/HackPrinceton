@@ -82,7 +82,7 @@ struct HomeScreen: View {
                 Sprinkles(count: 20, unit: stage.unit)
                 homeGlass(stage)
                 PrismText(text: "Iris", font: IrisFont.nunito(stage(78), .black), tracking: -3, timing: .brand,
-                          unit: stage.unit, hops: true)
+                          unit: stage.unit)
                     .accessibilityAddTraits(.isHeader)
                     .placed(x: 0, y: 128, width: 360, height: 94, on: stage)
                 PrismText(text: "See beyond the surface", font: IrisFont.nunito(stage(22), .bold), tracking: -0.5,
@@ -128,12 +128,14 @@ struct HomeScreen: View {
     @ViewBuilder
     private func homeGlass(_ stage: Stage) -> some View {
         GlassFloat(sparkle: (28, 22, 22), unit: stage.unit)
+            .modifier(GlassSkew(degrees: -10))
             .motion(Motion(7, curve: .easeInOut, repeats: true, alternate: true,
                            from: Pose(x: -5, y: -6, rotation: 14), to: Pose(x: 7, y: 13, rotation: 29)),
                     unit: stage.unit)
             .modifier(RestingTilt(degrees: 19))
             .placed(x: 288, y: 34, width: 86, height: 90, on: stage)
         GlassFloat(unit: stage.unit)
+            .modifier(GlassSkew(degrees: 9))
             .motion(Motion(8, curve: .easeInOut, repeats: true, alternate: true,
                            from: Pose(x: -6, y: 10, rotation: -22), to: Pose(x: 12, y: -12, rotation: -5)),
                     unit: stage.unit)
@@ -172,19 +174,9 @@ private struct SwipeHint: View {
                     .frame(height: 34 * unit)
                     .motion(Motion(1.4, curve: .easeInOut, repeats: true, alternate: true, from: .rest, to: Pose(y: -9)),
                             unit: unit)
-                ZStack {
-                    if listening {
-                        ListeningIndicator(text: "Listening…")
-                            .padding(.bottom, -32 * unit)
-                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
-                    } else {
-                        Text("swipe up")
-                            .font(IrisFont.nunito(16 * unit, .black))
-                            .foregroundStyle(IrisPalette.white)
-                            .transition(.opacity)
-                    }
-                }
-                .animation(.easeInOut(duration: 0.35), value: listening)
+                Text("swipe up")
+                    .font(IrisFont.nunito(16 * unit, .black))
+                    .foregroundStyle(IrisPalette.white)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .contentShape(Rectangle())

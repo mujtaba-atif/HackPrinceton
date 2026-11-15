@@ -135,14 +135,17 @@ struct Sprinkles: View {
     }
 
     private var specks: [Speck] {
-        (0..<count).map { i in
-            Speck(
-                x: quiet ? (i % 2 == 1 ? 0.94 : 0.04) : Double((i * 47 + 13) % 96) / 100,
-                y: quiet ? (18 + Double(i) * 10) / 100 : Double((i * 71 + 29) % 94) / 100,
+        (0..<count).map { i -> Speck in
+            let isRight = i % 2 == 1
+            let x: Double = quiet ? (isRight ? 0.94 : 0.04) : Double((i * 47 + 13) % 96) / 100
+            let y: Double = quiet ? (18 + Double(i) * 10) / 100 : Double((i * 71 + 29) % 94) / 100
+            return Speck(
+                x: x,
+                y: y,
                 rotation: Double(i * 41),
                 delay: -Double(i) * 0.63,
                 duration: 6 + Double(i % 5),
-                drift: i % 2 == 1 ? -22 : 22,
+                drift: isRight ? -22 : 22,
                 color: IrisPalette.confetti[i % 4],
                 kind: i % 4
             )
@@ -246,13 +249,14 @@ struct GlassFloat: View {
 struct GlassSheen: View {
     var body: some View {
         GeometryReader { geo in
+            let travel = 0.55 * Double(geo.size.width) * 2
             CSSLinearGradient(angle: 120, stops: [.init(color: .clear, location: 0.38),
                                                   .init(color: Color(rgba: 0xFAFCFF55), location: 0.48),
                                                   .init(color: .clear, location: 0.57)])
                 .frame(width: geo.size.width * 2, height: geo.size.height * 2)
                 .motion(Motion(6, curve: .easeInOut, repeats: true, [
-                    (0, Pose(x: -0.55 * geo.size.width * 2)), (0.2, Pose(x: -0.55 * geo.size.width * 2)),
-                    (0.65, Pose(x: 0.55 * geo.size.width * 2)), (1, Pose(x: 0.55 * geo.size.width * 2)),
+                    (0, Pose(x: -travel)), (0.2, Pose(x: -travel)),
+                    (0.65, Pose(x: travel)), (1, Pose(x: travel)),
                 ]))
                 .position(x: geo.size.width / 2, y: geo.size.height / 2)
         }
