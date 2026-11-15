@@ -47,10 +47,10 @@ struct MainScreen: View {
     @State private var listenTask: Task<Void, Never>?
     @StateObject private var listener = VoiceListener()
 
-    private let question = "Do you want to locate something, or explore something you're holding?"
+    private let question = "Are you looking for something, or do you want help exploring something?"
     private let commands: [String: [String]] = [
-        "find": ["locate", "find", "position", "pinpoint", "looking for", "search", "where"],
-        "understand": ["explore", "exploring", "understand", "analyze", "analyse", "analyzing", "interpret", "read", "holding"],
+        "find": ["find", "locate", "position", "pinpoint", "looking for", "search"],
+        "understand": ["understand", "analyze", "analyse", "analyzing", "interpret", "explore", "exploring"],
         "repeat": ["repeat", "say that again", "one more time", "again", "pardon"]
     ]
 
@@ -156,12 +156,12 @@ extension MainScreen {
     }
 
     private func chooseFind() {
-        choose(announcing: "Locate selected")
+        choose(announcing: "Locate object selected")
         showFind = true
     }
 
     private func chooseUnderstand() {
-        choose(announcing: "Explore selected")
+        choose(announcing: "Explore object selected")
         showAnalyze = true
     }
 

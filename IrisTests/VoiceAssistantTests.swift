@@ -96,29 +96,59 @@ final class VoiceAssistantTests: XCTestCase {
         XCTAssertFalse(tracker.update(distance: nil, time: 5))
     }
 
-    @MainActor
-    func testNearestEdgeOfTargetBox() {
-        let box = CGRect(x: 0.4, y: 0.4, width: 0.2, height: 0.2)
-        func assertPoint(_ a: CGPoint, _ b: CGPoint, line: UInt = #line) {
-            XCTAssertEqual(a.x, b.x, accuracy: 1e-9, line: line)
-            XCTAssertEqual(a.y, b.y, accuracy: 1e-9, line: line)
-        }
-        assertPoint(LocateTracker.nearestEdge(to: CGPoint(x: 0.1, y: 0.5), of: box), CGPoint(x: 0.4, y: 0.5))
-        assertPoint(LocateTracker.nearestEdge(to: CGPoint(x: 0.58, y: 0.5), of: box), CGPoint(x: 0.6, y: 0.5))
-        assertPoint(LocateTracker.nearestEdge(to: CGPoint(x: 0.9, y: 0.9), of: box), CGPoint(x: 0.6, y: 0.6))
+    func testObjectMaskEdgeCenterAndContains() throws {
+        // 6 × 4 grid (row 0 = top) with a 2 × 2 block in the middle.
+        var pixels = [Bool](repeating: false, count: 24)
+        for (x, y) in [(2, 1), (3, 1), (2, 2), (3, 2)] { pixels[y * 6 + x] = true }
+        let mask = try XCTUnwrap(ObjectMask(width: 6, height: 4, pixels: pixels))
+        XCTAssertEqual(mask.edge.count, 4, "every cell of a 2 × 2 block touches the outside")
+        XCTAssertTrue(mask.contains(CGPoint(x: 0.45, y: 0.5)))
+        XCTAssertFalse(mask.contains(CGPoint(x: 0.05, y: 0.5)))
+        XCTAssertTrue(mask.contains(mask.center))
+        let nearest = try XCTUnwrap(mask.nearestEdgePoint(to: CGPoint(x: 0, y: 0.5)))
+        XCTAssertLessThan(nearest.x, 0.5, "the nearest outline point is on the left side")
+        XCTAssertNil(ObjectMask(width: 2, height: 2, pixels: [false, false, false, false]))
+    }
+
+    func testBundledSegmentationModelLoadsWithCocoClasses() {
+        let segmenter = SegmentationDetector()
+        XCTAssertEqual(segmenter.availableClasses.count, 80)
+        XCTAssertTrue(segmenter.availableClasses.contains("bottle"))
+        XCTAssertEqual(AssistantFacts.matchClass("water bottle", in: segmenter.availableClasses), "bottle")
+    }
+
+    func testSpokenTargetMapsToModelClass() {
+        let classes = ["person", "bottle", "cup", "cell phone", "couch", "dining table", "car", "carrot"]
+        XCTAssertEqual(AssistantFacts.matchClass("water bottle", in: classes), "bottle")
+        XCTAssertEqual(AssistantFacts.matchClass("my phone", in: classes), "cell phone")
+        XCTAssertEqual(AssistantFacts.matchClass("mug", in: classes), "cup")
+        XCTAssertEqual(AssistantFacts.matchClass("sofa", in: classes), "couch")
+        XCTAssertEqual(AssistantFacts.matchClass("car", in: classes), "car")
+        XCTAssertNil(AssistantFacts.matchClass("keys", in: classes))
     }
 
     @MainActor
-    func testExploreSummaryRequestCarriesTextAndFields() {
-        var reading = LabelReading()
-        reading.title = "Ibuprofen"
-        reading.strength = "200 mg"
-        reading.allLines = ["Ibuprofen", "200 mg tablets"]
-        let message = ExploreScreen.summaryRequest(for: reading)
+    func testExploreSummaryRequestCarriesLabelText() {
+        let message = ExploreScreen.summaryRequest(for: ["Ibuprofen", "200 mg tablets"])
         XCTAssertTrue(message.contains("may contain misread characters"))
         XCTAssertTrue(message.contains("- 200 mg tablets"))
-        XCTAssertTrue(message.contains("Strength: 200 mg"))
-        XCTAssertTrue(ExploreScreen.persona.contains("Never say an item is safe"))
+        XCTAssertTrue(message.contains("Summarize this item in one or two short sentences, then wait."))
+    }
+
+    func testTextConsolidatorKeepsLinesSeenInThreeScans() {
+        var consolidator = TextConsolidator()
+        let label = TextReading(text: "Oat Milk", midY: 0.8, minX: 0.2)
+        let size = TextReading(text: "1 Litre", midY: 0.5, minX: 0.2)
+        let misread = TextReading(text: "0at Mi1k", midY: 0.8, minX: 0.2)
+        consolidator.add([label, size])
+        consolidator.add([label, misread])
+        XCTAssertEqual(consolidator.consolidated(), [], "nothing has been seen three times yet")
+        consolidator.add([label, size])
+        XCTAssertEqual(consolidator.consolidated(), ["Oat Milk"], "only lines seen in three scans count")
+        consolidator.add([label, size])
+        XCTAssertEqual(consolidator.consolidated(), ["Oat Milk", "1 Litre"], "top to bottom")
+        consolidator.reset()
+        XCTAssertEqual(consolidator.consolidated(), [])
     }
 
     func testIrisWordmarkSplitsIntoLettersInPlace() {

@@ -30,25 +30,34 @@ targets:
       - path: Iris
         excludes:
           - Resources/Info.plist
+          - Secrets.swift.example
     info:
       path: Iris/Resources/Info.plist
       properties:
-        ElevenLabsAgentID: $(ELEVENLABS_AGENT_ID)
         CFBundleDisplayName: Iris
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
-        NSCameraUsageDescription: "Iris uses the camera to help locate nearby objects and guide your hand toward them."
-        NSMicrophoneUsageDescription: "Iris uses the microphone so you can control exploration with your voice."
-        NSSpeechRecognitionUsageDescription: "Iris uses speech recognition to understand spoken object searches and navigation commands."
+        NSCameraUsageDescription: "Camera is used to detect hands and objects with AR."
+        NSMicrophoneUsageDescription: "Iris listens for your voice commands."
+        NSSpeechRecognitionUsageDescription: "Iris uses speech recognition to understand your voice commands."
         UIApplicationSupportsIndirectInputEvents: true
-        UIRequiresFullScreen: true
-        UILaunchScreen:
-          UIColorName: IrisBackground
+        CADisableMinimumFrameDuration: true
+        UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-    configFiles:
-      Debug: Config/Iris.xcconfig
-      Release: Config/Iris.xcconfig
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    preBuildScripts:
+      - name: Create Secrets.swift
+        inputFiles:
+          - $(SRCROOT)/Iris/Secrets.swift.example
+        outputFiles:
+          - $(SRCROOT)/Iris/Secrets.swift
+        script: |
+          if [ ! -f "$SRCROOT/Iris/Secrets.swift" ]; then
+            cp "$SRCROOT/Iris/Secrets.swift.example" "$SRCROOT/Iris/Secrets.swift"
+            echo "warning: Created Iris/Secrets.swift from the template. Add your ElevenLabs key, agent ID and voice ID."
+          fi
     dependencies:
       - package: ElevenLabs
       - package: LiveKit

@@ -5,10 +5,19 @@ Iris is a native iOS accessibility app designed to help blind and visually impai
 Iris runs on its own camera, detection, hand-tracking, depth and label-reading features, and it is voice-first:
 
 - **Home → Main.** Iris introduces itself and listens ("continue"), then asks whether to **Locate** something or **Explore** something you're holding. Every screen understands "go back".
-- **Locate**. Say what you're looking for. Iris finds it with on-device object detection, then guides your hand to it in three steps with a stereo tone, water ripples and short spoken cues, using hand tracking and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
-- **Explore**. Hold an item up. **Turn to Read** tells you which way to turn it until the label faces the camera, then the ElevenLabs agent summarizes it and answers questions. Without the agent, Iris speaks an offline reading of the label.
+- **Locate**. Say what you want to find. Iris outlines it with on-device segmentation (YOLO26n-seg), then guides your hand to it in three steps with a stereo tone, water ripples and short spoken cues, measuring fingertip to object with Vision hand pose and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
+- **Explore**. Hold an item up and keep it steady for a two-second countdown while Iris reads the label, then the ElevenLabs agent summarizes it and answers questions.
+- **Voice.** Every spoken line uses your ElevenLabs voice (the agent's voice), with the on-device voice as a fallback when there is no key or no network.
 
-See [docs/IRIS.md](docs/IRIS.md) for the flows, the ElevenLabs setup and on-device testing. The original Explore screen and hand-tracking debug screen are still available in Debug builds (long-press the home screen for 2 seconds).
+See [docs/IRIS.md](docs/IRIS.md) for the flows, the ElevenLabs setup and on-device testing. Developer screens — the original Explore screen (object list, depth readout, **Turn to Read** label sheet) and the hand-tracking debug screen — are available in Debug builds: long-press the home screen for 2 seconds.
+
+## ElevenLabs keys
+
+```sh
+cp Iris/Secrets.swift.example Iris/Secrets.swift   # git-ignored
+```
+
+Fill in the API key (`sk_…`), the public agent ID and the agent's voice ID. A build creates the file from the template if it's missing, so the app always builds; without a key it speaks with the on-device voice.
 
 ## Requirements
 
@@ -39,18 +48,20 @@ Select a physical iPhone and run the `Iris` scheme. AR camera tracking is unavai
 Iris/
 ├── App/                    App entry point (loading → home → main sequence)
 ├── Features/
-│   ├── Assistant/          ElevenLabs agent session, Locate's label hand-off, grounded object facts
+│   ├── Assistant/          ElevenLabs agent session, Locate's label hand-off, object-name matching
 │   ├── CameraAR/           AR session, preview, lifecycle, and frame streams
 │   ├── DepthEstimation/    Depth sampling, calibration, smoothing, spatial estimates and distance UI
 │   ├── HandTracking/       Vision hand pose, smoothing, overlay
-│   ├── LabelReading/       "Turn to Read": orientation guidance, text merging, label interpretation
-│   ├── Locate/             Three-step tone guidance and fingertip-to-object measurement
+│   ├── Explore/            Label text reader and multi-scan consolidation
+│   ├── LabelReading/       "Turn to Read" (developer screen): orientation guidance, text merging, interpretation
+│   ├── Locate/             Segmentation model, hand pose and fingertip-to-object measurement, tone guidance, overlays
 │   ├── ObjectDetection/    Core ML model, Vision inference, tracking, selection, overlay and list
 │   ├── OCR/                Reusable Vision text recognition
 │   ├── Guidance/           Guidance boundary
-│   └── Voice/              Speaker (one voice, one queue), keyword listener, target parsing
+│   └── Voice/              Speaker (ElevenLabs voice + on-device fallback), keyword listener, target parsing
 ├── Models/                 Shared domain and readiness models
 ├── Resources/              Info.plist and asset catalogs
+├── Secrets.swift.example   Template for the git-ignored ElevenLabs keys
 └── UI/
     ├── Art/                Vector artwork and Iris lettering
     ├── Motion/             Eyes, floating, water pour and leaf-fall transitions, bubble title

@@ -1,8 +1,0 @@
-// Shared build settings for the Iris app target. Safe to commit.
-//
-// ElevenLabs Conversational AI: a *public* agent needs only its agent ID (not a secret API key).
-// Put your own ID in Config/Local.xcconfig (git-ignored); copy Config/Local.xcconfig.example.
-// Leave it empty and the voice assistant runs in on-device offline mode.
-ELEVENLABS_AGENT_ID =
-
-#include? "Local.xcconfig"

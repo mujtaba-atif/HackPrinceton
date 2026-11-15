@@ -59,7 +59,6 @@
 		DE1EE19704C2915211D40713 /* SpeechOutputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6871216BEA716ED80AB846 /* SpeechOutputService.swift */; };
 		5355D4CBF408396D1805AE04 /* AssistantContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A8960D61F2D41C9B5383DC0 /* AssistantContext.swift */; };
 		6A41763898239C3A4351EF53 /* AssistantFacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7302C31E5AF8F530FCD911 /* AssistantFacts.swift */; };
-		36743F03F34F697742B2D39D /* AssistantConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D7A196C8D3A1584F498743 /* AssistantConfiguration.swift */; };
 		18835C427DA97D6D00A6946A /* VoiceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4AB58A2951DD083F1AD18 /* VoiceCommand.swift */; };
 		D7ECFA04AF0098E17891B9E8 /* VoiceAssistantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */; };
 		DFCB20AB557DBA23C1C14125 /* LabelFrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8858B7C49EA3E2EFA94918 /* LabelFrameProcessor.swift */; };
@@ -74,10 +73,7 @@
 		950A871D5BF4DDE5A9574A01 /* LabelReadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */; };
 		00E388654F932D3EC127013D /* AgentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E077E636FB62FB15697FBAB6 /* AgentSession.swift */; };
 		FC44698F6CF29488D1214D8D /* ObjectConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7D7333E76966306E23E8E88 /* ObjectConversation.swift */; };
-		F4CE618DD3FE40DAE294F4F5 /* LabelTextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */; };
 		B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */; };
-		42EE4EC83F869813A3FE766D /* LocateMeasurements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054A786B864DF3687842F878 /* LocateMeasurements.swift */; };
-		852924408A48D470A6EEA869 /* LocateTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */; };
 		7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755033595C1F3BB46DC83F00 /* Speaker.swift */; };
 		1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */; };
 		20EEF65CB78975CEF6B1E969 /* VoiceListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9F75CE03C12CC79C15115C /* VoiceListener.swift */; };
@@ -105,6 +101,15 @@
 		1731BDB8F9C940A24001D44B /* GuidanceRipple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5541AEC519176B9639B2032D /* GuidanceRipple.swift */; };
 		818A36B82427DC9FA8656147 /* WaterVisualizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FB3E1F770B91D5FCF0E8AC /* WaterVisualizer.swift */; };
 		B7949439CC8121C58B40B4CE /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7596E344345AB05C574D20FB /* LiveKit */; };
+		71852BAF5E3F62958B4F5AB3 /* yolo26n-seg.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */; };
+		327F814E23A0F1CECDC30C7B /* BoundingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4B9D8D705E569613508285 /* BoundingBox.swift */; };
+		495DC139EB93A665D6CAA1F7 /* ModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302E52BFED13DC936B0FFE1A /* ModelStore.swift */; };
+		0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73195524758434685EDE70A4 /* ObjectDetection.swift */; };
+		F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */; };
+		B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */; };
+		6C1CBCE8BD772F8E124719F8 /* TextConsolidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */; };
+		7291E0C5631DCB7613BB7F65 /* TextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965C24B30DBF979D7034F8B9 /* TextReader.swift */; };
+		34761C72166B58C77E2FC806 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = F36E68C00ED7D7FF2F33DF2E /* Secrets.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -167,12 +172,10 @@
 		F964D09B0D26D1CCFC354060 /* VoiceGuidanceProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceGuidanceProviding.swift; sourceTree = "<group>"; };
 		F9ADE4BFC9891AA0716C24FA /* HandGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandGeometry.swift; sourceTree = "<group>"; };
 		FC82A8203AF5E65E11EDBD92 /* ObjectDetectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetectionState.swift; sourceTree = "<group>"; };
-		08957277764E1D54BFBA8CCF /* Iris.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Iris.xcconfig; path = Config/Iris.xcconfig; sourceTree = SOURCE_ROOT; };
 		172268DB436A67974D36025B /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		FF6871216BEA716ED80AB846 /* SpeechOutputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechOutputService.swift; sourceTree = "<group>"; };
 		9A8960D61F2D41C9B5383DC0 /* AssistantContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantContext.swift; sourceTree = "<group>"; };
 		0A7302C31E5AF8F530FCD911 /* AssistantFacts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantFacts.swift; sourceTree = "<group>"; };
-		38D7A196C8D3A1584F498743 /* AssistantConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantConfiguration.swift; sourceTree = "<group>"; };
 		72D4AB58A2951DD083F1AD18 /* VoiceCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommand.swift; sourceTree = "<group>"; };
 		742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceAssistantTests.swift; sourceTree = "<group>"; };
 		8A8858B7C49EA3E2EFA94918 /* LabelFrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelFrameProcessor.swift; sourceTree = "<group>"; };
@@ -187,10 +190,7 @@
 		52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelReadingTests.swift; sourceTree = "<group>"; };
 		E077E636FB62FB15697FBAB6 /* AgentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSession.swift; sourceTree = "<group>"; };
 		C7D7333E76966306E23E8E88 /* ObjectConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectConversation.swift; sourceTree = "<group>"; };
-		B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelTextReader.swift; sourceTree = "<group>"; };
 		4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceBeepController.swift; sourceTree = "<group>"; };
-		054A786B864DF3687842F878 /* LocateMeasurements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateMeasurements.swift; sourceTree = "<group>"; };
-		AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateTracker.swift; sourceTree = "<group>"; };
 		755033595C1F3BB46DC83F00 /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetParser.swift; sourceTree = "<group>"; };
 		CB9F75CE03C12CC79C15115C /* VoiceListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceListener.swift; sourceTree = "<group>"; };
@@ -217,6 +217,15 @@
 		9E44C4C4C8BE620696581CAF /* ConversationWater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationWater.swift; sourceTree = "<group>"; };
 		5541AEC519176B9639B2032D /* GuidanceRipple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceRipple.swift; sourceTree = "<group>"; };
 		C5FB3E1F770B91D5FCF0E8AC /* WaterVisualizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterVisualizer.swift; sourceTree = "<group>"; };
+		DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "yolo26n-seg.mlpackage"; sourceTree = "<group>"; };
+		CA4B9D8D705E569613508285 /* BoundingBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBox.swift; sourceTree = "<group>"; };
+		302E52BFED13DC936B0FFE1A /* ModelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelStore.swift; sourceTree = "<group>"; };
+		73195524758434685EDE70A4 /* ObjectDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
+		4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmentation.swift; sourceTree = "<group>"; };
+		D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentationOverlay.swift; sourceTree = "<group>"; };
+		C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextConsolidator.swift; sourceTree = "<group>"; };
+		965C24B30DBF979D7034F8B9 /* TextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextReader.swift; sourceTree = "<group>"; };
+		F36E68C00ED7D7FF2F33DF2E /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -260,6 +269,7 @@
 		38916584387B58FAEDFAA98C /* Iris */ = {
 			isa = PBXGroup;
 			children = (
+				F36E68C00ED7D7FF2F33DF2E /* Secrets.swift */,
 				9A2FCE0EFD41ABC760FB2980 /* App */,
 				FA4ABDAD4CEA38B9BB1B6DDF /* Features */,
 				28E1B48094E387E08625C349 /* Models */,
@@ -393,7 +403,6 @@
 		E4A64CCE529E74FB7D775D6E = {
 			isa = PBXGroup;
 			children = (
-				08957277764E1D54BFBA8CCF /* Iris.xcconfig */,
 				38916584387B58FAEDFAA98C /* Iris */,
 				8B859314DB564112B1801AB9 /* IrisTests */,
 				63481E0C1E99B48667E1E2AC /* Products */,
@@ -443,6 +452,7 @@
 		FA4ABDAD4CEA38B9BB1B6DDF /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				9290ACDF0681308EF14C4D46 /* Explore */,
 				C6436FC52638AF1D781B0C81 /* Locate */,
 				75E0319372597868C2F8A30B /* CameraAR */,
 				50B7E35C504C63AC0C53135D /* LabelReading */,
@@ -470,7 +480,6 @@
 			children = (
 				C7D7333E76966306E23E8E88 /* ObjectConversation.swift */,
 				E077E636FB62FB15697FBAB6 /* AgentSession.swift */,
-				38D7A196C8D3A1584F498743 /* AssistantConfiguration.swift */,
 				0A7302C31E5AF8F530FCD911 /* AssistantFacts.swift */,
 				9A8960D61F2D41C9B5383DC0 /* AssistantContext.swift */,
 			);
@@ -480,7 +489,6 @@
 		50B7E35C504C63AC0C53135D /* LabelReading */ = {
 			isa = PBXGroup;
 			children = (
-				B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */,
 				98690645B600F3F7E5728212 /* LabelTextAccumulator.swift */,
 				6B7AEAA18B8E399572D422B4 /* LabelReadingModels.swift */,
 				9EEA6BA3D6A65063959D72B4 /* LabelOrientationAnalyzer.swift */,
@@ -504,8 +512,12 @@
 		C6436FC52638AF1D781B0C81 /* Locate */ = {
 			isa = PBXGroup;
 			children = (
-				AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */,
-				054A786B864DF3687842F878 /* LocateMeasurements.swift */,
+				D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */,
+				4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */,
+				73195524758434685EDE70A4 /* ObjectDetection.swift */,
+				302E52BFED13DC936B0FFE1A /* ModelStore.swift */,
+				CA4B9D8D705E569613508285 /* BoundingBox.swift */,
+				B7F0AF49E565610C38E25EFA /* Resources */,
 				4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */,
 			);
 			path = Locate;
@@ -569,6 +581,23 @@
 			path = Water;
 			sourceTree = "<group>";
 		};
+		B7F0AF49E565610C38E25EFA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		9290ACDF0681308EF14C4D46 /* Explore */ = {
+			isa = PBXGroup;
+			children = (
+				965C24B30DBF979D7034F8B9 /* TextReader.swift */,
+				C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */,
+			);
+			path = Explore;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -594,6 +623,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 04789D8D15353B4DBDC24D6A /* Build configuration list for PBXNativeTarget "Iris" */;
 			buildPhases = (
+				CAE508E496A804650887F8F5 /* Create Secrets.swift */,
 				4638D94365E6C2ED35EA0D1D /* Sources */,
 				5F52672D1553BD25810CF56F /* Resources */,
 				41A263075FD39F5DDF901744 /* Frameworks */,
@@ -665,11 +695,42 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		CAE508E496A804650887F8F5 /* Create Secrets.swift */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Iris/Secrets.swift.example",
+			);
+			name = "Create Secrets.swift";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Iris/Secrets.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ ! -f \"$SRCROOT/Iris/Secrets.swift\" ]; then\n  cp \"$SRCROOT/Iris/Secrets.swift.example\" \"$SRCROOT/Iris/Secrets.swift\"\n  echo \"warning: Created Iris/Secrets.swift from the template. Add your ElevenLabs key, agent ID and voice ID.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		4638D94365E6C2ED35EA0D1D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34761C72166B58C77E2FC806 /* Secrets.swift in Sources */,
+				7291E0C5631DCB7613BB7F65 /* TextReader.swift in Sources */,
+				6C1CBCE8BD772F8E124719F8 /* TextConsolidator.swift in Sources */,
+				B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */,
+				F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */,
+				0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */,
+				495DC139EB93A665D6CAA1F7 /* ModelStore.swift in Sources */,
+				327F814E23A0F1CECDC30C7B /* BoundingBox.swift in Sources */,
 				818A36B82427DC9FA8656147 /* WaterVisualizer.swift in Sources */,
 				1731BDB8F9C940A24001D44B /* GuidanceRipple.swift in Sources */,
 				8DD30BEF7D27EEE14413F291 /* ConversationWater.swift in Sources */,
@@ -696,10 +757,7 @@
 				20EEF65CB78975CEF6B1E969 /* VoiceListener.swift in Sources */,
 				1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */,
 				7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */,
-				852924408A48D470A6EEA869 /* LocateTracker.swift in Sources */,
-				42EE4EC83F869813A3FE766D /* LocateMeasurements.swift in Sources */,
 				B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */,
-				F4CE618DD3FE40DAE294F4F5 /* LabelTextReader.swift in Sources */,
 				FC44698F6CF29488D1214D8D /* ObjectConversation.swift in Sources */,
 				00E388654F932D3EC127013D /* AgentSession.swift in Sources */,
 				CF9C5457F3332626BA112524 /* ARCameraPreview.swift in Sources */,
@@ -733,7 +791,6 @@
 				306B8470BFB0D6AD6DE6E9B1 /* LabelGuidanceCues.swift in Sources */,
 				DFCB20AB557DBA23C1C14125 /* LabelFrameProcessor.swift in Sources */,
 				18835C427DA97D6D00A6946A /* VoiceCommand.swift in Sources */,
-				36743F03F34F697742B2D39D /* AssistantConfiguration.swift in Sources */,
 				6A41763898239C3A4351EF53 /* AssistantFacts.swift in Sources */,
 				5355D4CBF408396D1805AE04 /* AssistantContext.swift in Sources */,
 				DE1EE19704C2915211D40713 /* SpeechOutputService.swift in Sources */,
@@ -758,6 +815,7 @@
 				CE3B0C2210C6EF486652F3F2 /* VoiceFirstBadge.swift in Sources */,
 				E48F23BA27D3DC4CFFC47097 /* VoiceGuidanceProviding.swift in Sources */,
 				62534DA60438D3BDFD6917B5 /* YOLOv3TinyFP16.mlmodel in Sources */,
+				71852BAF5E3F62958B4F5AB3 /* yolo26n-seg.mlpackage in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -786,7 +844,6 @@
 /* Begin XCBuildConfiguration section */
 		498B52181808926E092A49A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 08957277764E1D54BFBA8CCF /* Iris.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -803,7 +860,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios;
 				PRODUCT_NAME = Iris;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -944,7 +1001,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios.tests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Iris.app/Iris";
 			};
 			name = Debug;
@@ -961,14 +1018,13 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios.tests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Iris.app/Iris";
 			};
 			name = Release;
 		};
 		ECEA6313A88FB156AA0CFDA0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 08957277764E1D54BFBA8CCF /* Iris.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -985,7 +1041,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iris.ios;
 				PRODUCT_NAME = Iris;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

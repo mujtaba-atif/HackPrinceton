@@ -38,7 +38,7 @@ final class ObjectConversation: ObservableObject {
 
     /// Reads the middle 60% of the frame (`TextReader.region`) — which is roughly the part
     /// `ConversationWater`'s rim leaves clear, so what is being read is what is not under water.
-    private let reader = LabelTextReader()
+    private let reader = TextReader()
     private let agent = AgentSession()
     private var statusSink: AnyCancellable?
     private var task: Task<Void, Never>?
@@ -119,7 +119,7 @@ final class ObjectConversation: ObservableObject {
         // are the three seconds it takes to say, and the label is in hand by the time it ends. Nothing
         // is said here at all any more — a second "hold it there while I read it" was another two
         // seconds of speech saying what had just been said, on the near side of the handoff where
-        // every word still has to be checked against `ContentView.backKeywords`.
+        // every word still has to be checked against `LocateScreen.backKeywords`.
         lines = await scan(
             from: readableAt,
             after: readAfter,
@@ -217,9 +217,7 @@ final class ObjectConversation: ObservableObject {
         in at most three short spoken sentences, plainly, with no lists and no markdown, and never read \
         the whole label out unless they ask you to. Never mention text, scanning, OCR or the camera: \
         just say what the thing is. If what you were given is garbled or empty, say so and offer to \
-        look again — `rescan` is a tool you can call for that, and it takes a few seconds. Never say an \
-        item is safe to eat, drink, take or use; for food, medicine, doses, allergens or dates, say what \
-        the label says and suggest checking with a pharmacist, doctor or someone they trust.
+        look again — `rescan` is a tool you can call for that, and it takes a few seconds.
         """
     }
 

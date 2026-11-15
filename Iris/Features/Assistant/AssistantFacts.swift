@@ -75,21 +75,39 @@ enum AssistantFacts {
 
     /// Best detected object matching a spoken name ("water bottle" → "bottle", "my phone" → "cell phone").
     static func match(_ spokenName: String, in objects: [VisibleObject]) -> VisibleObject? {
+        guard let score = scorer(for: spokenName) else { return nil }
+        return objects
+            .map { ($0, score($0.name)) }
+            .filter { $0.1 > 0 }
+            .max { ($0.1, $0.0.confidence) < ($1.1, $1.0.confidence) }?.0
+    }
+
+    /// The model class a spoken name refers to ("water bottle" → "bottle", "my phone" → "cell phone"),
+    /// or nil when no class fits. Used by Locate to point segmentation at the named object.
+    static func matchClass(_ spokenName: String, in classNames: [String]) -> String? {
+        guard let score = scorer(for: spokenName) else { return nil }
+        var best: (name: String, score: Int)?
+        for name in classNames {
+            let value = score(name)
+            if value > 0, value > (best?.score ?? 0) { best = (name, value) }
+        }
+        return best?.name
+    }
+
+    /// Scores how well a detected class name matches what was said: 3 exact (or synonym), 2 contained
+    /// in what was said ("water bottle" ⊇ "bottle"), 1 the class name contains it, 0 no match.
+    private static func scorer(for spokenName: String) -> ((String) -> Int)? {
         let target = singular(VoiceCommandParser.normalize(spokenName))
         guard !target.isEmpty else { return nil }
         let candidates = [target, synonyms[target]].compactMap { $0 }
             + target.split(separator: " ").compactMap { synonyms[String($0)] }
-        func score(_ object: VisibleObject) -> Int {
-            let name = object.name.lowercased()
+        return { rawName in
+            let name = rawName.lowercased()
             if candidates.contains(name) { return 3 }
-            if candidates.contains(where: { $0.contains(name) }) { return 2 } // "water bottle" ⊇ "bottle"
+            if candidates.contains(where: { $0.contains(name) }) { return 2 }
             if name.contains(target) { return 1 }
             return 0
         }
-        return objects
-            .map { ($0, score($0)) }
-            .filter { $0.1 > 0 }
-            .max { ($0.1, $0.0.confidence) < ($1.1, $1.0.confidence) }?.0
     }
 
     static func find(_ spokenName: String, in context: AssistantContext) -> (answer: String, match: VisibleObject?) {

@@ -14,7 +14,7 @@ enum IrisLettering {
         case upward
     }
 
-    /// `text` set in heavy rounded type, scaled to fit `rect` (artboard points, y down) and centered in it.
+    /// `text` set in heavy type, scaled to fit `rect` (artboard points, y down) and centered in it.
     static func layer(name: String, text: String, in rect: CGRect, color: Color,
                       orientation: Orientation = .horizontal) -> ArtLayer {
         var outline = glyphOutline(text)
@@ -36,13 +36,13 @@ enum IrisLettering {
     }
 
     /// The text's glyph outlines on a y-down canvas, at an arbitrary size (callers scale it).
+    /// Set in SF Pro Heavy: the closest system match to the artwork's heavy grotesque wordmarks.
     private static func glyphOutline(_ text: String) -> Path {
-        let base = UIFont.systemFont(ofSize: 200, weight: .black)
-        let descriptor = base.fontDescriptor.withDesign(.rounded) ?? base.fontDescriptor
-        let font = CTFontCreateWithFontDescriptor(descriptor as CTFontDescriptor, 200, nil)
+        let base = UIFont.systemFont(ofSize: 200, weight: .heavy)
+        let font = CTFontCreateWithFontDescriptor(base.fontDescriptor as CTFontDescriptor, 200, nil)
         let attributed = NSAttributedString(string: text, attributes: [
             NSAttributedString.Key(kCTFontAttributeName as String): font,
-            NSAttributedString.Key(kCTKernAttributeName as String): 6
+            NSAttributedString.Key(kCTKernAttributeName as String): 0
         ])
         let line = CTLineCreateWithAttributedString(attributed)
         let combined = CGMutablePath()

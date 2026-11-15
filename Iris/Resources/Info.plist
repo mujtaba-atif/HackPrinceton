@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDuration</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -20,26 +22,21 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>ElevenLabsAgentID</key>
-	<string>$(ELEVENLABS_AGENT_ID)</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Iris uses the camera to help locate nearby objects and guide your hand toward them.</string>
+	<string>Camera is used to detect hands and objects with AR.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Iris uses the microphone so you can control exploration with your voice.</string>
+	<string>Iris listens for your voice commands.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Iris uses speech recognition to understand spoken object searches and navigation commands.</string>
+	<string>Iris uses speech recognition to understand your voice commands.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>
-	<dict>
-		<key>UIColorName</key>
-		<string>IrisBackground</string>
-	</dict>
-	<key>UIRequiresFullScreen</key>
-	<true/>
+	<dict/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
 </plist>
