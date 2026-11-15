@@ -2,6 +2,29 @@
 
 Editable design: https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg
 
+## Run and reuse
+
+This directory contains the complete browser UI package. From the repository
+root, run:
+
+```sh
+python3 -m http.server 4173 --bind 127.0.0.1 --directory Design/Iris
+```
+
+Open <http://127.0.0.1:4173/>. There are no npm dependencies or build steps.
+Keep this whole directory together: the preview loads its scripts, stylesheet,
+fonts, and demo camera image using relative paths. It also works by opening
+`index.html` directly; phone sensor access requires HTTPS in supporting browsers.
+The Enable phone motion button requests sensor access only after a tap.
+
+See [ASSETS.md](ASSETS.md) for the file map, current Figma links, and implementation
+boundaries. [`figma-exports/`](figma-exports/manifest.json) contains direct SVG
+exports of the current card artwork, diagonal discovery screen, and camera
+overlays, with a source-node link for each export. The SVGs are static; use the
+HTML/CSS/JS preview for animations and interactions.
+
+## Design revisions
+
 Revision 18 replaces the large camera waves with four narrow optical light
 strips, two per side, with softly traveling highlights. The camera object mask
 is translucent green and follows the bottle silhouette. A 21-landmark hand
@@ -76,8 +99,8 @@ Local browser preview: http://127.0.0.1:4173/
 The latest Figma code layer is [Iris · Camera guidance · v18](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858).
 
 Select the latest code layer in Figma and press Play to interact. The native
-screens are editable. Local preview changes are uncommitted and must not be
-pushed to Git without a new explicit user request.
+screens are editable. This UI package and the current SVG exports are included
+on the `UI/UX` branch with the user's authorization.
 
 The original study adapted selected UI artwork from the user-selected
 `amiezeng/Probe` branch `riba/more-ui-stuff`. No repository was cloned or forked.
@@ -117,9 +140,9 @@ Use the review controls outside the phone to
 trigger the demonstrated voice and camera events.
 
 Native Figma frames include linked navigation, directional entrances, editable
-character components, gaze keyframes, glass waves, ambient particles, and success
-confetti. Continuous blinks, gaze loops, and flowing waves are demonstrated in the
-runnable code preview.
+character components, map and magnifier motion, camera edge lights, ambient
+particles, and success confetti. Continuous animations and simulated hand
+movement are demonstrated in the runnable code preview.
 The shared Figma card components retain their IDs and instances.
 
 Reduced motion disables continuous movement and hides confetti. The revised

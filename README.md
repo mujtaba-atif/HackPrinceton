@@ -4,6 +4,30 @@ Reachly is a native iOS accessibility app designed to help blind and visually im
 
 This repository currently contains the iOS 17+ product foundation: the SwiftUI app shell, Reachly visual identity, accessible home experience, feature boundaries, permission metadata, and XcodeGen configuration. Camera capture, object detection, hand tracking, guidance logic, and voice processing are intentionally not implemented yet.
 
+## Iris UI package
+
+The `UI/UX` branch includes the Iris design and runnable browser preview in
+[`Design/Iris`](Design/Iris/README.md), with SVG artwork, fonts and licenses,
+glass cards, characters, animations, phone-motion controls, and camera overlays.
+The [asset guide](Design/Iris/ASSETS.md) maps these files to the UI.
+
+Run the preview from the repository root:
+
+```sh
+python3 -m http.server 4173 --bind 127.0.0.1 --directory Design/Iris
+```
+
+Open <http://127.0.0.1:4173/>. No package installation or build step is needed.
+
+- [Editable Figma design](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg)
+- [Animated Figma preview, revision 18](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858)
+- [Figma SVG exports and source-node manifest](Design/Iris/figma-exports/manifest.json)
+
+The browser preview demonstrates the Iris UI. The SwiftUI app below remains a
+separate foundation; the Iris screens have not been integrated into it. Camera
+recognition, hand tracking, physical distances, and voice responses in the
+preview are simulated.
+
 ## Requirements
 
 - macOS with Xcode installed
