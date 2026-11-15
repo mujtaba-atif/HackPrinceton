@@ -1,0 +1,12 @@
+assets/source/
+assets/screens/
+assets/audio/
+assets/fonts/
+assets/textures/
+renders/
+exports/
+review/
+scenes/*.blend*
+*.log
+__pycache__/
+.venv/

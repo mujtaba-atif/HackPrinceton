@@ -1,0 +1,44 @@
+appId: com.iris.ios
+name: Iris production screen captures
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible: "Iris"
+    timeout: 30000
+- repeat:
+    times: 8
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 1000
+- takeScreenshot: welcome
+- launchApp:
+    stopApp: true
+    arguments:
+      IrisPreviewScreen: main
+- extendedWaitUntil:
+    visible: "Locate an object"
+    timeout: 30000
+- repeat:
+    times: 4
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 1000
+- takeScreenshot: options
+- tapOn: "Explore an object"
+- repeat:
+    times: 4
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 1000
+- takeScreenshot: explore
+- launchApp:
+    stopApp: true
+    arguments:
+      IrisPreviewScreen: locate
+- repeat:
+    times: 6
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 1000
+- takeScreenshot: locate

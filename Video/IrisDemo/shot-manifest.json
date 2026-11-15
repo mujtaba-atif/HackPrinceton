@@ -1,0 +1,91 @@
+{
+  "fps": 60,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "duration": 102.2,
+  "starts": {
+    "01_close_your_eyes": 0,
+    "02_every_day": 7,
+    "03_scale": 14,
+    "04_the_gap": 23,
+    "05_so_we_built_iris": 29,
+    "06_locate": 35,
+    "07_real_demo": 40,
+    "08_under_the_surface": 74.2,
+    "09_next": 83.2,
+    "10_iris": 95.2
+  },
+  "demo": {
+    "duration": 34.2,
+    "segments": [
+      [
+        13.5,
+        16.6
+      ],
+      [
+        22.4,
+        53.5
+      ]
+    ]
+  },
+  "demo_screen_pixels": {
+    "x": 765,
+    "y": 115,
+    "width": 390,
+    "height": 851
+  },
+  "shots": [
+    {
+      "id": "01_close_your_eyes",
+      "duration": 7,
+      "frames": 420
+    },
+    {
+      "id": "02_every_day",
+      "duration": 7,
+      "frames": 420
+    },
+    {
+      "id": "03_scale",
+      "duration": 9,
+      "frames": 540
+    },
+    {
+      "id": "04_the_gap",
+      "duration": 6,
+      "frames": 360
+    },
+    {
+      "id": "05_so_we_built_iris",
+      "duration": 6,
+      "frames": 360
+    },
+    {
+      "id": "06_locate",
+      "duration": 5,
+      "frames": 300
+    },
+    {
+      "id": "07_real_demo",
+      "duration": 34.2,
+      "frames": 2052
+    },
+    {
+      "id": "08_under_the_surface",
+      "duration": 9,
+      "frames": 540
+    },
+    {
+      "id": "09_next",
+      "duration": 12,
+      "frames": 720
+    },
+    {
+      "id": "10_iris",
+      "duration": 7,
+      "frames": 420
+    }
+  ]
+}
