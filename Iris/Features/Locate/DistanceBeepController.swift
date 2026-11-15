@@ -35,9 +35,12 @@ private final class ToneLevel: @unchecked Sendable {
 /// started following the tone has to be told which axis they are on before the tone means anything:
 ///
 /// 1. **Depth.** The tone sits in the *right* ear while the hand has to go further forward, and in the
-///    *left* ear once it has gone past the object. Silent otherwise — no spoken direction on this axis.
-/// 2. **Lateral.** Once the depth is right, the tone pans to the side the hand has to travel. The
-///    voice only announces the phase once; it does not repeat "left"/"right", the tone does that.
+///    *left* ear once it has gone past the object. `ReachCoach` also says how far, every few seconds
+///    at most ("Reach about 8 inches further"), and says plainly when the hand is in front of the
+///    object rather than at it, which is what a hand overlapping the object on screen looks like.
+/// 2. **Lateral.** Once the depth is right, the tone pans to the side the hand has to travel. With
+///    headphones the voice only announces the phase; the tone carries left and right. Without them,
+///    `ReachCoach` says which way, since there is no tone to follow.
 /// 3. **Contact**, and then **ready**: the hand is on the object, so the tone stops and the voice asks
 ///    for it to be brought up to the camera, until it is close enough to read.
 ///
@@ -99,7 +102,7 @@ final class DistanceBeepController: ObservableObject {
     private enum Cue: String {
         case findHand = "Hold your hand up in front of the camera"
         case findObject = "Move the camera around so I can see it"
-        case headphones = "Please connect headphones to use guidance"
+        case headphones = "Connect headphones to hear the guidance tone as well"
     }
 
     private let audioEngine = AVAudioEngine()
@@ -146,6 +149,8 @@ final class DistanceBeepController: ObservableObject {
         lostTimeout: 2
     )
     private var lastMeasured: TimeInterval = 0
+    /// Spoken distance and direction during the two steering steps.
+    private var coach = ReachCoach(configuration: .init(tolerance: DistanceBeepController.depthTolerance))
     private var hasHeadphones = false
     private var routeObserver: NSObjectProtocol?
 
@@ -182,6 +187,7 @@ final class DistanceBeepController: ObservableObject {
     func begin() {
         guard !active else { return }
         active = true
+        coach.reset()
         lastCue = nil
         lastSpoken = Date()
         lastMeasured = CACurrentMediaTime()
@@ -263,9 +269,10 @@ final class DistanceBeepController: ObservableObject {
 
         switch phase {
         case .depth:
-            // Phase 1: forward is the right ear, past the object is the left. No spoken direction.
+            // Phase 1: forward is the right ear, past the object is the left, and the coach says how far.
             guard let depthGap = measurement.depthGap else {
                 silence()
+                coachSay(coach.depthLine(gap: nil, handInFront: false, at: now))
                 return
             }
             drive(
@@ -278,6 +285,9 @@ final class DistanceBeepController: ObservableObject {
                 // goes quiet a moment before the phase flips.
                 direction: abs(depthGap) <= Self.depthTolerance ? nil : (depthGap > 0 ? .forward : .back)
             )
+            // Overlapping the object on screen while still short of it: the hand is in front of the object.
+            let inFront = measurement.insideMask && depthGap > Self.depthTolerance
+            coachSay(coach.depthLine(gap: depthGap, handInFront: inFront, at: now))
         case .lateral:
             // Phase 2: steer to the mask's centre, not to `measurement.edge` — the nearest contour
             // point slides along the silhouette as the hand moves, so it isn't a fixed goal.
@@ -290,6 +300,10 @@ final class DistanceBeepController: ObservableObject {
                 sweep: 0,
                 direction: abs(dx) <= Double(lateralTolerance) ? nil : (dx > 0 ? .right : .left)
             )
+            // With headphones the panned tone already says which way; repeating it would be a chant.
+            if !hasHeadphones {
+                coachSay(coach.lateralLine(dx: dx, tolerance: Double(lateralTolerance), at: now))
+            }
         case .idle, .contact, .ready:
             silence()
         }
@@ -305,6 +319,7 @@ final class DistanceBeepController: ObservableObject {
         }
         active = false
         phase = .idle
+        coach.reset()
         pendingPhaseLine = nil
         lastCue = nil
         lastSpoken = .distantPast
@@ -376,6 +391,7 @@ final class DistanceBeepController: ObservableObject {
         let advanced = next > phase
         phase = next
         lastCue = nil
+        coach.stepChanged(at: CACurrentMediaTime())
         print("Guidance: phase \(next)")
         // The chime and the line announce the same thing at two speeds: the chime is struck by the
         // render thread on the next buffer, so it marks the step the moment it changes, while the line
@@ -386,12 +402,12 @@ final class DistanceBeepController: ObservableObject {
         switch next {
         case .depth:
             pendingPhaseLine = hasHeadphones
-                ? "Step one of three. Reach your hand out toward the \(objectName), and follow the tone."
-                : "Step one of three. Reach your hand out toward the \(objectName), a little at a time."
+                ? "Step one of three. Reach your hand out toward the \(objectName), and follow the tone. I'll tell you how far."
+                : "Step one of three. Reach your hand out slowly toward the \(objectName). I'll tell you how far."
         case .lateral:
             pendingPhaseLine = hasHeadphones
-                ? "Step two of three. Good. Now move your hand left or right, toward the tone."
-                : "Step two of three. Good. Now move your hand left or right."
+                ? "Step two of three. Good, that's the right distance. Now move your hand left or right, toward the tone."
+                : "Step two of three. Good, that's the right distance. Now I'll tell you left or right."
         case .contact:
             pendingPhaseLine = "Step three of three. That's it. Take hold of the \(objectName) and bring it up to the camera."
         case .ready:
@@ -408,6 +424,16 @@ final class DistanceBeepController: ObservableObject {
         guard let line = pendingPhaseLine, speak(line) else { return }
         pendingPhaseLine = nil
         lastSpoken = Date()
+        coach.noteSpeech(at: CACurrentMediaTime())
+    }
+
+    /// Speaks the coach's line if it has one and nothing else is talking; otherwise it comes up again
+    /// on a later update, since the coach only marks a line said once it has been.
+    private func coachSay(_ line: ReachCoach.Line?) {
+        guard let line, speak(ReachCoach.text(for: line, objectName: objectName)) else { return }
+        coach.didSpeak(line, at: CACurrentMediaTime())
+        lastSpoken = Date()
+        print("Guidance: \(ReachCoach.text(for: line, objectName: objectName))")
     }
 
     /// Two pips, up for a step forward and down for falling back to the one before it. Struck rather

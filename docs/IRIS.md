@@ -9,6 +9,8 @@ Iris follows [Probe](https://github.com/amiezeng/Probe) (used with permission). 
 3. **Locate**
    1. Iris asks what you're looking for ("my water bottle"). If you say nothing within 12 s, it guides to the most prominent detected object.
    2. Once the object is detected, a stereo tone, a water ripple and spoken steps guide you. Step 1 is reaching out (depth), step 2 is moving across, and step 3 is taking hold. Headphones are needed to hear left and right; the chime and voice work without them.
+      - **Measuring the reach.** The object's distance is read around your hand, never through it. While the object is clearly visible, Iris stores where it is in the room. Once your hand covers part of it, Iris reads the parts still showing, and once your hand covers all of it, Iris uses the stored position. On LiDAR phones, a hand that only overlaps the object on screen never counts as touching it; the fingertip depth has to reach the object.
+      - **Spoken distance.** In step 1, Iris says how far to go ("Reach about 8 inches further"), says when your hand is in front of the object but not at it yet, and says "You've gone past it" if you overshoot. It speaks at most every 2.5 seconds. Without headphones it also says left or right in step 2.
    3. When you hold the object close enough, Iris reads its label and hands over to the ElevenLabs agent ("Let me see what you're holding").
 4. **Explore**
    1. **Turn to Read** says "turn it left", "turn it right", "move it closer" or "hold it steady", while the scan-area ring fills.

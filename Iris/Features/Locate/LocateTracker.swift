@@ -11,6 +11,11 @@ import simd
 /// `DepthSampler`. Probe measured against a segmentation mask; Iris measures against the detection box,
 /// so "inside the object" means inside its box. All points use Vision coordinates (normalized, upright
 /// portrait, bottom-left origin), Probe's convention.
+///
+/// Iris change: the object's depth while reaching is read *around* the hand, never through it
+/// (`ReachOcclusion`, `ObjectDepthMemory`). Read through it, a hand passing in front of the object put
+/// the object at the hand's depth, which counted as a touch. With LiDAR, overlapping the object on
+/// screen also no longer counts as contact without a depth measurement to back it.
 @MainActor
 final class LocateTracker: ObservableObject {
     // Probe's tuning, unchanged.
@@ -34,6 +39,7 @@ final class LocateTracker: ObservableObject {
 
     private var foundTracker = FoundTracker()
     private var closeTracker = LocateTracker.makeCloseTracker()
+    private var objectMemory = ObjectDepthMemory()
     private var lastObjectSeen: TimeInterval = 0
     private var lastJoints: [CGPoint] = []
 
@@ -59,6 +65,7 @@ final class LocateTracker: ObservableObject {
         objectClose = false
         foundTracker = FoundTracker()
         closeTracker = Self.makeCloseTracker()
+        objectMemory.reset()
         lastJoints = []
     }
 
@@ -66,16 +73,33 @@ final class LocateTracker: ObservableObject {
     ///   - target: the object's current box (Vision coordinates), nil while it isn't detected.
     ///   - hands: tracked hands from `HandTrackingService` (top-left image coordinates).
     func update(frame: CameraFrame, target: CGRect?, hands: [HandObservation]) {
-        let depth = DepthFrame(cameraFrame: frame)
-        let objectDepth = target.flatMap { self.objectDepth(in: $0, frame: depth) }
+        update(depth: DepthFrame(cameraFrame: frame), cameraTransform: frame.cameraTransform,
+               target: target, hands: hands)
+    }
+
+    /// The same, from the parts of a frame it uses, so tests can drive it with synthetic depth.
+    func update(depth: DepthFrame, cameraTransform: simd_float4x4, target: CGRect?, hands: [HandObservation]) {
         let live = hands.filter { $0.state == .tracking || $0.state == .limited }.prefix(2)
-        lastJoints = live.flatMap { $0.landmarks.values.map { Self.vision($0.location) } }
+        let handJoints = live.map { $0.landmarks.values.map { Self.vision($0.location) } }
+        lastJoints = handJoints.flatMap { $0 }
+
+        // Fingertip depths first: the object's depth is read around the hand, and needs to know how near it is.
+        let fingersPerHand = live.map { hand in
+            Self.fingers(of: hand).map { finger in (finger, self.depth(at: Self.depthPoint(of: finger), frame: depth)) }
+        }
+        let nearestHandDepth = fingersPerHand.joined().compactMap(\.1).min()
+        // Straight off the box, for bringing the object to the camera: by then it is in the hand and moving.
+        let liveObjectDepth = target.flatMap { objectDepth(in: $0, frame: depth) }
+        let reachObjectDepth = target.flatMap {
+            self.reachObjectDepth(in: $0, liveDepth: liveObjectDepth, hands: ReachOcclusion.handRegions(handJoints),
+                                  nearestHandDepth: nearestHandDepth, frame: depth, cameraTransform: cameraTransform)
+        }
 
         var perHand: [[EdgeMeasurement]] = []
         if let target {
-            for hand in live {
-                perHand.append(Self.fingers(of: hand).compactMap {
-                    measure($0, target: target, objectDepth: objectDepth, frame: depth)
+            for fingers in fingersPerHand {
+                perHand.append(fingers.map { finger, tipDepth in
+                    measure(finger, tipDepth: tipDepth, target: target, objectDepth: reachObjectDepth, frame: depth)
                 })
             }
         }
@@ -86,7 +110,9 @@ final class LocateTracker: ObservableObject {
         if rightHandEdge?.fingertip != second?.fingertip || (rightHandEdge == nil) != (second == nil) { rightHandEdge = second }
 
         var nearest = [first?.distance, second?.distance].compactMap { $0 }.min()
-        if nearest == nil {
+        // Overlap on screen stands in for contact only on phones without LiDAR. With LiDAR, a hand in front
+        // of the object overlaps it just the same, so a missing depth reading holds the state instead.
+        if nearest == nil, depth.depthMap == nil {
             nearest = screenContactDistance(hands: perHand)
         }
         // A gripping hand hides its fingertips and blocks LiDAR, so a hand still overlapping the object
@@ -94,9 +120,36 @@ final class LocateTracker: ObservableObject {
         if nearest == nil, objectFound, let target, handOverlaps(target) {
             nearest = 0
         }
-        let found = foundTracker.update(distance: nearest, time: frame.timestamp)
+        let found = foundTracker.update(distance: nearest, time: depth.timestamp)
         if found != objectFound { objectFound = found }
-        updateApproach(time: frame.timestamp, target: target, objectDepth: objectDepth, frame: depth)
+        updateApproach(time: depth.timestamp, target: target, objectDepth: liveObjectDepth, frame: depth)
+    }
+
+    /// The object's depth for measuring the reach, never read through the hand.
+    ///
+    /// 1. No hand over the box: the usual box reading, which is also stored in `objectMemory`.
+    /// 2. A hand over part of it: the cells of the box clear of the hand.
+    /// 3. A hand over all of it: the stored position, projected into the current camera.
+    /// Otherwise nil, because a reading through the hand would put the object at the hand.
+    private func reachObjectDepth(in box: CGRect, liveDepth: Float?, hands: [CGRect], nearestHandDepth: Float?,
+                                  frame: DepthFrame, cameraTransform: simd_float4x4) -> Float? {
+        let remembered = frame.isTrackingNormal
+            ? objectMemory.axialDepth(cameraTransform: cameraTransform, at: frame.timestamp) : nil
+        guard ReachOcclusion.covers(box, hands: hands) else {
+            if let liveDepth, frame.isTrackingNormal,
+               let point = cameraPoint(at: CGPoint(x: box.midX, y: box.midY), depth: liveDepth, frame: frame) {
+                objectMemory.remember(portraitPoint: point, cameraTransform: cameraTransform, at: frame.timestamp)
+            }
+            return liveDepth ?? remembered
+        }
+        let cellDepths = ReachOcclusion.clearCells(of: box, avoiding: hands).compactMap { cell -> Float? in
+            guard let clipped = DetectionGeometry.clippedUnitRect(cell),
+                  case let .measured(axial) = DepthSampler.sample(frame: frame,
+                                                                  sensorRegion: DetectionGeometry.sensorRect(clipped))
+            else { return nil }
+            return Float(axial)
+        }
+        return ReachOcclusion.objectDepth(cellDepths: cellDepths, nearestHandDepth: nearestHandDepth) ?? remembered
     }
 
     // MARK: - Probe's approach step
@@ -147,15 +200,19 @@ final class LocateTracker: ObservableObject {
         }
     }
 
-    private func measure(_ finger: Finger, target: CGRect, objectDepth: Float?, frame: DepthFrame) -> EdgeMeasurement? {
+    /// The tip sits at the very end of a thin finger, so a patch centered on it is half background.
+    /// Its depth is read halfway down to the next joint instead, where a small patch is all finger.
+    private static func depthPoint(of finger: Finger) -> CGPoint {
+        finger.dip.map { CGPoint(x: (finger.tip.x + $0.x) / 2, y: (finger.tip.y + $0.y) / 2) } ?? finger.tip
+    }
+
+    private func measure(_ finger: Finger, tipDepth: Float?, target: CGRect, objectDepth: Float?,
+                         frame: DepthFrame) -> EdgeMeasurement {
         let edge = Self.nearestEdge(to: finger.tip, of: target)
         let inside = target.contains(finger.tip)
-        // The tip sits at the very end of a thin finger, so a patch centered on it is half background.
-        // Read its depth halfway down to the next joint instead, where a small patch is all finger.
-        let depthPoint = finger.dip.map { CGPoint(x: (finger.tip.x + $0.x) / 2, y: (finger.tip.y + $0.y) / 2) } ?? finger.tip
         var distance: Float?
         var depthGap: Float?
-        if let tipDepth = depth(at: depthPoint, frame: frame), let objectDepth {
+        if let tipDepth, let objectDepth {
             if inside {
                 depthGap = objectDepth - tipDepth - finger.reach
                 distance = max(0, depthGap!)
