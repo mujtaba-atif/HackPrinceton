@@ -1,6 +1,44 @@
-# Iris UI and motion preview — Live reading
+# Iris UI and motion preview — Camera guidance
 
 Editable design: https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg
+
+Revision 18 replaces the large camera waves with four narrow optical light
+strips, two per side, with softly traveling highlights. The camera object mask
+is translucent green and follows the bottle silhouette. A 21-landmark hand
+overlay connects the index fingertip to the object with a distance label.
+Move hand closer/back updates the pose, connector, and both distances together;
+Hide hand removes the landmarks and suppresses the distance until tracking
+returns. These are design simulations, not live segmentation, hand detection,
+or calibrated physical distance. The camera image and mock inputs remain local.
+
+Revision 17 gives both the map and magnifier a wider 6.2-second side-to-side
+sway. The map travels from -12 to +10 px; the lens from +19 to -31 px.
+A separate sensor layer adds up to 14 px of map movement and 22 px of lens
+movement, proportional to horizontal phone acceleration, then eases to center.
+The preview has Enable phone motion plus gentle/quick shake demonstrations.
+Sensor access starts only after a tap, handles denial and missing sensors,
+works over HTTPS in supporting browsers, and keeps all samples on the device.
+Reduced motion disables both the idle animation and sensor response. Native
+Figma demonstrates idle sway; actual phone sensors run in the browser preview.
+Physical phone testing is still needed; the response model and desktop shake
+previews were tested.
+
+Revision 16 replaces the Locate eyes with an editable cartoon treasure map.
+Warm textured parchment, blue islands and a compass fit the Iris palette. A
+traveling light follows the winding trail to a coral-red X; the parchment sways,
+the compass turns and the destination bounces on arrival. Reduced motion keeps
+the completed illustration still. Native Figma animates the route opacity; the
+browser preview also moves its dashes. All existing controls remain unchanged.
+
+Revision 14 removes the discovery heading and expands Locate and Explore into
+full-width, equal-area sections. Their shared diagonal runs from y=448 at the
+left edge to y=352 at the right on the 360 × 800 screen. The back and Listening
+controls stay overlaid; the content, glass lenses and wandering eyes keep their
+original styling and motion. Both entire sections remain tappable.
+
+Revision 12 reshapes Locate and Explore as opposing rounded parallelograms.
+Smaller glass lenses and ambient panels share the slanted treatment, preserving
+the blue palette, typography, card size, and continuous motion.
 
 Revision 11 removes the scan countdown, hold requirement and skip control.
 Reading progresses on recognition events rather than elapsed time. In this
@@ -10,7 +48,7 @@ those events; the camera interface itself has no countdown or capture button.
 Revision 10 adds a restrained, entry-only letter reveal inspired by the live
 Render.com headline. A blue/soft-violet/ice highlight travels through the glyphs
 as they rise and come into focus. It appears only on the Iris landing title,
-“See beyond the surface”, and “How can Iris help you?”. Each settles to white;
+“See beyond the surface”, and “How can Iris assist you?”. Each settles to white;
 no repeating text shimmer, and reduced motion shows the final text immediately.
 The native Figma layers use editable TextStagger and masked gradient tracks;
 the code preview uses staggered glyphs and text-clipped gradients.
@@ -35,7 +73,7 @@ individual blinks and gentle bounces keep the original playful Iris style.
 
 Local browser preview: http://127.0.0.1:4173/
 
-The latest Figma code layer is [Iris · Live reading · v11](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=119-377&code-node-id=119-377).
+The latest Figma code layer is [Iris · Camera guidance · v18](https://www.figma.com/design/zLF4VopCM0YI8eZAH2Aexg?node-id=204-858&code-node-id=204-858).
 
 Select the latest code layer in Figma and press Play to interact. The native
 screens are editable. Local preview changes are uncommitted and must not be
@@ -60,10 +98,10 @@ There is no package installation or build step.
   and Echo with headphones; overlapping silhouettes, varied sizes and blink rhythms.
 - Swipe-up/tap navigation, a sideways glass wipe, and a sprinkle pop.
 - Locate springs from the left; Explore springs from the right, with different timing.
-- Floating glass over the eyes, a sweeping rectangular lens, glints, and soft shadows.
-- Locate pupils smoothly look up, left, down and right in a continuous loop.
-- Three translucent camera-wave layers enter from the top and both sides, then
-  sway gently in a dark-blue-to-ice gradient. Flow continues across camera states.
+- A textured treasure map with a traveling route marker, turning compass and red X.
+- Map and magnifier sway horizontally, with an optional phone-shake response.
+- Four thin glass light strips animate along the camera edges.
+- Green silhouette highlighting, hand landmarks, a fingertip distance link, and a hand-lost state.
 - Ambient blue sprinkles, quieter edge accents over camera views, and success confetti.
 - Looking, spatial guidance, distance, object reached and ready-to-read states.
 - Object-shaped boundaries and an interior scanning light; no rectangular target.
