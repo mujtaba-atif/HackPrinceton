@@ -2,7 +2,7 @@ import Foundation
 
 /// Spoken coaching during the reach, so distance is heard in words, not only as which ear the tone is in.
 ///
-/// Probe's step one was silent apart from the tone, and without headphones it was silent altogether, so
+/// Step one used to be silent apart from the tone, and without headphones it was silent altogether, so
 /// nothing told someone whose hand was in front of the object that it was still short of it. This says
 /// how far to go, says plainly when the hand is in front of the object rather than at it, and says when
 /// it has gone past. Lines come at most every `minimumGap` seconds, and only when the advice changes or

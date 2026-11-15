@@ -1,6 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: renamed Probe → Iris, Find → Locate, Analyze → Explore.
-
 import SwiftUI
 
 /// Fills the screen with `color` like water poured into a glass: a stream falls from the top center

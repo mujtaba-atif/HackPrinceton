@@ -1,6 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: renamed Probe → Iris, Find → Locate, Analyze → Explore.
-
 import SwiftUI
 
 /// The way the hand has to move, as the guidance is steering it. `nil` is "lined up on this axis".

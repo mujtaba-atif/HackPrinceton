@@ -290,7 +290,7 @@ final class LocateTrackerReachTests: XCTestCase {
         XCTAssertNil(tracker.leftHandEdge?.depthGap)
     }
 
-    /// Without LiDAR there is nothing else to go on, so Probe's screen-overlap stand-in still applies.
+    /// Without LiDAR there is nothing else to go on, so the screen-overlap stand-in still applies.
     func testPhonesWithoutDepthStillUseScreenOverlap() throws {
         let tracker = LocateTracker()
         try run(tracker, hands: [handOverObject]) {

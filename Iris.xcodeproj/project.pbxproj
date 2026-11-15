@@ -62,6 +62,7 @@
 		36743F03F34F697742B2D39D /* AssistantConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38D7A196C8D3A1584F498743 /* AssistantConfiguration.swift */; };
 		18835C427DA97D6D00A6946A /* VoiceCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4AB58A2951DD083F1AD18 /* VoiceCommand.swift */; };
 		D7ECFA04AF0098E17891B9E8 /* VoiceAssistantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */; };
+		9DA141E5E5C8BE9147B6D0CD /* AppearanceSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9814BDBC28719E56E7C749A4 /* AppearanceSearchTests.swift */; };
 		FAA0AC3D531F7DF6FA2F2C20 /* LocateReachTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9237F046493AB4A11488ADB /* LocateReachTests.swift */; };
 		DFCB20AB557DBA23C1C14125 /* LabelFrameProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8858B7C49EA3E2EFA94918 /* LabelFrameProcessor.swift */; };
 		306B8470BFB0D6AD6DE6E9B1 /* LabelGuidanceCues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A4E9AEE5377CCDF1AA8335 /* LabelGuidanceCues.swift */; };
@@ -78,6 +79,10 @@
 		F4CE618DD3FE40DAE294F4F5 /* LabelTextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */; };
 		B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */; };
 		42EE4EC83F869813A3FE766D /* LocateMeasurements.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054A786B864DF3687842F878 /* LocateMeasurements.swift */; };
+		8C5D453D89FF77847C8504AB /* AppearanceDescriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24E2E5B5B7543C5420C7270 /* AppearanceDescriber.swift */; };
+		775550A71F4E3FF235789620 /* AppearanceSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2191025F92388BA27B3482 /* AppearanceSearch.swift */; };
+		0B682F87CC7F67828B2F3945 /* AppearanceAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3320F75B4113933A42190DDA /* AppearanceAnalysis.swift */; };
+		CC439D096B27F5FBAFB9ACA5 /* TargetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E8F324F145CC8C4A70873B0 /* TargetAppearance.swift */; };
 		6F30EA497713C6BAC439BBB9 /* ReachCoach.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86432A9EB588C61A88CAF30E /* ReachCoach.swift */; };
 		9BF83294808E49C3D56EAC80 /* ReachDepth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53267B8135E5D2B050214EA9 /* ReachDepth.swift */; };
 		852924408A48D470A6EEA869 /* LocateTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */; };
@@ -178,6 +183,7 @@
 		38D7A196C8D3A1584F498743 /* AssistantConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssistantConfiguration.swift; sourceTree = "<group>"; };
 		72D4AB58A2951DD083F1AD18 /* VoiceCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceCommand.swift; sourceTree = "<group>"; };
 		742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceAssistantTests.swift; sourceTree = "<group>"; };
+		9814BDBC28719E56E7C749A4 /* AppearanceSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSearchTests.swift; sourceTree = "<group>"; };
 		F9237F046493AB4A11488ADB /* LocateReachTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateReachTests.swift; sourceTree = "<group>"; };
 		8A8858B7C49EA3E2EFA94918 /* LabelFrameProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelFrameProcessor.swift; sourceTree = "<group>"; };
 		46A4E9AEE5377CCDF1AA8335 /* LabelGuidanceCues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelGuidanceCues.swift; sourceTree = "<group>"; };
@@ -194,6 +200,10 @@
 		B804D3CAC0E72AFF9E237F3F /* LabelTextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelTextReader.swift; sourceTree = "<group>"; };
 		4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceBeepController.swift; sourceTree = "<group>"; };
 		054A786B864DF3687842F878 /* LocateMeasurements.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateMeasurements.swift; sourceTree = "<group>"; };
+		D24E2E5B5B7543C5420C7270 /* AppearanceDescriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceDescriber.swift; sourceTree = "<group>"; };
+		DE2191025F92388BA27B3482 /* AppearanceSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceSearch.swift; sourceTree = "<group>"; };
+		3320F75B4113933A42190DDA /* AppearanceAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceAnalysis.swift; sourceTree = "<group>"; };
+		2E8F324F145CC8C4A70873B0 /* TargetAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetAppearance.swift; sourceTree = "<group>"; };
 		86432A9EB588C61A88CAF30E /* ReachCoach.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachCoach.swift; sourceTree = "<group>"; };
 		53267B8135E5D2B050214EA9 /* ReachDepth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReachDepth.swift; sourceTree = "<group>"; };
 		AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateTracker.swift; sourceTree = "<group>"; };
@@ -333,6 +343,7 @@
 			children = (
 				52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */,
 				742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */,
+				9814BDBC28719E56E7C749A4 /* AppearanceSearchTests.swift */,
 				F9237F046493AB4A11488ADB /* LocateReachTests.swift */,
 				BCBE9D9F09430759795B87DD /* DepthEstimationTests.swift */,
 				EAB9D74F971C908C48C294BE /* HandTrackingTests.swift */,
@@ -513,6 +524,10 @@
 			children = (
 				AEF4DBFEB177F86A715BF582 /* LocateTracker.swift */,
 				054A786B864DF3687842F878 /* LocateMeasurements.swift */,
+				D24E2E5B5B7543C5420C7270 /* AppearanceDescriber.swift */,
+				DE2191025F92388BA27B3482 /* AppearanceSearch.swift */,
+				3320F75B4113933A42190DDA /* AppearanceAnalysis.swift */,
+				2E8F324F145CC8C4A70873B0 /* TargetAppearance.swift */,
 				86432A9EB588C61A88CAF30E /* ReachCoach.swift */,
 				53267B8135E5D2B050214EA9 /* ReachDepth.swift */,
 				4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */,
@@ -707,6 +722,10 @@
 				7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */,
 				852924408A48D470A6EEA869 /* LocateTracker.swift in Sources */,
 				42EE4EC83F869813A3FE766D /* LocateMeasurements.swift in Sources */,
+				8C5D453D89FF77847C8504AB /* AppearanceDescriber.swift in Sources */,
+				775550A71F4E3FF235789620 /* AppearanceSearch.swift in Sources */,
+				0B682F87CC7F67828B2F3945 /* AppearanceAnalysis.swift in Sources */,
+				CC439D096B27F5FBAFB9ACA5 /* TargetAppearance.swift in Sources */,
 				6F30EA497713C6BAC439BBB9 /* ReachCoach.swift in Sources */,
 				9BF83294808E49C3D56EAC80 /* ReachDepth.swift in Sources */,
 				B3BB012097F3782BDC10F610 /* DistanceBeepController.swift in Sources */,
@@ -781,6 +800,7 @@
 				15442A1C76D81A8E1CD1121F /* ObjectDetectionTests.swift in Sources */,
 				950A871D5BF4DDE5A9574A01 /* LabelReadingTests.swift in Sources */,
 				D7ECFA04AF0098E17891B9E8 /* VoiceAssistantTests.swift in Sources */,
+				9DA141E5E5C8BE9147B6D0CD /* AppearanceSearchTests.swift in Sources */,
 				FAA0AC3D531F7DF6FA2F2C20 /* LocateReachTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,7 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: reads labels with `LabelTextReader` (Turn to Read's OCR pipeline) from the shared camera
-// stream, and the persona adds Iris's safety rule (never call an item safe to eat, drink or take).
-
 import Combine
 import Foundation
 

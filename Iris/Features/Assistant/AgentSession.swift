@@ -1,8 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: the agent ID comes from build configuration (no secrets in source), no voice
-// override (Iris's on-device voice isn't an ElevenLabs voice), and `read_label` is accepted as
-// another name for Probe's `rescan` tool.
-
 import Combine
 import Foundation
 import ElevenLabs
@@ -337,7 +332,7 @@ final class AgentSession: ObservableObject {
     }
 
     private func runTool(_ call: ClientToolCallEvent, on conversation: Conversation) async {
-        // `read_label` is Iris's name for the same act as Probe's `rescan`.
+        // `read_label` is another name for the `rescan` tool.
         guard (call.toolName == "rescan" || call.toolName == "read_label"), onRescan != nil else {
             try? await conversation.sendToolResult(for: call.toolCallId, result: "Unknown tool.", isError: true)
             return

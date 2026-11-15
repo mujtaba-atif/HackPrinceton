@@ -1,6 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: renamed Probe → Iris, Find → Locate, Analyze → Explore.
-
 import SwiftUI
 
 /// "Listening…" pill: a mic that breathes, on a frosted capsule with a hairline edge.

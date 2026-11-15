@@ -77,7 +77,7 @@ final class VoiceAssistantTests: XCTestCase {
         XCTAssertFalse(AssistantFacts.needsSafetyNote("Blue chair"))
     }
 
-    // MARK: Probe flows
+    // MARK: Locate and Explore flows
 
     func testTargetParserStripsRequests() {
         XCTAssertEqual(TargetParser.extract(from: "Can you help me find my water bottle please"), "water bottle")

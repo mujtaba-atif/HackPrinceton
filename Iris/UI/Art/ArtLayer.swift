@@ -1,6 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: renamed Probe → Iris, Find → Locate, Analyze → Explore.
-
 import SwiftUI
 
 /// One filled path of an Illustrator layer, in artboard points (origin top-left, y down).

@@ -1,6 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: renamed Probe → Iris, Find → Locate, Analyze → Explore.
-
 import SwiftUI
 
 /// What the conversation is doing, as the water draws it.

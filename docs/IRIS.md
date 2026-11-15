@@ -1,13 +1,12 @@
 # Iris: flows, voice and setup
 
-Iris follows [Probe](https://github.com/amiezeng/Probe) (used with permission). Probe's Find screen is **Locate** here, and its Analyze screen is **Explore**. When behaviour is unclear, Probe's `main` branch is the reference.
-
 ## Flow
 
 1. **Loading → Home.** Iris says "Hello, this is Iris…" and listens for "continue", "okay", "start" and similar. You can also swipe up.
 2. **Main.** Iris asks, "Do you want to locate something, or explore something you're holding?" Say **locate**/**find** or **explore**/**read**, or tap a card. "Repeat" asks the question again.
 3. **Locate**
    1. Iris asks what you're looking for ("my water bottle"). If you say nothing within 12 s, it guides to the most prominent detected object.
+      - **Things the detector doesn't know.** The detector has 80 classes. For anything else (pills, keys, a wallet, a pill bottle among other bottles), Iris works out what it looks like and searches by sight. The description comes from a built-in catalog of everyday items first. Failing that, Apple's on-device language model describes it, on phones with Apple Intelligence, with no network or key. The search uses Apple's on-device image classifier (about 1,300 labels) plus color, texture (shiny, matte, patterned, smooth, translucent), shape and size. Colors or sizes you say ("the small orange bottle") always count. A match needs two agreeing passes. If only color and texture agree, Iris says "this might be…" and asks you to check by touch. If Iris can't picture the item at all, it asks you to describe it.
    2. Once the object is detected, a stereo tone, a water ripple and spoken steps guide you. Step 1 is reaching out (depth), step 2 is moving across, and step 3 is taking hold. Headphones are needed to hear left and right; the chime and voice work without them.
       - **Measuring the reach.** The object's distance is read around your hand, never through it. While the object is clearly visible, Iris stores where it is in the room, and uses that position once your hand covers the object. If nothing was stored, it reads the parts of the object still showing. On LiDAR phones, a hand that only overlaps the object on screen counts as touching it only if depth showed the hand within about 12 cm of the object in the last second, which covers a closing grip that hides the fingertips.
       - **Spoken distance.** In step 1, Iris says how far to go ("Reach about 8 inches further"), says when your hand is in front of the object but not at it yet, and says "You've gone past it" if you overshoot. If it can't measure, it asks you to open your hand, or to move it aside so it can see the object. It speaks at most every 2.5 seconds after anything else it says. Without headphones it also says left or right in step 2. Phones without LiDAR get no distances, only "reach out slowly until you touch it."

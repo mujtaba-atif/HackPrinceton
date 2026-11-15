@@ -1,9 +1,3 @@
-// Ported from Probe's Analyze screen (`AnalyzeView`, github.com/amiezeng/Probe), used with the authors'
-// permission. Iris changes: Probe's text reader and hold-still countdown are replaced by Turn to Read
-// (`LabelGuidanceService`), which tells the user which way to turn the item until the label faces the
-// camera; its readiness drives Probe's scan-area ring. The ElevenLabs agent then summarizes, as in
-// Probe, with Turn to Read's offline reading as the fallback. Analyze is called Explore.
-
 import SwiftUI
 
 struct ExploreScreen: View {
@@ -170,7 +164,7 @@ struct ExploreScreen: View {
         guidance.stop()
     }
 
-    /// Probe opens the microphone whenever nothing is coming out of the speaker, and never before: the
+    /// The microphone opens whenever nothing is coming out of the speaker, and never before: the
     /// spoken lines would otherwise be heard as commands. Not once the agent has the microphone.
     private func startListenLoop() {
         listenLoop?.cancel()
@@ -267,7 +261,7 @@ struct ExploreScreen: View {
         """
     }
 
-    /// Probe's Analyze screen used the agent's dashboard prompt; Iris sends its own so the safety rule
+    /// Iris sends its own persona so the safety rule
     /// always applies (the agent retries without it if overrides aren't allowed).
     static let persona = """
     You are Iris, a voice guide for someone who cannot see. They are holding an item up to their phone's \

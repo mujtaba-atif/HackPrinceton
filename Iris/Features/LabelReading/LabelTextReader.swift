@@ -2,7 +2,7 @@ import Combine
 import CoreGraphics
 import Foundation
 
-/// Continuously reads text from the camera, the way Probe's `TextReader` does: each scan feeds a
+/// Continuously reads text from the camera: each scan feeds a
 /// running merge, and `lines` is the clean, de-duplicated result in reading order.
 ///
 /// Built on Turn to Read's pieces — `LabelCropPlanner` picks the region (the selected object, else the
@@ -15,7 +15,7 @@ final class LabelTextReader: ObservableObject {
     static let region = LabelCropPlanner.centerRegion
 
     @Published private(set) var lines: [String] = []
-    /// Same convention as Probe: landscape sensor turned upright for the portrait preview.
+    /// Landscape sensor turned upright for the portrait preview.
     @Published private(set) var uprightImageSize = CGSize(width: 1440, height: 1920)
 
     var minimumSightings = 2

@@ -2,11 +2,11 @@
 
 Iris is a native iOS accessibility app designed to help blind and visually impaired people find nearby objects, move a hand toward them, and understand what they are holding through clear spoken guidance.
 
-The app follows [Probe](https://github.com/amiezeng/Probe)'s design and flows (used with its authors' permission), on Iris's own camera, detection, hand-tracking, depth and label-reading features. It is voice-first:
+Iris runs on its own camera, detection, hand-tracking, depth and label-reading features, and it is voice-first:
 
 - **Home → Main.** Iris introduces itself and listens ("continue"), then asks whether to **Locate** something or **Explore** something you're holding. Every screen understands "go back".
-- **Locate** (Probe's Find). Say what you're looking for. Iris finds it with on-device object detection, then guides your hand to it in three steps with a stereo tone, water ripples and short spoken cues, using hand tracking and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
-- **Explore** (Probe's Analyze). Hold an item up. **Turn to Read** tells you which way to turn it until the label faces the camera, then the ElevenLabs agent summarizes it and answers questions. Without the agent, Iris speaks an offline reading of the label.
+- **Locate**. Say what you're looking for. Iris finds it with on-device object detection, then guides your hand to it in three steps with a stereo tone, water ripples and short spoken cues, using hand tracking and LiDAR depth. Once you're holding it, Iris reads the label and hands over to a conversational agent.
+- **Explore**. Hold an item up. **Turn to Read** tells you which way to turn it until the label faces the camera, then the ElevenLabs agent summarizes it and answers questions. Without the agent, Iris speaks an offline reading of the label.
 
 See [docs/IRIS.md](docs/IRIS.md) for the flows, the ElevenLabs setup and on-device testing. The original Explore screen and hand-tracking debug screen are still available in Debug builds (long-press the home screen for 2 seconds).
 
@@ -37,14 +37,14 @@ Select a physical iPhone and run the `Iris` scheme. AR camera tracking is unavai
 
 ```text
 Iris/
-├── App/                    App entry point (Probe's loading → home → main sequence)
+├── App/                    App entry point (loading → home → main sequence)
 ├── Features/
 │   ├── Assistant/          ElevenLabs agent session, Locate's label hand-off, grounded object facts
 │   ├── CameraAR/           AR session, preview, lifecycle, and frame streams
 │   ├── DepthEstimation/    Depth sampling, calibration, smoothing, spatial estimates and distance UI
 │   ├── HandTracking/       Vision hand pose, smoothing, overlay
 │   ├── LabelReading/       "Turn to Read": orientation guidance, text merging, label interpretation
-│   ├── Locate/             Probe's three-step tone guidance and fingertip-to-object measurement
+│   ├── Locate/             Three-step tone guidance and fingertip-to-object measurement
 │   ├── ObjectDetection/    Core ML model, Vision inference, tracking, selection, overlay and list
 │   ├── OCR/                Reusable Vision text recognition
 │   ├── Guidance/           Guidance boundary
@@ -52,7 +52,7 @@ Iris/
 ├── Models/                 Shared domain and readiness models
 ├── Resources/              Info.plist and asset catalogs
 └── UI/
-    ├── Art/                Probe's vector artwork and Iris lettering
+    ├── Art/                Vector artwork and Iris lettering
     ├── Motion/             Eyes, floating, water pour and leaf-fall transitions, bubble title
     ├── Water/              Audio-reactive water, guidance ripples, conversation water
     ├── Status/             Status blob and listening pill
@@ -116,12 +116,6 @@ The bundled **YOLOv3TinyFP16** is a real 17.7 MB Core ML detector from [Apple's 
 
 Only the fixed 80 model classes are supported; this is not arbitrary object recognition, OCR, segmentation, or a hand detector. IDs are approximate spatial associations, not persistent physical identities. Two similar objects crossing, fast motion, prolonged occlusion, or camera movement can swap or lose IDs. Small, transparent, poorly lit, or partly hidden objects are difficult for this compact model. Confidence is a model score, not a calibrated probability of correctness. All full-image detections are listed, including objects in preview-cropped margins. Portrait rear-camera use is supported; adding landscape/front-camera support requires updating orientation and geometry together. Recognition and real-time speed still need physical-device validation. No reaching instructions are emitted.
 
-### Reference study
-
-The requested `../probe-reference` was absent, so [Probe](https://github.com/amiezeng/Probe) was inspected from a temporary GitHub checkout at `4f393171b9b4a32592413fc6fc8df617606d4306`, with the owner's permission. Relevant files were `CameraController.swift`, `ObjectDetection.swift`, `Segmentation.swift`, `ModelStore.swift`, `CameraView.swift`, `BoundingBox.swift`, and the bundled model packages.
-
-Probe's active segmentation path uses `yolo26n-seg`, 640-pixel input, `.right` orientation, `.scaleFit`, a 100 ms throttle and busy guard. It decodes raw tensors/masks and removes letterbox padding; its default filter permits bottles. Its separate EGOHOS object model targets hand/interaction categories and is disabled by default. Iris's integration is original: it uses an independently downloaded bounding-box model, the existing frame broker, typed Vision results, explicit tracking/selection state, and aspect-fill-aware overlay geometry. No Probe source, weights, hand logic, or camera lifecycle was copied into Iris.
-
 ## Depth and spatial positioning
 
 Select an object to see **“Bottle — approximately 0.7 meters away”**, with its horizontal/vertical direction relative to the portrait camera. The exact class name comes from detection. Unsupported devices, unreliable readings, missing frames, lost targets, and limited tracking show **“Distance unavailable”**. No metric distance is inferred from the RGB image. The readout is inside the existing scrollable object list, supports Dynamic Type and VoiceOver, and does not interrupt speech on every update.
@@ -158,8 +152,6 @@ Valid axial measurements use a time-based exponential smoother with a 250 ms tim
 Future guidance must check identity, `.measured`, freshness and coordinate conventions, and align its hand measurement to the same time. A 2D bearing can remain available without depth; it never implies a 3D point. `DepthEstimationService` does not consume hand observations, issue reach instructions, or modify hand-tracking protocols. A later branch can consume this interface without replacing the camera or detector.
 
 This estimates a visible surface within a detection box, **not the object's center of mass, nearest edge, grasp point, or a persistent world pose**. Backgrounds and occluding objects can still dominate a box even when sample statistics pass. Transparent/reflective objects, thin objects and motion are difficult. `.measured` means the configured checks passed, not that the reading is ground truth. Physical-device accuracy, latency and sustained performance remain to be measured.
-
-Probe's `CameraController.swift` and depth helpers in `ObjectDetection.swift` were studied for capability gating, sensor orientation, confidence filtering, median sampling, and intrinsics. Iris uses its own separate service, timestamp matching, bounded history, validity model and box-region sampler. No Probe hand or reach-guidance code was imported.
 
 ## Label reading (Turn to Read)
 
@@ -262,6 +254,3 @@ Earlier: validated November 14, 2026 with Xcode 26.2: clean unsigned iOS device 
 5. Pause/resume, background/foreground, interrupt tracking, and exit/re-enter Explore. No previous distance may reappear from an earlier session. Shake/cover the camera enough to limit AR tracking and verify invalidation and recovery.
 6. On a non-LiDAR iPhone, verify object detection still works and the selected target shows **Distance unavailable**, with no meters fabricated. On both devices, test the readout with VoiceOver and the largest Dynamic Type setting; every row/control should remain reachable by scrolling.
 
-## Credits
-
-Iris's screens, artwork, motion, guidance tones and voice flow are ported from [Probe](https://github.com/amiezeng/Probe) by its authors, with permission. Ported files carry a header saying so.

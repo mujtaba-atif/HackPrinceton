@@ -5,12 +5,12 @@ import simd
 
 /// Measures where the user's fingertips are relative to the target object, for `DistanceBeepController`.
 ///
-/// This is Probe's `ObjectDetector` measurement step (fingertip → object edge, LiDAR depth gap, debounced
+/// This is the measurement step (fingertip → object edge, LiDAR depth gap, debounced
 /// contact, then the approach to the camera) rebuilt on Iris's own services: Vision hand pose from
 /// `HandTrackingService`, the YOLO target box from `ObjectDetectionService`, and LiDAR samples through
-/// `DepthSampler`. Probe measured against a segmentation mask; Iris measures against the detection box,
+/// `DepthSampler`. It measures against the detection box rather than a segmentation mask,
 /// so "inside the object" means inside its box. All points use Vision coordinates (normalized, upright
-/// portrait, bottom-left origin), Probe's convention.
+/// portrait, bottom-left origin).
 ///
 /// Iris change: the object's depth while reaching is read *around* the hand, never through it
 /// (`ReachOcclusion`, `ObjectDepthMemory`). Read through it, a hand passing in front of the object put
@@ -18,7 +18,7 @@ import simd
 /// screen also no longer counts as contact without a depth measurement to back it.
 @MainActor
 final class LocateTracker: ObservableObject {
-    // Probe's tuning, unchanged.
+    // Tuning.
     static let readDistance: Float = 0.25     // meters (≈10 in)
     static let tooCloseDistance: Float = 0.15 // meters (≈6 in)
     private static let jointReach: [Float] = [0, 0.012, 0.03, 0.05]
@@ -122,7 +122,7 @@ final class LocateTracker: ObservableObject {
         }
         let first = perHand.first.flatMap(closest)
         let second = perHand.count > 1 ? closest(perHand[1]) : nil
-        // Probe labels the two hands left and right; which is which doesn't change the guidance. Compared
+        // The two hands are labeled left and right; which is which doesn't change the guidance. Compared
         // whole, not by fingertip alone: a still finger's distance changes as the depth reading does.
         if leftHandEdge != first { leftHandEdge = first }
         if rightHandEdge != second { rightHandEdge = second }
@@ -169,7 +169,7 @@ final class LocateTracker: ObservableObject {
         return ReachOcclusion.objectDepth(cellDepths: cellDepths, nearestHandDepth: nearestHandDepth)
     }
 
-    // MARK: - Probe's approach step
+    // MARK: - Approach step
 
     private func updateApproach(time: TimeInterval, target: CGRect?, objectDepth: Float?, frame: DepthFrame) {
         if objectFound, !approaching {
@@ -252,7 +252,7 @@ final class LocateTracker: ObservableObject {
         )
     }
 
-    /// Probe's `closestEdgeMeasurement`: the fingertip with a LiDAR reading if any has one, else the one
+    /// The closest edge measurement: the fingertip with a LiDAR reading if any has one, else the one
     /// nearest the object on screen.
     private func closest(_ measurements: [EdgeMeasurement]) -> EdgeMeasurement? {
         if let best = measurements.filter({ $0.distance != nil }).min(by: { $0.distance! < $1.distance! }) {
@@ -283,12 +283,12 @@ final class LocateTracker: ObservableObject {
 
     // MARK: - Geometry and depth
 
-    /// Hand-tracking points are top-left image coordinates; Probe's maths uses Vision's bottom-left.
+    /// Hand-tracking points are top-left image coordinates; the maths uses Vision's bottom-left.
     private static func vision(_ point: CGPoint) -> CGPoint {
         CGPoint(x: point.x, y: 1 - point.y)
     }
 
-    /// The point on the box's outline nearest `point` (Probe's `nearestEdgePoint` for a mask).
+    /// The point on the box's outline nearest `point` (the box equivalent of a mask's nearest edge point).
     static func nearestEdge(to point: CGPoint, of box: CGRect) -> CGPoint {
         guard box.contains(point) else {
             return CGPoint(x: min(max(point.x, box.minX), box.maxX), y: min(max(point.y, box.minY), box.maxY))

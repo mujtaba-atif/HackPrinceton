@@ -66,7 +66,7 @@ enum AssistantFacts {
 
     // MARK: Find
 
-    private static let synonyms: [String: String] = [
+    static let synonyms: [String: String] = [
         "phone": "cell phone", "mobile": "cell phone", "iphone": "cell phone", "cellphone": "cell phone",
         "mug": "cup", "sofa": "couch", "television": "tv", "computer": "laptop",
         "notebook": "laptop", "remote control": "remote", "plant": "potted plant", "table": "dining table",

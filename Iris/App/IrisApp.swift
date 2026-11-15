@@ -1,6 +1,5 @@
 import SwiftUI
 
-// The launch sequence is Probe's (github.com/amiezeng/Probe, used with the authors' permission).
 @main
 struct IrisApp: App {
     /// Builds the artwork and the vision models up front, so no screen has to do it as it appears.

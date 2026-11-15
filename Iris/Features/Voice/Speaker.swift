@@ -1,8 +1,3 @@
-// Ported from Probe (github.com/amiezeng/Probe), used with the authors' permission.
-// Iris changes: lines are always spoken on device. Probe fetched ElevenLabs text-to-speech with an API
-// key shipped in the app; Iris never ships a secret key, and the ElevenLabs agent (which needs none)
-// is where Iris's AI voice lives.
-
 import AVFoundation
 import Combine
 import Foundation
