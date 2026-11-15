@@ -69,8 +69,11 @@ when connecting a real tracking pipeline. Phone shake input in `motion.js` is a
 separate optional device-sensor feature and requires permission and a secure
 browser context on supporting phones.
 
-The `Reachly/` SwiftUI project has not been ported to this Iris design. These
-files are the design assets and working browser reference for that integration.
+The native SwiftUI app is in `Iris/`. It implements earlier Iris design revisions
+and includes live camera, detection, hand-tracking, depth, and voice features.
+These files provide the revision 18 design reference and assets; they do not
+automatically update the artwork embedded in `Iris/UI/Glass/IrisArtwork.swift`
+or replace the native feature implementations.
 
 ## Review checklist
 

@@ -1,10 +1,18 @@
-name: Reachly
+name: Iris
 
 options:
-  bundleIdPrefix: com.reachly
+  bundleIdPrefix: com.iris
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
+
+packages:
+  ElevenLabs:
+    url: https://github.com/elevenlabs/elevenlabs-swift-sdk.git
+    exactVersion: 3.3.1
+  LiveKit:
+    url: https://github.com/livekit/client-sdk-swift.git
+    majorVersion: 2.0.0
 
 settings:
   base:
@@ -15,44 +23,86 @@ settings:
     SUPPORTS_MACCATALYST: NO
 
 targets:
-  Reachly:
+  Iris:
     type: application
     platform: iOS
     sources:
-      - path: Reachly
+      - path: Iris
         excludes:
           - Resources/Info.plist
+          - Resources/Fonts
+          - Secrets.swift.example
+      - path: Iris/Resources/Fonts
+        type: folder
+        buildPhase: resources
     info:
-      path: Reachly/Resources/Info.plist
+      path: Iris/Resources/Info.plist
       properties:
-        CFBundleDisplayName: Reachly
+        CFBundleDisplayName: Iris
         CFBundleShortVersionString: "1.0"
         CFBundleVersion: "1"
-        NSCameraUsageDescription: "Reachly uses the camera to help locate nearby objects and guide your hand toward them."
-        NSMicrophoneUsageDescription: "Reachly uses the microphone so you can control exploration with your voice."
-        NSSpeechRecognitionUsageDescription: "Reachly uses speech recognition to understand spoken object searches and navigation commands."
+        NSCameraUsageDescription: "Camera is used to detect hands and objects with AR."
+        NSMicrophoneUsageDescription: "Iris listens for your voice commands."
+        NSSpeechRecognitionUsageDescription: "Iris uses speech recognition to understand your voice commands."
         UIApplicationSupportsIndirectInputEvents: true
-        UILaunchScreen:
-          UIColorName: ReachlyBackground
+        CADisableMinimumFrameDuration: true
+        UILaunchScreen: {}
+        UIAppFonts:
+          - Fonts/Nunito-SemiBold.ttf
+          - Fonts/Nunito-Bold.ttf
+          - Fonts/Nunito-ExtraBold.ttf
+          - Fonts/Nunito-Black.ttf
+          - Fonts/NunitoSans-Bold.ttf
+          - Fonts/NunitoSans-ExtraBold.ttf
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+    preBuildScripts:
+      - name: Create Secrets.swift
+        inputFiles:
+          - $(SRCROOT)/Iris/Secrets.swift.example
+        outputFiles:
+          - $(SRCROOT)/Iris/Secrets.swift
+        script: |
+          if [ ! -f "$SRCROOT/Iris/Secrets.swift" ]; then
+            cp "$SRCROOT/Iris/Secrets.swift.example" "$SRCROOT/Iris/Secrets.swift"
+            echo "warning: Created Iris/Secrets.swift from the template. Add your ElevenLabs key, agent ID and voice ID."
+          fi
+    dependencies:
+      - package: ElevenLabs
+      - package: LiveKit
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.reachly.ios
-        PRODUCT_NAME: Reachly
+        PRODUCT_BUNDLE_IDENTIFIER: com.iris.ios
+        PRODUCT_NAME: Iris
         ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME: AccentColor
         GENERATE_INFOPLIST_FILE: NO
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         ENABLE_USER_SCRIPT_SANDBOXING: YES
 
+  IrisTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: IrisTests
+    dependencies:
+      - target: Iris
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.iris.ios.tests
+
 schemes:
-  Reachly:
+  Iris:
     build:
       targets:
-        Reachly: all
+        Iris: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - IrisTests
     archive:
       config: Release
 
