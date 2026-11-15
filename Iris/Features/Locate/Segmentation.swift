@@ -117,7 +117,11 @@ class SegmentationDetector: ObservableObject {
     private var busy = false
 
     private var inputSize: CGFloat = 640 // read from the model's image input at load
-    private let confidenceThreshold: Float = 0.02   
+    /// Below this a detection is noise: at 2% a faint smear over the background could become the target.
+    private let confidenceThreshold: Float = 0.15
+    /// Among detections at least this fraction as confident as the best one, the largest mask is the
+    /// target (the nearest of several bottles). A much weaker detection never wins on size alone.
+    private let rivalConfidence: Float = 0.6
     private let maskThreshold: Float = 0.5
     @Published private(set) var uprightImageSize = CGSize(width: 1440, height: 1920)
     private var classNames: [String] = []
@@ -311,6 +315,7 @@ class SegmentationDetector: ObservableObject {
         var largestMaskColor: (UInt8, UInt8, UInt8) = (255, 255, 255)
 
         var segments: [Segment] = []
+        let topConfidence = kept.first?.confidence ?? 0
         for candidate in kept {
             let rgb = Self.palette[candidate.classIndex % Self.palette.count]
             var candidateMask = [Bool](repeating: false, count: canvasW * canvasH)
@@ -340,7 +345,7 @@ class SegmentationDetector: ObservableObject {
             let candidateArea = candidateMask.reduce(into: 0) { count, pixel in
                 if pixel { count += 1 }
             }
-            if candidateArea > largestMaskArea {
+            if candidate.confidence >= topConfidence * rivalConfidence, candidateArea > largestMaskArea {
                 largestMask = candidateMask
                 largestMaskArea = candidateArea
                 largestMaskColor = rgb

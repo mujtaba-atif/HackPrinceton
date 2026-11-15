@@ -491,6 +491,10 @@ class ObjectDetector: ObservableObject {
         guard now - lastDetectionTimestamp >= minDetectionInterval else {
             return
         }
+        // One detection at a time: if hand pose takes longer than the interval, frames would queue up on
+        // `detectionQueue`, each holding its camera buffers, and the hands would fall further behind.
+        guard !detectionBusy else { return }
+        detectionBusy = true
         lastDetectionTimestamp = now
 
         detectionQueue.async { [weak self] in
@@ -501,8 +505,12 @@ class ObjectDetector: ObservableObject {
             if self.handPoseEnabled {
                 self.detectHand(in: frame.capturedImage)
             }
+            DispatchQueue.main.async { self.detectionBusy = false }
         }
     }
+
+    /// Touched only on the main thread, where frames arrive.
+    private var detectionBusy = false
 
     private func detectObjects(in pixelBuffer: CVPixelBuffer) {
         guard let request = objectRequest else {

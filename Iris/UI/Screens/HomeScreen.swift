@@ -1,59 +1,26 @@
 import SwiftUI
 
 struct HomeScreen: View {
-    /// Not private, and off the main actor, so `Preloader` can build the split before the screen is shown.
-    nonisolated static let titleLetters = HomeArt.title.pieces
-    /// Sits under "IRIS", a third of its height, in artboard points.
-    private static let subtitleBounds = CGRect(
-        x: HomeArt.title.bounds.minX,
-        y: HomeArt.title.bounds.maxY + 28,
-        width: HomeArt.title.bounds.width,
-        height: HomeArt.title.bounds.height / 3
-    )
-    /// Low on the monster's body, clear of the eye, in artboard points.
-    private static let hintBounds = CGRect(
-        x: HomeArt.artboard.midX - 170,
-        y: 1285,
-        width: 340,
-        height: 150
-    )
-    /// Where "IRIS" is centered (in artboard points) while `LoadingScreen` is up. It rises from there.
-    static let loadingTitleCenter: CGFloat = 720
-    /// How far below its place here that is, as a fraction of the artboard's height (`artboardShift`).
-    static let loadingTitleDrop = (loadingTitleCenter - HomeArt.title.bounds.midY) / HomeArt.artboard.height
-    /// The title glides up; the monster follows a beat later with a little give, and comes up from
-    /// below the whole artboard (a shift of `1`), further than any part of him is on screen.
-    private static let titleRise = Animation.smooth(duration: 0.9)
-    private static let monsterRise = Animation.spring(duration: 1.0, bounce: 0.2).delay(0.15)
-    /// How long after the rise starts the title is close enough to its place for the letters to start
-    /// hopping and the subtitle and hint to come in.
-    private static let landingDelay = Duration.milliseconds(550)
-
     /// False while the loading screen is still up over this one (so it can lay out and draw unseen).
-    /// Turning it true plays the entrance: the title rises from where `LoadingScreen` drew it and the
-    /// monster slides in from below. It isn't replayed when coming back from the main screen.
+    /// Turning it true plays the entrance: the title's light reveal, the tagline, then the crew. It isn't
+    /// replayed when coming back from the main screen.
     var introStarted = true
 
     @State private var hasIntroduced = false
     @StateObject private var listener = VoiceListener()
-
-    /// The entrance has started: title and monster are on their way to their places.
-    @State private var risen = false
-    /// ...and the title has all but arrived: the letters can hop, the rest can fade in.
-    @State private var landed = false
 
     @State private var showMainScreen = false
     #if DEBUG
     /// Developer screens (the original Explore, hand tracking): long-press the home screen.
     @State private var showsDeveloperScreens = false
     #endif
-    @State private var pouring = false
-    @State private var eyes = EyeMotion()
+    /// The glass wipe is crossing to the options screen.
+    @State private var wiping = false
+    @State private var confetti = 0
 
-    /// The main screen *replaces* this one as the stack's root rather than being pushed onto it.
-    /// A push animates the new screen in from the side, and `disablesAnimations` doesn't stop it
-    /// (the push is run by UIKit), so the seam between the two screens slid across mid-transition
-    /// no matter how long the water was held over it. Swapping the root has no animation to suppress.
+    /// The main screen *replaces* this one as the stack's root rather than being pushed onto it: a push
+    /// slides the new screen in from the side, which UIKit runs and `disablesAnimations` can't stop. The
+    /// glass wipe is the transition instead, and swapping the root under it has nothing to suppress.
     var body: some View {
         NavigationStack {
             ZStack {
@@ -62,30 +29,25 @@ struct HomeScreen: View {
                 } else {
                     home
                 }
-                // Main screen's blue pours in over the home screen, then the main screen takes its
-                // place underneath and the water comes straight off it.
-                if pouring {
-                    WaterPour(color: MainArt.background.color) {
+                Confetti(trigger: confetti)
+                if wiping {
+                    GlassWipe {
                         swap(toMain: true)
-                        // By the time it's full the water is a flat sheet of the main screen's own color
-                        // (the bubbles and foam fade out as it tops up), so it can be cut rather than
-                        // faded: a fade kept the buttons hidden through the first half of their fall,
-                        // which is what made them look like they started late. The couple of frames
-                        // held here are for the main screen's first frame, and are invisible.
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { pouring = false }
+                        // The options screen paints over the sheet on its first frame; a beat later the
+                        // sheet goes.
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { wiping = false }
                     }
                 }
             }
             .ignoresSafeArea()
-            .task(id: introStarted) {
-                guard introStarted, !risen else { return }
-                risen = true
-                try? await Task.sleep(for: Self.landingDelay)
-                guard !Task.isCancelled else { return }
-                landed = true
-            }
         }
         .background(VolumeHUDHider())
+        #if DEBUG
+        // `-IrisPreviewScreen main|locate|explore` opens straight onto a screen, for screenshots.
+        .task {
+            if UserDefaults.standard.string(forKey: "IrisPreviewScreen") != nil { swap(toMain: true) }
+        }
+        #endif
         #if DEBUG
         .fullScreenCover(isPresented: $showsDeveloperScreens) {
             HomeView()
@@ -107,238 +69,144 @@ struct HomeScreen: View {
         withTransaction(transaction) { showMainScreen = toMain }
     }
 
+    private func proceed() {
+        guard !wiping, !showMainScreen else { return }
+        confetti += 1
+        wiping = true
+    }
+
     private var home: some View {
-            // Layers of design/IrisHome.ai; the background layer is the full-screen color.
-            Artboard(rect: HomeArt.artboard) {
-                // Nested over the whole artboard (which places its layers exactly where this one would)
-                // so that the eyes moving redraws only the monster — not the title's letters and the
-                // subtitle, whose text has to be measured and fitted again on every pass.
-                Monster(eyes: eyes)
-                    .artboardShift(risen ? 0 : 1, animation: Self.monsterRise)
-                    .artFrame(HomeArt.artboard)
-                // "IRIS", one letter at a time so they hop in a wave once they've risen into place.
-                // Grouped over the whole artboard so the group can be shifted as one.
-                Artboard(rect: HomeArt.artboard) {
-                    ForEach(Array(Self.titleLetters.enumerated()), id: \.offset) { i, letter in
-                        letter
-                            .modifier(Bubbly(delay: Double(i) * 0.1, isActive: landed))
-                            .artFrame(letter.bounds)
+        StageView { stage in
+            HomeBackdrop()
+            if introStarted {
+                Sprinkles(count: 20, unit: stage.unit)
+                homeGlass(stage)
+                PrismText(text: "Iris", font: IrisFont.nunito(stage(78), .black), tracking: -3, timing: .brand,
+                          unit: stage.unit, hops: true)
+                    .accessibilityAddTraits(.isHeader)
+                    .placed(x: 0, y: 128, width: 360, height: 94, on: stage)
+                PrismText(text: "See beyond the surface", font: IrisFont.nunito(stage(22), .bold), tracking: -0.5,
+                          timing: .tagline, unit: stage.unit)
+                    .placed(x: 0, y: 216, width: 360, height: 30, on: stage)
+                Crew(stage: stage)
+                SwipeHint(unit: stage.unit, listening: listener.isListening, action: proceed)
+                    .placed(x: 75, y: 704, width: 210, height: 82, on: stage)
+            }
+        }
+        .ignoresSafeArea()
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    let isVerticalSwipe = abs(value.translation.height) > abs(value.translation.width)
+                    if isVerticalSwipe && value.translation.height < -60 {
+                        proceed()
                     }
                 }
-                .artboardShift(risen ? 0 : Self.loadingTitleDrop, animation: Self.titleRise)
-                .artFrame(HomeArt.artboard)
-                // Fades in under the title once it has landed, hops in after the last letter, then
-                // pulses with them.
-                SubtitleLetters(text: "Reach with confidence", color: HomeArt.title.color,
-                                delay: Double(Self.titleLetters.count) * 0.1, isActive: landed)
-                    .opacity(landed ? 1 : 0)
-                    .animation(.easeOut(duration: 0.3).delay(0.4), value: landed)
-                    .artFrame(Self.subtitleBounds)
-                if landed {
-                    ScrollHint(color: HomeArt.background.color)
-                        .artFrame(Self.hintBounds)
-                }
-            }
-            .background(HomeArt.background.color)
-            .clipped()
-            .ignoresSafeArea()
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture()
-                    .onEnded { value in
-                        let isVerticalSwipe = abs(value.translation.height) > abs(value.translation.width)
-                        if isVerticalSwipe && value.translation.height < -80 {
-                            pouring = true
-                        }
-                    }
-            )
-            .overlay(alignment: .bottom) {
-                if listener.isListening {
-                    ListeningIndicator()
-                }
-            }
-            .animation(.easeInOut, value: listener.isListening)
-            .task(id: introStarted) {
-                guard introStarted else { return }
-                if !hasIntroduced {
-                    try? await Task.sleep(for: .seconds(0.25))
-                    guard !Task.isCancelled else { return }
-                    hasIntroduced = true
-                    Speaker.shared.speak("Hello, this is Iris. I can help you find things around you, or help you understand an item you're holding!")
-                }
-                await Speaker.shared.waitUntilIdle()
+        )
+        .task(id: introStarted) {
+            guard introStarted else { return }
+            if !hasIntroduced {
+                try? await Task.sleep(for: .seconds(0.25))
                 guard !Task.isCancelled else { return }
-                await listener.start(
-                    commands: ["continue": ["continue", "okay", "next", "start", "begin", "go", "yes", "ready"]]
-                ) { _ in pouring = true }
+                hasIntroduced = true
+                Speaker.shared.speak("Hello, this is Iris. I can help you find things around you, or help you understand an item you're holding!")
             }
-            .onAppear { eyes.start() }
-            .onDisappear { eyes.stop(); listener.stop() }
-            #if DEBUG
-            .onLongPressGesture(minimumDuration: 2) { showsDeveloperScreens = true }
-            #endif
+            await Speaker.shared.waitUntilIdle()
+            guard !Task.isCancelled else { return }
+            await listener.start(
+                commands: ["continue": ["continue", "okay", "next", "start", "begin", "go", "yes", "ready"]]
+            ) { _ in proceed() }
+        }
+        .onDisappear { listener.stop() }
+        #if DEBUG
+        .onLongPressGesture(minimumDuration: 2) { showsDeveloperScreens = true }
+        #endif
+    }
+
+    /// The two floating panes on the welcome screen.
+    @ViewBuilder
+    private func homeGlass(_ stage: Stage) -> some View {
+        GlassFloat(sparkle: (28, 22, 22), unit: stage.unit)
+            .motion(Motion(7, curve: .easeInOut, repeats: true, alternate: true,
+                           from: Pose(x: -5, y: -6, rotation: 14), to: Pose(x: 7, y: 13, rotation: 29)),
+                    unit: stage.unit)
+            .modifier(RestingTilt(degrees: 19))
+            .placed(x: 288, y: 34, width: 86, height: 90, on: stage)
+        GlassFloat(unit: stage.unit)
+            .motion(Motion(8, curve: .easeInOut, repeats: true, alternate: true,
+                           from: Pose(x: -6, y: 10, rotation: -22), to: Pose(x: 12, y: -12, rotation: -5)),
+                    unit: stage.unit)
+            .modifier(RestingTilt(degrees: -19))
+            .placed(x: -33, y: 271, width: 91, height: 69, on: stage)
     }
 }
 
-/// The subtitle, one letter at a time like the title, scaled as a whole to fit its frame.
-private struct SubtitleLetters: View {
-    var text: String
-    var color: Color
-    var delay: Double
-    var isActive = true
-
-    /// The row's size at the reference font size, measured once laid out.
-    @State private var natural = CGSize(width: 1, height: 1)
-
-    var body: some View {
-        GeometryReader { geo in
-            let scale = min(geo.size.width / natural.width, geo.size.height / natural.height)
-            HStack(spacing: 0) {
-                ForEach(Array(text.enumerated()), id: \.offset) { i, ch in
-                    Text(String(ch))
-                        .font(.system(size: 500, weight: .bold, design: .rounded))
-                        .foregroundStyle(color)
-                        .modifier(Bubbly(delay: delay + Double(i) * 0.04, hop: 8, pulse: 0.03, isActive: isActive))
-                }
-            }
-            .fixedSize()
-            .onGeometryChange(for: CGSize.self) { $0.size } action: { natural = $0 }
-            .scaleEffect(scale)
-            .frame(width: geo.size.width, height: geo.size.height)
-        }
-    }
-}
-
-/// The monster and his eye, which follow the phone (`EyeMotion`).
-private struct Monster: View {
-    var eyes: EyeMotion
-
-    var body: some View {
-        Artboard(rect: HomeArt.artboard) {
-            HomeArt.monster
-                .lookOffset(eyes.look, amount: 0.03, tilt: 3)
-            HomeArt.eyeWhite
-                .blink(eyes.blinks)
-                .lookOffset(eyes.look, amount: 0.15, tilt: 8)
-            HomeArt.iris
-                .lookOffset(eyes.look, amount: 0.9)
-                .blink(eyes.blinks)
-            HomeArt.pupil
-                .lookOffset(eyes.look, amount: 1.35)
-                .blink(eyes.blinks)
-        }
-    }
-}
-
-/// "Swipe up" nudge: after `delay` it fades in and then keeps drifting up and back down, with the
-/// upper chevron trailing the lower one so the pair reads as a flow upward.
-private struct ScrollHint: View {
-    var color: Color
-    var delay: Double = 1.5
-
-    @State private var shown = false
-    @State private var rising = false
-
-    var body: some View {
-        VStack(spacing: 4) {
-            chevron(opacity: 0.45, lag: 0.18)
-            chevron(opacity: 1, lag: 0)
-            Text("swipe up")
-                .font(.system(size: 17, weight: .heavy, design: .rounded))
-                .foregroundStyle(color)
-                .padding(.top, 4)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .opacity(shown ? 1 : 0)
-        .allowsHitTesting(false)
-        .onAppear {
-            withAnimation(.easeOut(duration: 0.7).delay(delay)) { shown = true }
-            rising = true
-        }
-        .onDisappear {
-            shown = false
-            rising = false
-        }
-    }
-
-    private func chevron(opacity: Double, lag: Double) -> some View {
-        Chevron()
-            .stroke(color.opacity(opacity), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
-            .frame(width: 30, height: 15)
-            .offset(y: rising ? -9 : 0)
-            .animation(
-                .easeInOut(duration: 1.1).repeatForever(autoreverses: true).delay(delay + lag),
-                value: rising
-            )
-    }
-}
-
-private struct Chevron: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        return path
-    }
-}
-
-/// Bubbles in with one jelly hop (crouch, jump while stretched, squash on landing and wobble back),
-/// then keeps gently growing and shrinking by `pulse`. `delay` staggers it so a row of them goes in a wave.
-/// Replays each time the view appears (once `isActive`).
-private struct Bubbly: ViewModifier {
-    var delay: Double
-    var hop: CGFloat = 16
-    var pulse: CGFloat = 0.05
-    /// Seconds to grow, then again to shrink.
-    var pulseDuration = 1.0
-    /// Held still until this is true (the view can be on screen, at rest, well before it should hop).
-    var isActive = true
-
-    struct Pose {
-        var y: CGFloat = 0
-        /// > 1 is tall and thin, < 1 short and wide.
-        var stretch: CGFloat = 1
-    }
-
-    @State private var hops = 0
-    @State private var pulsing = false
-
-    /// When the crouch starts.
-    private var start: Double { 0.3 + delay }
+/// The tilt a floating pane keeps when its orbit stops under reduced motion.
+struct RestingTilt: ViewModifier {
+    var degrees: Double
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
-        content
-            .scaleEffect(pulsing ? 1 + pulse : 1)
-            .keyframeAnimator(initialValue: Pose(), trigger: hops) { view, pose in
-                view
-                    .scaleEffect(x: 1 / pose.stretch.squareRoot(), y: pose.stretch, anchor: .bottom)
-                    .offset(y: pose.y)
-            } keyframes: { _ in
-                KeyframeTrack(\.y) {
-                    LinearKeyframe(0, duration: start + 0.12)
-                    CubicKeyframe(-hop, duration: 0.26)
-                    CubicKeyframe(0, duration: 0.22)
+        content.rotationEffect(.degrees(reduceMotion ? degrees : 0))
+    }
+}
+
+/// "swipe up" with two chevrons nudging upward; tapping it continues too. While Iris is listening for
+/// "continue", the label becomes the glass listening pill, so the screen shows the microphone is open.
+private struct SwipeHint: View {
+    var unit: CGFloat
+    var listening = false
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 5 * unit) {
+                ZStack {
+                    Chevron(top: 3)
+                        .stroke(IrisPalette.white.opacity(0.45), style: StrokeStyle(lineWidth: 4 * unit, lineCap: .round, lineJoin: .round))
+                    Chevron(top: 21)
+                        .stroke(IrisPalette.white, style: StrokeStyle(lineWidth: 4 * unit, lineCap: .round, lineJoin: .round))
                 }
-                KeyframeTrack(\.stretch) {
-                    LinearKeyframe(1, duration: start)
-                    CubicKeyframe(0.8, duration: 0.12)  // crouch
-                    CubicKeyframe(1.15, duration: 0.12) // take off
-                    CubicKeyframe(1, duration: 0.14)    // top
-                    CubicKeyframe(1.08, duration: 0.22) // fall
-                    CubicKeyframe(0.8, duration: 0.08)  // land
-                    SpringKeyframe(1, duration: 0.9, spring: .bouncy(duration: 0.4, extraBounce: 0.2))
+                .frame(width: 26 * unit, height: 32 * unit)
+                    .frame(height: 34 * unit)
+                    .motion(Motion(1.4, curve: .easeInOut, repeats: true, alternate: true, from: .rest, to: Pose(y: -9)),
+                            unit: unit)
+                ZStack {
+                    if listening {
+                        ListeningIndicator(text: "Listening…")
+                            .padding(.bottom, -32 * unit)
+                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    } else {
+                        Text("swipe up")
+                            .font(IrisFont.nunito(16 * unit, .black))
+                            .foregroundStyle(IrisPalette.white)
+                            .transition(.opacity)
+                    }
                 }
+                .animation(.easeInOut(duration: 0.35), value: listening)
             }
-            .onChange(of: isActive, initial: true) { _, active in
-                guard active else { return }
-                hops += 1
-                // Starts once the landing wobble has settled.
-                withAnimation(.easeInOut(duration: pulseDuration).repeatForever().delay(start + 1.2)) {
-                    pulsing = true
-                }
-            }
-            .onDisappear { pulsing = false }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Continue")
+        .accessibilityHint("Or swipe up, or say continue")
+        .motion(Motion(0.7, delay: 1.5, from: Pose(opacity: 0)))
+    }
+}
+
+/// One upward chevron of the design's 30 × 38 pair, its point at `top`.
+private struct Chevron: Shape {
+    var top: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        let sx = rect.width / 30, sy = rect.height / 38
+        var path = Path()
+        path.move(to: CGPoint(x: 3 * sx, y: (top + 12) * sy))
+        path.addLine(to: CGPoint(x: 15 * sx, y: top * sy))
+        path.addLine(to: CGPoint(x: 27 * sx, y: (top + 12) * sy))
+        return path
     }
 }
 

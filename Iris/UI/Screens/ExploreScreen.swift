@@ -37,20 +37,37 @@ struct ExploreScreen: View {
     private let rescanHold: TimeInterval = 1.5
     private let rescanTimeout: TimeInterval = 8
 
+    @State private var celebrations = 0
+    /// What was read for the summary, kept so it can be read out if the agent never answers.
+    @State private var readLines: [String] = []
+    /// The agent couldn't connect, or dropped: Iris read the label out itself and listens for "go back".
+    @State private var agentEnded = false
+
     var body: some View {
-        GeometryReader { geo in
+        StageView { stage in
+            IrisPalette.ink
             ARCameraPreview(session: camera.session)
-                .overlay {
-                    ScanAreaOutline(
-                        imageSize: reader.uprightImageSize,
-                        viewSize: geo.size,
-                        foundText: !reader.lines.isEmpty,
-                        progress: ringProgress
-                    )
-                }
+            LinearGradient(stops: [.init(color: Color(rgba: 0x061B3740), location: 0),
+                                   .init(color: .clear, location: 0.32),
+                                   .init(color: .clear, location: 0.6),
+                                   .init(color: Color(rgba: 0x061B3750), location: 1)],
+                           startPoint: .top, endPoint: .bottom)
+                .allowsHitTesting(false)
+            CameraGlass(mode: .explore)
+            // The reading area. The hold-steady countdown fills it with light from the bottom up.
+            ObjectOutline(path: scanAreaPath(in: stage), style: outlineStyle,
+                          scanning: !summaryStarted || rescanning, fill: Double(ringProgress))
+            Sprinkles(count: 6, quiet: true, unit: stage.unit)
+            Confetti(trigger: celebrations, unit: stage.unit)
+            GlassBackButton(action: onBack)
+            statusPill
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }
         .ignoresSafeArea()
-        .overlay(alignment: .bottom) { statusPill }
+        .navigationBarBackButtonHidden(true)
+        .onChange(of: summaryStarted) { _, started in
+            if started { celebrations += 1 }
+        }
         .animation(.easeInOut, value: agent.status)
         .animation(.easeInOut, value: holdStartedAt != nil)
         .animation(.easeInOut, value: summaryStarted)
@@ -60,6 +77,7 @@ struct ExploreScreen: View {
         .onAppear {
             agent.onEndRequested = { onBack() }
             agent.onRescan = { await performRescan() }
+            agent.onEnded = { agentWentAway() }
             Task { await camera.start() }
         }
         .onChange(of: camera.state) { _, state in
@@ -94,7 +112,9 @@ struct ExploreScreen: View {
 
     @ViewBuilder
     private var statusPill: some View {
-        if !rescanning, agent.isRunning {
+        if agentEnded {
+            ListeningIndicator(text: listening ? "Say go back to finish" : "Iris is speaking…", speaking: !listening)
+        } else if !rescanning, agent.isRunning {
             ListeningIndicator(status: agent.status)
         } else if !rescanning, summaryStarted {
             ListeningIndicator(text: "Text detected", systemImage: "checkmark.circle.fill")
@@ -103,6 +123,20 @@ struct ExploreScreen: View {
         } else {
             ListeningIndicator(text: "Looking for text…", systemImage: "text.viewfinder")
         }
+    }
+
+    private var outlineStyle: ObjectOutline.Style {
+        if summaryStarted, !rescanning { return .settled }
+        return reader.lines.isEmpty ? .explore : .reading
+    }
+
+    /// `TextReader.region` (Vision coordinates, origin bottom left) on screen, the camera image being
+    /// aspect-filled.
+    private func scanAreaPath(in stage: Stage) -> Path {
+        let region = TextReader.region
+        let normalized = CGRect(x: region.minX, y: 1 - region.maxY, width: region.width, height: region.height)
+        let rect = MaskContour.aspectFill(normalized, image: reader.uprightImageSize, view: stage.size)
+        return Path(roundedRect: rect, cornerRadius: 28 * stage.unit, style: .continuous)
     }
 
     // Waits for text, runs the countdown once it is found, and returns what was read. With `hints`, it also nudges
@@ -207,12 +241,32 @@ struct ExploreScreen: View {
     // The agent takes over the microphone, so our own listener stops first. Connecting takes a moment anyway, so
     // it starts right away instead of waiting for "Text detected." to finish.
     private func beginSummary(with lines: [String]) {
+        readLines = lines
         summaryStarted = true
         holdStartedAt = nil
         withAnimation(.easeOut(duration: 0.3)) { ringProgress = 0 }
         stopListening()
         Speaker.shared.speak("Text detected.")
         agent.start(initialMessage: Self.summaryRequest(for: lines))
+    }
+
+    /// The agent couldn't be reached, or went away before it was done. Without this the screen would sit on
+    /// "Text detected" in silence with the microphone already handed over, and someone who can't see it
+    /// would be stuck: so Iris reads the label out itself and opens the microphone for "go back".
+    private func agentWentAway() {
+        guard summaryStarted, !agentEnded else { return }
+        agentEnded = true
+        Speaker.shared.speak(Self.fallbackSummary(for: readLines))
+        Task {
+            await Speaker.shared.waitUntilIdle()
+            await startListening()
+        }
+    }
+
+    /// Said in place of the agent's summary: the label itself, which is what the user wanted to know.
+    static func fallbackSummary(for lines: [String]) -> String {
+        guard !lines.isEmpty else { return "I can't reach the assistant, and I couldn't make out the text. Say go back to try again." }
+        return "I can't reach the assistant, but here's what it says. " + lines.prefix(6).joined(separator: ". ") + "."
     }
 
     /// Forwards camera frames to the reader, which throttles itself.
@@ -240,42 +294,6 @@ struct ExploreScreen: View {
 
         Summarize this item in one or two short sentences, then wait.
         """
-    }
-}
-
-/// Outlines the part of the picture that is being read, and fills in green during the countdown. The camera image
-/// fills the screen and is cropped to fit, so the outline is computed the same way (see SegmentationOverlay in
-/// LocateScreen).
-private struct ScanAreaOutline: View {
-    let imageSize: CGSize
-    let viewSize: CGSize
-    let foundText: Bool
-    let progress: CGFloat
-
-    private var rect: CGRect {
-        let scale = max(viewSize.width / imageSize.width, viewSize.height / imageSize.height)
-        let content = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
-        let region = TextReader.region
-        return CGRect(
-            x: region.minX * content.width - (content.width - viewSize.width) / 2,
-            y: (1 - region.maxY) * content.height - (content.height - viewSize.height) / 2,
-            width: region.width * content.width,
-            height: region.height * content.height
-        )
-    }
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .stroke(foundText ? Color.green.opacity(0.4) : Color.white.opacity(0.8), lineWidth: 3)
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .trim(from: 0, to: progress)
-                    .stroke(Color.green, style: StrokeStyle(lineWidth: 6, lineCap: .round))
-            }
-            .frame(width: rect.width, height: rect.height)
-            .position(x: rect.midX, y: rect.midY)
-            .animation(.easeInOut, value: foundText)
-            .allowsHitTesting(false)
     }
 }
 

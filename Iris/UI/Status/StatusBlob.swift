@@ -1,148 +1,102 @@
 import SwiftUI
 
-/// The one thing at the bottom of the camera screen: a blob of water holding whatever the screen has to
-/// say. How far away the thing is, big, with a line under it naming what is happening — the step the
-/// voice has just announced while guidance has the screen, the conversation's own state after the
-/// handoff, when there is no distance left to show and the blob is that line alone.
+/// The glass status panel at the bottom of the camera screens: a big line on top (how far, or the headline
+/// of what is happening) and a smaller one under it. It pops in from the right and hovers gently.
 ///
-/// It is the only bottom pill here. The frosted `ListeningIndicator` used to sit under it saying the
-/// same steps in different words, so the two are one thing, in the same water as `WaterPour` and
-/// `GuidanceRipple`.
+/// While guidance has the screen the big line is the distance being measured and the small one the step
+/// the voice has announced; with nothing measured, a step label such as "Step 2 of 3 · Move across" is
+/// split at its "·" into the two lines.
 struct StatusBlob: View {
-    /// The big line: what was measured. `nil` while nothing is — the blob is then a single line of text
-    /// rather than a readout of "—".
+    /// The big line: what was measured. `nil` while nothing is.
     var measurement: String?
     /// Where that measurement has to get to ("→ 10 in"), on the last step. Smaller, beside it.
     var goal: String?
     /// What is happening, in the same words the voice uses.
     var text: String
-    /// Breathes, the way the old pill's microphone did.
+    /// An SF Symbol for the step, breathing beside the small line (or the big one when there is no small
+    /// line), so the step reads at a glance.
     var systemImage: String?
-    /// The blob fills out and its foam brightens once the thing it is reporting has been reached. The
-    /// screen's other "yes" is a green box, which belongs to the computer-vision overlay rather than
-    /// to this.
+    /// Brightens the rim once the thing it is reporting has been reached.
     var highlighted = false
 
-    /// The MainScreen blue, taken from the layer itself so it can't drift from the rest of the water.
-    private let water = MainArt.background.color
+    @Environment(\.irisUnit) private var unit
 
-    @State private var start = Date()
-    @State private var bob = false
-    @State private var breathing = false
-
-    /// With a measurement above it the second line is a caption; on its own it is the whole message,
-    /// so it is set at the size the pill it replaced used.
-    private var alone: Bool { measurement == nil }
-
-    var body: some View {
-        VStack(spacing: 3) {
-            if let measurement {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(measurement)
-                        .font(.system(size: 34, weight: .heavy, design: .rounded).monospacedDigit())
-                    if let goal {
-                        Text(goal)
-                            .font(.system(size: 17, weight: .semibold, design: .rounded).monospacedDigit())
-                            .opacity(0.75)
-                    }
-                }
-            }
-            HStack(spacing: 7) {
-                if let systemImage {
-                    Image(systemName: systemImage)
-                        .font(.system(size: alone ? 17 : 14, weight: .semibold))
-                        .symbolRenderingMode(.hierarchical)
-                        .scaleEffect(breathing ? 1.12 : 0.92)
-                }
-                Text(text)
-                    .font(.system(size: alone ? 19 : 15, weight: .semibold, design: .rounded))
-            }
-            .opacity(alone ? 1 : 0.92)
-        }
-        .lineLimit(1)
-        .minimumScaleFactor(0.75)
-        .foregroundStyle(.white)
-        .shadow(color: .black.opacity(0.3), radius: 3, y: 1)
-        .padding(.horizontal, 34)
-        .padding(.vertical, alone ? 17 : 20)
-        .background {
-            // Only the blob is on a per-frame schedule: the text sits outside it, so a wobble doesn't
-            // re-lay-out two strings 120 times a second.
-            TimelineView(.animation) { timeline in
-                let t = timeline.date.timeIntervalSince(start)
-                Canvas(opaque: false, rendersAsynchronously: true) { context, size in
-                    let path = blob(in: size, t: t)
-                    context.fill(path, with: .color(water.opacity(highlighted ? 0.92 : 0.78)))
-                    // A glint, so it reads as a surface and not a flat shape.
-                    context.fill(
-                        Path(ellipseIn: CGRect(x: size.width * 0.15, y: size.height * 0.17,
-                                               width: size.width * 0.2, height: size.height * 0.15)),
-                        with: .color(.white.opacity(0.16))
-                    )
-                    context.stroke(
-                        path,
-                        with: .color(.white.opacity(highlighted ? 0.95 : 0.55)),
-                        style: StrokeStyle(lineWidth: 2.5, lineJoin: .round)
-                    )
-                }
-                .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
-            }
-        }
-        // Buoyancy, as a repeating animation rather than another per-frame schedule: it's a transform
-        // on what is already drawn, so it costs nothing to keep running.
-        .offset(y: bob ? 3 : -3)
-        .padding(.bottom, 32)
-        .transition(.opacity.combined(with: .scale(scale: 0.92)))
-        .animation(.easeInOut(duration: 0.3), value: highlighted)
-        .onAppear {
-            start = .now
-            withAnimation(.easeInOut(duration: 1.7).repeatForever(autoreverses: true)) { bob = true }
-            withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { breathing = true }
-        }
+    private var lines: (head: String, detail: String?) {
+        if let measurement { return (measurement, text) }
+        let parts = text.components(separatedBy: " · ")
+        if parts.count == 2 { return (parts[0], parts[1]) }
+        return (text, nil)
     }
 
-    /// A squircle with a slow swell running around it: round enough to read as a drop of water, square
-    /// enough to hold a line of text without wasting its corners the way an ellipse would.
-    private func blob(in size: CGSize, t: TimeInterval) -> Path {
-        let centerX = size.width / 2
-        let centerY = size.height / 2
-        // Room for the foam line, which is stroked on the path itself.
-        let radiusX = centerX - 3
-        let radiusY = centerY - 3
-        let steps = 48
-
-        var points: [CGPoint] = []
-        points.reserveCapacity(steps)
-        for step in 0..<steps {
-            let angle = Double(step) / Double(steps) * 2 * .pi
-            // Two swells at different rates, so the surface never repeats a shape you can catch.
-            let swell = 1 + 0.035 * sin(3 * angle + t * 0.9) + 0.022 * sin(5 * angle - t * 0.6)
-            let cosine = cos(angle), sine = sin(angle)
-            points.append(CGPoint(
-                x: centerX + radiusX * swell * copysign(pow(abs(cosine), 0.5), cosine),
-                y: centerY + radiusY * swell * copysign(pow(abs(sine), 0.5), sine)
-            ))
+    var body: some View {
+        let (head, detail) = lines
+        let shape = RoundedRectangle(cornerRadius: 29 * unit, style: .continuous)
+        VStack(spacing: 2 * unit) {
+            HStack(alignment: .firstTextBaseline, spacing: 6 * unit) {
+                if detail == nil, let systemImage { icon(systemImage, size: 22) }
+                Text(head)
+                    .font(IrisFont.nunito(34 * unit, .black).monospacedDigit())
+                    .tracking(-1 * unit)
+                if let goal {
+                    Text(goal)
+                        .font(IrisFont.nunito(17 * unit, .bold).monospacedDigit())
+                        .opacity(0.75)
+                }
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            if let detail {
+                HStack(spacing: 6 * unit) {
+                    if let systemImage { icon(systemImage, size: 14) }
+                    Text(detail)
+                        .font(IrisFont.nunito(15 * unit, .semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+            }
         }
-
-        // Smoothed through the midpoints, the same way the waves and `WaterPour`'s surface are drawn.
-        var path = Path()
-        path.move(to: CGPoint(x: (points[steps - 1].x + points[0].x) / 2,
-                              y: (points[steps - 1].y + points[0].y) / 2))
-        for step in 0..<steps {
-            let next = points[(step + 1) % steps]
-            path.addQuadCurve(
-                to: CGPoint(x: (points[step].x + next.x) / 2, y: (points[step].y + next.y) / 2),
-                control: points[step]
-            )
+        .contentTransition(.numericText())
+        .foregroundStyle(IrisPalette.white)
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, 20 * unit)
+        .padding(.vertical, 18 * unit)
+        .frame(width: 270 * unit)
+        .frame(minHeight: 101 * unit)
+        .background {
+            shape
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .overlay {
+                    shape.fill(LinearGradient(colors: [Color(rgba: 0x297FDBCC), Color(rgba: 0x123A73B3)],
+                                              startPoint: .topLeading, endPoint: .bottomTrailing))
+                }
+                .overlay(alignment: .topLeading) {
+                    // The thin highlight along the top edge.
+                    LinearGradient(colors: [.clear, Color(rgba: 0xFAFCFF99), .clear], startPoint: .leading, endPoint: .trailing)
+                        .frame(width: 90 * unit, height: 1)
+                        .offset(x: 20 * unit, y: 10 * unit)
+                }
+                .overlay {
+                    shape.strokeBorder(highlighted ? IrisPalette.ice : Color(rgba: 0xE7F5FFAA),
+                                       lineWidth: highlighted ? 2 : 1)
+                }
+                .shadow(color: Color(rgba: 0x061B3740), radius: 15 * unit, y: 14 * unit)
         }
-        path.closeSubpath()
-        return path
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel([measurement, goal.map { "goal \($0)" }, text].compactMap { $0 }.joined(separator: ", "))
+        .accessibilityAddTraits(.updatesFrequently)
+        .motion(Motion(4.5, delay: 0.7, curve: .easeInOut, repeats: true, alternate: true, from: .rest, to: Pose(y: -5)),
+                unit: unit)
+        .motion(Motion(0.7, curve: Bezier(0.2, 0.8, 0.25, 1.3), from: Pose(x: 90, y: 20, scale: 0.6, opacity: 0)),
+                unit: unit)
+        .animation(.easeInOut(duration: 0.3), value: highlighted)
+        .padding(.bottom, 45 * unit)
+        .transition(.opacity)
     }
 }
 
 extension StatusBlob {
-    /// The conversation half of the screen, in the words `ListeningIndicator` used for it on Analyze —
-    /// there is nothing measured here, so this is the one-line blob.
+    /// The conversation half of the screen.
     init(status: AgentSession.Status) {
         switch status {
         case .speaking: self.init(text: "Iris is speaking…", systemImage: "speaker.wave.2.fill")
@@ -150,5 +104,14 @@ extension StatusBlob {
         case .connecting: self.init(text: "Connecting…", systemImage: "antenna.radiowaves.left.and.right")
         case .listening, .idle: self.init(text: "Listening…", systemImage: "mic.fill")
         }
+    }
+
+    private func icon(_ name: String, size: CGFloat) -> some View {
+        Image(systemName: name)
+            .font(.system(size: size * unit, weight: .semibold))
+            .symbolRenderingMode(.hierarchical)
+            .contentTransition(.symbolEffect(.replace))
+            .motion(Motion(0.8, curve: .easeInOut, repeats: true, alternate: true,
+                           from: Pose(scale: 0.92), to: Pose(scale: 1.12)))
     }
 }

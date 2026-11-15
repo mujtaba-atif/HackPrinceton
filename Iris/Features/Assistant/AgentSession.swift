@@ -75,11 +75,35 @@ final class AgentSession: ObservableObject {
     private var personaPrompt: String?
     private var personaFirstMessage: String?
     private var pendingInitialMessage: String?
-    private var retriedWithoutOverrides = false
-    /// Whether the connection that is up was made with overrides. A refused override presents as a
-    /// connection that is dropped before the agent says anything, and only one made with overrides is
-    /// worth retrying without them.
-    private var usedOverrides = false
+    /// Which overrides the connection that is up was made with. A refused override presents as a failed or
+    /// dropped connection, and each refusal steps down one level (`OverrideLevel.fallback`).
+    private var overrides = OverrideLevel.full
+
+    /// What a connection asks the agent to change. The voice is the override an agent is most likely not to
+    /// allow, and it is the least important, so it goes first: a refused voice keeps Locate's persona.
+    private enum OverrideLevel {
+        /// Persona (if any) and voice.
+        case full
+        /// Persona only.
+        case persona
+        /// The agent as configured.
+        case none
+    }
+
+    /// The level to retry at after `level` was refused, or nil when there is nothing left to drop.
+    private func fallback(after level: OverrideLevel) -> OverrideLevel? {
+        switch level {
+        case .full: hasPersona ? .persona : OverrideLevel.none
+        case .persona: OverrideLevel.none
+        case .none: nil
+        }
+    }
+
+    /// False while `Secrets` still holds the template's placeholder (or nothing): there is no agent to call.
+    static var isConfigured: Bool {
+        let id = Secrets.elevenLabsAgentID.trimmingCharacters(in: .whitespaces)
+        return !id.isEmpty && !id.hasPrefix("PASTE_")
+    }
     private var hasPersona: Bool { personaPrompt != nil || personaFirstMessage != nil }
     private var keywordFollowUp: Task<Void, Never>?
     private var lastRescan: (lines: [String], finishedAt: Date, delivered: Bool)?
@@ -134,10 +158,16 @@ final class AgentSession: ObservableObject {
         personaPrompt = prompt
         personaFirstMessage = firstMessage
         pendingInitialMessage = initialMessage
-        retriedWithoutOverrides = false
-        usedOverrides = false
         resetForConnection()
-        beginConnecting(withOverrides: true)
+        // No agent ID: fail straight away, so the screen's fallback runs instead of two doomed network
+        // round trips. Reported after this returns, as a real failure would be.
+        guard Self.isConfigured else {
+            print("Agent: no agent ID in Secrets.swift")
+            status = .idle
+            Task { @MainActor [weak self] in self?.onEnded?() }
+            return
+        }
+        beginConnecting(overrides: .full)
     }
 
     /// Per-connection state, so a retry starts as clean as a first attempt.
@@ -153,27 +183,26 @@ final class AgentSession: ObservableObject {
         isApplyingMute = false
     }
 
-    private func beginConnecting(withOverrides: Bool) {
+    private func beginConnecting(overrides level: OverrideLevel) {
         status = .connecting
         startTask = Task { [self] in
             defer { startTask = nil }
-            var useOverrides = withOverrides
+            var level = level
             while true {
                 do {
                     // Off the main actor: both halves of this are synchronous IPC to the media server.
                     try await Task.detached(priority: .userInitiated) { try Self.prepareAudio() }.value
-                    try await connect(withOverrides: useOverrides)
+                    try await connect(overrides: level)
                     return
                 } catch {
-                    guard useOverrides, !Task.isCancelled else {
+                    guard !Task.isCancelled, let next = fallback(after: level) else {
                         print("Agent start failed: \(error)")
                         status = .idle
                         onEnded?()
                         return
                     }
-                    print("Agent refused the overrides (\(error)) — retrying as it is configured")
-                    retriedWithoutOverrides = true
-                    useOverrides = false
+                    print("Agent refused the overrides (\(error)) — retrying with fewer")
+                    level = next
                     resetForConnection()
                 }
             }
@@ -217,7 +246,7 @@ final class AgentSession: ObservableObject {
         return true
     }()
 
-    private func connect(withOverrides: Bool) async throws {
+    private func connect(overrides level: OverrideLevel) async throws {
         var config = ConversationConfig(
             onError: { print("Agent error: \($0)") },
             onAgentResponse: { [weak self] text, _ in
@@ -234,15 +263,15 @@ final class AgentSession: ObservableObject {
         )
         // Without this the SDK waits a full second after the agent stops before it reports "listening".
         config.agentStateConfiguration = AgentStateConfiguration(speakingToListeningDelay: 0.2)
-        usedOverrides = withOverrides
-        if withOverrides {
-            // Only for a caller that is re-skinning the agent. A screen that takes the agent as
-            // configured (Analyze) still gets the voice override below, but not this.
-            if hasPersona {
-                config.agentOverrides = AgentOverrides(prompt: personaPrompt, firstMessage: personaFirstMessage)
-            }
-            // The voice `Speaker` has been using, always: the agent picks up mid-conversation from
-            // whatever the screen last said, and a change of voice there reads as a second person.
+        overrides = level
+        // Only for a caller that is re-skinning the agent. A screen that takes the agent as configured
+        // (Explore) still gets the voice override below, but not this.
+        if level != .none, hasPersona {
+            config.agentOverrides = AgentOverrides(prompt: personaPrompt, firstMessage: personaFirstMessage)
+        }
+        // The voice `Speaker` has been using: the agent picks up mid-conversation from whatever the screen
+        // last said, and a change of voice there reads as a second person.
+        if level == .full {
             config.ttsOverrides = TTSOverrides(
                 voiceId: Speaker.voiceID,
                 stability: Speaker.stability,
@@ -490,11 +519,10 @@ final class AgentSession: ObservableObject {
         conversation = nil
         // A refused override can also present as a connection that is accepted and then dropped, so a
         // disconnect before the agent has said a single word is treated as the same failure.
-        if !isStopping, usedOverrides, !retriedWithoutOverrides, !heardAgent {
-            print("Dropped before the agent spoke — retrying as it is configured")
-            retriedWithoutOverrides = true
+        if !isStopping, !heardAgent, let next = fallback(after: overrides) {
+            print("Dropped before the agent spoke — retrying with fewer overrides")
             resetForConnection()
-            beginConnecting(withOverrides: false)
+            beginConnecting(overrides: next)
             return
         }
         status = .idle

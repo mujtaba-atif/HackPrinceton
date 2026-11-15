@@ -150,14 +150,4 @@ final class VoiceAssistantTests: XCTestCase {
         consolidator.reset()
         XCTAssertEqual(consolidator.consolidated(), [])
     }
-
-    func testIrisWordmarkSplitsIntoLettersInPlace() {
-        let rect = CGRect(x: 76.6, y: 270.9, width: 572.0, height: 126.3)
-        let title = IrisLettering.layer(name: "Title", text: "IRIS", in: rect, color: .white)
-        XCTAssertEqual(title.pieces.count, 4)
-        XCTAssertTrue(rect.insetBy(dx: -1, dy: -1).contains(title.bounds))
-        let label = IrisLettering.layer(name: "Label", text: "LOCATE", in: CGRect(x: 0, y: 0, width: 90, height: 300),
-                                        color: .white, orientation: .upward)
-        XCTAssertGreaterThan(label.bounds.height, label.bounds.width, "sideways label runs vertically")
-    }
 }

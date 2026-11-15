@@ -77,39 +77,42 @@
 		7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 755033595C1F3BB46DC83F00 /* Speaker.swift */; };
 		1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */; };
 		20EEF65CB78975CEF6B1E969 /* VoiceListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB9F75CE03C12CC79C15115C /* VoiceListener.swift */; };
-		816E70868450FEDA1EDE7D95 /* ArtLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1480F9BE369E6FB51AB91BC /* ArtLayer.swift */; };
-		50076E6C1612C690C1F3A84B /* ArtRaster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E4D1DF8E283C35DB75AD79F /* ArtRaster.swift */; };
-		C3FF707128CDD29B8CC9F064 /* HomeArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00729E084364D74826C945CF /* HomeArt.swift */; };
-		968D8CE496470359ADD0E0E6 /* IrisLettering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245BAEC5942E27A36209488 /* IrisLettering.swift */; };
-		6F7296C053452E66EA97BCA2 /* MainArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB763965BDA80D446416E68 /* MainArt.swift */; };
-		FE0F180F4361EFAEACB5FD0A /* BubbleTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE94D1CA250489DBF41A47F /* BubbleTitle.swift */; };
-		9C1C6D2C1BF947BC90AF636B /* EyeMotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A3287F5758629A8EDD4DE /* EyeMotion.swift */; };
-		7E9DEE7DBD1154C0E161F108 /* Floating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E89014CC8F53551BCAB046 /* Floating.swift */; };
-		5DEF8043E0E3463E07FACA3B /* PageTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172F92B51E2CDF58E4CFC68C /* PageTransition.swift */; };
 		BC2F80D78C7B4E98114C2028 /* ExploreScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA3B51575FFCA38EB03FFF4A /* ExploreScreen.swift */; };
 		3CB2F72CBC536A6055E6B44C /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72E5803A65B52FD9176F2F51 /* HomeScreen.swift */; };
 		11ECD56AC9746F1282B6F5EA /* LoadingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A449D08AD378D086F4FED11 /* LoadingScreen.swift */; };
 		02E966CF7C30457838BC93D9 /* LocateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7609DD9148ECBE05E9E68DDE /* LocateScreen.swift */; };
 		8A379054380DF7946BA1D070 /* MainScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAAB3211DB6E012AEF47CCEB /* MainScreen.swift */; };
 		577A899346A9311B348CAD6A /* Preloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D37767CFFF9095EB37628D8 /* Preloader.swift */; };
-		8573830C84FE9E84469A8E81 /* HandHighlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB794C55C189F64F28642828 /* HandHighlight.swift */; };
 		3E3A4B121E3D663D760365BB /* ListeningIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E6C6ED0C5A6C11EC7189225 /* ListeningIndicator.swift */; };
 		456EABA3869A47A66130BCD2 /* StatusBlob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0130B7367C22BB90DA8158DA /* StatusBlob.swift */; };
 		5D38D151CCD81227F64B2027 /* VolumeHUDHider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA6226E98B8A0B68C7FE9AFB /* VolumeHUDHider.swift */; };
-		0008798CAB6EA0F631A99BD2 /* AudioLevels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2390BD742EF871F1300FF6F6 /* AudioLevels.swift */; };
-		8DD30BEF7D27EEE14413F291 /* ConversationWater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E44C4C4C8BE620696581CAF /* ConversationWater.swift */; };
-		1731BDB8F9C940A24001D44B /* GuidanceRipple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5541AEC519176B9639B2032D /* GuidanceRipple.swift */; };
-		818A36B82427DC9FA8656147 /* WaterVisualizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FB3E1F770B91D5FCF0E8AC /* WaterVisualizer.swift */; };
 		B7949439CC8121C58B40B4CE /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7596E344345AB05C574D20FB /* LiveKit */; };
 		71852BAF5E3F62958B4F5AB3 /* yolo26n-seg.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */; };
-		327F814E23A0F1CECDC30C7B /* BoundingBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4B9D8D705E569613508285 /* BoundingBox.swift */; };
 		495DC139EB93A665D6CAA1F7 /* ModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302E52BFED13DC936B0FFE1A /* ModelStore.swift */; };
 		0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73195524758434685EDE70A4 /* ObjectDetection.swift */; };
 		F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */; };
-		B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */; };
 		6C1CBCE8BD772F8E124719F8 /* TextConsolidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */; };
 		7291E0C5631DCB7613BB7F65 /* TextReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 965C24B30DBF979D7034F8B9 /* TextReader.swift */; };
 		34761C72166B58C77E2FC806 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = F36E68C00ED7D7FF2F33DF2E /* Secrets.swift */; };
+		1F0A7C3E5B2D4A6E8C9F0B12 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 1F0A7C3E5B2D4A6E8C9F0B11 /* Fonts */; };
+		588E56D1BEDDC8F5D0659183 /* Ambience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086D9C7CFBA02740357396A /* Ambience.swift */; };
+		16C5FF087B717350AF4316CB /* IrisArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54017A5513CAAB40A086121E /* IrisArtwork.swift */; };
+		431037924DCCEC34113EB769 /* IrisPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7E7FA00358420FE2871674 /* IrisPalette.swift */; };
+		3ED2FB8C38E59179E9F3A3E9 /* Keyframes.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED16BEE08D8385CE5CA4C9AD /* Keyframes.swift */; };
+		5E52690739AA0D0A7C5E4361 /* PrismText.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCE692648559FDE5752EA6D0 /* PrismText.swift */; };
+		6138923C9D38E589FA2DDEE9 /* SVGPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 008C949608F726AED8378D49 /* SVGPath.swift */; };
+		35FB586F109AEA49EABFA339 /* Stage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D73DF6A45700DF376EB8E6 /* Stage.swift */; };
+		3ABB8229B5A1918C4B73FE0D /* VectorArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02C0800FC65848E70EBD0AFA /* VectorArt.swift */; };
+		7D181D3EC9B47B87A782DD8F /* MaskContour.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0448BBC4606BE63D89A783 /* MaskContour.swift */; };
+		B2E2D2E6AB33A7E19EAE9226 /* CameraGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EC656511F3C506D6457A934 /* CameraGlass.swift */; };
+		81C1C4876F152AEB276A1883 /* Crew.swift in Sources */ = {isa = PBXBuildFile; fileRef = D524076CFF2C1EA9928ED592 /* Crew.swift */; };
+		D9C55300909A34A331A77627 /* GlassControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92C8CB3A38164E180BE688D /* GlassControls.swift */; };
+		0C9693B609DE7575EA347BBB /* GlassWipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815144D18FC3D2CF1FF3C851 /* GlassWipe.swift */; };
+		9517DDA797E775CF094571D1 /* ObjectOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A922A36F36632F4262D0FEA /* ObjectOutline.swift */; };
+		643B7251FFF93091F9BF533F /* OptionCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70ECC760A035014FAEA77D60 /* OptionCards.swift */; };
+		FD40FCB217AEDB601A24B81A /* AudioLevels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572304DD0DBDD723EBF37A55 /* AudioLevels.swift */; };
+		FE82AA3C4F857414D302EB56 /* IrisDesignTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CB5A092CBA552031E404DC /* IrisDesignTests.swift */; };
+		D01FADBEDA3CD61EAE0523CA /* DeviceTilt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C41092FDAE067343DC2D15FC /* DeviceTilt.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,38 +197,41 @@
 		755033595C1F3BB46DC83F00 /* Speaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speaker.swift; sourceTree = "<group>"; };
 		55B7DF5BAE968A9BC0D9B234 /* TargetParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetParser.swift; sourceTree = "<group>"; };
 		CB9F75CE03C12CC79C15115C /* VoiceListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceListener.swift; sourceTree = "<group>"; };
-		A1480F9BE369E6FB51AB91BC /* ArtLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtLayer.swift; sourceTree = "<group>"; };
-		7E4D1DF8E283C35DB75AD79F /* ArtRaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtRaster.swift; sourceTree = "<group>"; };
-		00729E084364D74826C945CF /* HomeArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeArt.swift; sourceTree = "<group>"; };
-		5245BAEC5942E27A36209488 /* IrisLettering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisLettering.swift; sourceTree = "<group>"; };
-		9FB763965BDA80D446416E68 /* MainArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainArt.swift; sourceTree = "<group>"; };
-		AEE94D1CA250489DBF41A47F /* BubbleTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubbleTitle.swift; sourceTree = "<group>"; };
-		D90A3287F5758629A8EDD4DE /* EyeMotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeMotion.swift; sourceTree = "<group>"; };
-		27E89014CC8F53551BCAB046 /* Floating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Floating.swift; sourceTree = "<group>"; };
-		172F92B51E2CDF58E4CFC68C /* PageTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageTransition.swift; sourceTree = "<group>"; };
 		DA3B51575FFCA38EB03FFF4A /* ExploreScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreScreen.swift; sourceTree = "<group>"; };
 		72E5803A65B52FD9176F2F51 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
 		7A449D08AD378D086F4FED11 /* LoadingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScreen.swift; sourceTree = "<group>"; };
 		7609DD9148ECBE05E9E68DDE /* LocateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocateScreen.swift; sourceTree = "<group>"; };
 		DAAB3211DB6E012AEF47CCEB /* MainScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreen.swift; sourceTree = "<group>"; };
 		2D37767CFFF9095EB37628D8 /* Preloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preloader.swift; sourceTree = "<group>"; };
-		AB794C55C189F64F28642828 /* HandHighlight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandHighlight.swift; sourceTree = "<group>"; };
 		5E6C6ED0C5A6C11EC7189225 /* ListeningIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeningIndicator.swift; sourceTree = "<group>"; };
 		0130B7367C22BB90DA8158DA /* StatusBlob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBlob.swift; sourceTree = "<group>"; };
 		EA6226E98B8A0B68C7FE9AFB /* VolumeHUDHider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeHUDHider.swift; sourceTree = "<group>"; };
-		2390BD742EF871F1300FF6F6 /* AudioLevels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevels.swift; sourceTree = "<group>"; };
-		9E44C4C4C8BE620696581CAF /* ConversationWater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationWater.swift; sourceTree = "<group>"; };
-		5541AEC519176B9639B2032D /* GuidanceRipple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidanceRipple.swift; sourceTree = "<group>"; };
-		C5FB3E1F770B91D5FCF0E8AC /* WaterVisualizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterVisualizer.swift; sourceTree = "<group>"; };
 		DF988DD9092F3ECFDFCD4929 /* yolo26n-seg.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = "yolo26n-seg.mlpackage"; sourceTree = "<group>"; };
-		CA4B9D8D705E569613508285 /* BoundingBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundingBox.swift; sourceTree = "<group>"; };
 		302E52BFED13DC936B0FFE1A /* ModelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelStore.swift; sourceTree = "<group>"; };
 		73195524758434685EDE70A4 /* ObjectDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
 		4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Segmentation.swift; sourceTree = "<group>"; };
-		D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentationOverlay.swift; sourceTree = "<group>"; };
 		C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextConsolidator.swift; sourceTree = "<group>"; };
 		965C24B30DBF979D7034F8B9 /* TextReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextReader.swift; sourceTree = "<group>"; };
 		F36E68C00ED7D7FF2F33DF2E /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		1F0A7C3E5B2D4A6E8C9F0B11 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
+		5086D9C7CFBA02740357396A /* Ambience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ambience.swift; sourceTree = "<group>"; };
+		54017A5513CAAB40A086121E /* IrisArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisArtwork.swift; sourceTree = "<group>"; };
+		CA7E7FA00358420FE2871674 /* IrisPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisPalette.swift; sourceTree = "<group>"; };
+		ED16BEE08D8385CE5CA4C9AD /* Keyframes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyframes.swift; sourceTree = "<group>"; };
+		CCE692648559FDE5752EA6D0 /* PrismText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrismText.swift; sourceTree = "<group>"; };
+		008C949608F726AED8378D49 /* SVGPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGPath.swift; sourceTree = "<group>"; };
+		37D73DF6A45700DF376EB8E6 /* Stage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stage.swift; sourceTree = "<group>"; };
+		02C0800FC65848E70EBD0AFA /* VectorArt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VectorArt.swift; sourceTree = "<group>"; };
+		BF0448BBC4606BE63D89A783 /* MaskContour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskContour.swift; sourceTree = "<group>"; };
+		9EC656511F3C506D6457A934 /* CameraGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraGlass.swift; sourceTree = "<group>"; };
+		D524076CFF2C1EA9928ED592 /* Crew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crew.swift; sourceTree = "<group>"; };
+		F92C8CB3A38164E180BE688D /* GlassControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassControls.swift; sourceTree = "<group>"; };
+		815144D18FC3D2CF1FF3C851 /* GlassWipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassWipe.swift; sourceTree = "<group>"; };
+		5A922A36F36632F4262D0FEA /* ObjectOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectOutline.swift; sourceTree = "<group>"; };
+		70ECC760A035014FAEA77D60 /* OptionCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionCards.swift; sourceTree = "<group>"; };
+		572304DD0DBDD723EBF37A55 /* AudioLevels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevels.swift; sourceTree = "<group>"; };
+		A4CB5A092CBA552031E404DC /* IrisDesignTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IrisDesignTests.swift; sourceTree = "<group>"; };
+		C41092FDAE067343DC2D15FC /* DeviceTilt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceTilt.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				2E5427E9CC3CBB1A2445DEBA /* Assets.xcassets */,
+				1F0A7C3E5B2D4A6E8C9F0B11 /* Fonts */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -335,6 +342,7 @@
 		8B859314DB564112B1801AB9 /* IrisTests */ = {
 			isa = PBXGroup;
 			children = (
+				A4CB5A092CBA552031E404DC /* IrisDesignTests.swift */,
 				52799FE903FA9AE6908EB919 /* LabelReadingTests.swift */,
 				742BCB2D3A3DD9ACF735870A /* VoiceAssistantTests.swift */,
 				BCBE9D9F09430759795B87DD /* DepthEstimationTests.swift */,
@@ -386,11 +394,9 @@
 		D580CBAFC79367258C0BD8D8 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				6E67ED299F7BB1A5DCD81721 /* Water */,
+				B34C856811D5F496E15FE3C3 /* Glass */,
 				C207E0FA4620FFF4CCD3915C /* Status */,
 				882B59F88E75429526DA3935 /* Screens */,
-				2EAA1334D98C64DCE32E55FE /* Motion */,
-				5C82E641F84C85967601CC7E /* Art */,
 				68C2A2295A1FF386D46FA3E2 /* Components */,
 				22066024C41492529EF58145 /* Exploration */,
 				557E02960D82EDDC2AC9C404 /* LabelReading */,
@@ -512,38 +518,14 @@
 		C6436FC52638AF1D781B0C81 /* Locate */ = {
 			isa = PBXGroup;
 			children = (
-				D17D69ECCF28E766BD9F5DE7 /* SegmentationOverlay.swift */,
+				BF0448BBC4606BE63D89A783 /* MaskContour.swift */,
 				4FC68D0C5BA294E6AD1C79D8 /* Segmentation.swift */,
 				73195524758434685EDE70A4 /* ObjectDetection.swift */,
 				302E52BFED13DC936B0FFE1A /* ModelStore.swift */,
-				CA4B9D8D705E569613508285 /* BoundingBox.swift */,
 				B7F0AF49E565610C38E25EFA /* Resources */,
 				4657F7C7CB02F87342DFAF13 /* DistanceBeepController.swift */,
 			);
 			path = Locate;
-			sourceTree = "<group>";
-		};
-		5C82E641F84C85967601CC7E /* Art */ = {
-			isa = PBXGroup;
-			children = (
-				9FB763965BDA80D446416E68 /* MainArt.swift */,
-				5245BAEC5942E27A36209488 /* IrisLettering.swift */,
-				00729E084364D74826C945CF /* HomeArt.swift */,
-				7E4D1DF8E283C35DB75AD79F /* ArtRaster.swift */,
-				A1480F9BE369E6FB51AB91BC /* ArtLayer.swift */,
-			);
-			path = Art;
-			sourceTree = "<group>";
-		};
-		2EAA1334D98C64DCE32E55FE /* Motion */ = {
-			isa = PBXGroup;
-			children = (
-				172F92B51E2CDF58E4CFC68C /* PageTransition.swift */,
-				27E89014CC8F53551BCAB046 /* Floating.swift */,
-				D90A3287F5758629A8EDD4DE /* EyeMotion.swift */,
-				AEE94D1CA250489DBF41A47F /* BubbleTitle.swift */,
-			);
-			path = Motion;
 			sourceTree = "<group>";
 		};
 		882B59F88E75429526DA3935 /* Screens */ = {
@@ -565,20 +547,8 @@
 				EA6226E98B8A0B68C7FE9AFB /* VolumeHUDHider.swift */,
 				0130B7367C22BB90DA8158DA /* StatusBlob.swift */,
 				5E6C6ED0C5A6C11EC7189225 /* ListeningIndicator.swift */,
-				AB794C55C189F64F28642828 /* HandHighlight.swift */,
 			);
 			path = Status;
-			sourceTree = "<group>";
-		};
-		6E67ED299F7BB1A5DCD81721 /* Water */ = {
-			isa = PBXGroup;
-			children = (
-				C5FB3E1F770B91D5FCF0E8AC /* WaterVisualizer.swift */,
-				5541AEC519176B9639B2032D /* GuidanceRipple.swift */,
-				9E44C4C4C8BE620696581CAF /* ConversationWater.swift */,
-				2390BD742EF871F1300FF6F6 /* AudioLevels.swift */,
-			);
-			path = Water;
 			sourceTree = "<group>";
 		};
 		B7F0AF49E565610C38E25EFA /* Resources */ = {
@@ -596,6 +566,29 @@
 				C45E6B638BF68987CE93A1D1 /* TextConsolidator.swift */,
 			);
 			path = Explore;
+			sourceTree = "<group>";
+		};
+		B34C856811D5F496E15FE3C3 /* Glass */ = {
+			isa = PBXGroup;
+			children = (
+				C41092FDAE067343DC2D15FC /* DeviceTilt.swift */,
+				572304DD0DBDD723EBF37A55 /* AudioLevels.swift */,
+				70ECC760A035014FAEA77D60 /* OptionCards.swift */,
+				5A922A36F36632F4262D0FEA /* ObjectOutline.swift */,
+				815144D18FC3D2CF1FF3C851 /* GlassWipe.swift */,
+				F92C8CB3A38164E180BE688D /* GlassControls.swift */,
+				D524076CFF2C1EA9928ED592 /* Crew.swift */,
+				9EC656511F3C506D6457A934 /* CameraGlass.swift */,
+				02C0800FC65848E70EBD0AFA /* VectorArt.swift */,
+				37D73DF6A45700DF376EB8E6 /* Stage.swift */,
+				008C949608F726AED8378D49 /* SVGPath.swift */,
+				CCE692648559FDE5752EA6D0 /* PrismText.swift */,
+				ED16BEE08D8385CE5CA4C9AD /* Keyframes.swift */,
+				CA7E7FA00358420FE2871674 /* IrisPalette.swift */,
+				54017A5513CAAB40A086121E /* IrisArtwork.swift */,
+				5086D9C7CFBA02740357396A /* Ambience.swift */,
+			);
+			path = Glass;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -688,6 +681,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				93721CC20B86C337CC950622 /* Assets.xcassets in Resources */,
+				1F0A7C3E5B2D4A6E8C9F0B12 /* Fonts in Resources */,
 				28175E154EE0E9D7A7E2404C /* MODEL.md in Resources */,
 				C55600206C603E6BD86F5083 /* YOLO-LICENSE.txt in Resources */,
 			);
@@ -723,37 +717,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D01FADBEDA3CD61EAE0523CA /* DeviceTilt.swift in Sources */,
+				FD40FCB217AEDB601A24B81A /* AudioLevels.swift in Sources */,
+				643B7251FFF93091F9BF533F /* OptionCards.swift in Sources */,
+				9517DDA797E775CF094571D1 /* ObjectOutline.swift in Sources */,
+				0C9693B609DE7575EA347BBB /* GlassWipe.swift in Sources */,
+				D9C55300909A34A331A77627 /* GlassControls.swift in Sources */,
+				81C1C4876F152AEB276A1883 /* Crew.swift in Sources */,
+				B2E2D2E6AB33A7E19EAE9226 /* CameraGlass.swift in Sources */,
+				7D181D3EC9B47B87A782DD8F /* MaskContour.swift in Sources */,
+				3ABB8229B5A1918C4B73FE0D /* VectorArt.swift in Sources */,
+				35FB586F109AEA49EABFA339 /* Stage.swift in Sources */,
+				6138923C9D38E589FA2DDEE9 /* SVGPath.swift in Sources */,
+				5E52690739AA0D0A7C5E4361 /* PrismText.swift in Sources */,
+				3ED2FB8C38E59179E9F3A3E9 /* Keyframes.swift in Sources */,
+				431037924DCCEC34113EB769 /* IrisPalette.swift in Sources */,
+				16C5FF087B717350AF4316CB /* IrisArtwork.swift in Sources */,
+				588E56D1BEDDC8F5D0659183 /* Ambience.swift in Sources */,
 				34761C72166B58C77E2FC806 /* Secrets.swift in Sources */,
 				7291E0C5631DCB7613BB7F65 /* TextReader.swift in Sources */,
 				6C1CBCE8BD772F8E124719F8 /* TextConsolidator.swift in Sources */,
-				B479A9345954CCC4CF3EED15 /* SegmentationOverlay.swift in Sources */,
 				F543523FBEDD045D0359EF77 /* Segmentation.swift in Sources */,
 				0040CB0070103B3C55C49244 /* ObjectDetection.swift in Sources */,
 				495DC139EB93A665D6CAA1F7 /* ModelStore.swift in Sources */,
-				327F814E23A0F1CECDC30C7B /* BoundingBox.swift in Sources */,
-				818A36B82427DC9FA8656147 /* WaterVisualizer.swift in Sources */,
-				1731BDB8F9C940A24001D44B /* GuidanceRipple.swift in Sources */,
-				8DD30BEF7D27EEE14413F291 /* ConversationWater.swift in Sources */,
-				0008798CAB6EA0F631A99BD2 /* AudioLevels.swift in Sources */,
 				5D38D151CCD81227F64B2027 /* VolumeHUDHider.swift in Sources */,
 				456EABA3869A47A66130BCD2 /* StatusBlob.swift in Sources */,
 				3E3A4B121E3D663D760365BB /* ListeningIndicator.swift in Sources */,
-				8573830C84FE9E84469A8E81 /* HandHighlight.swift in Sources */,
 				577A899346A9311B348CAD6A /* Preloader.swift in Sources */,
 				8A379054380DF7946BA1D070 /* MainScreen.swift in Sources */,
 				02E966CF7C30457838BC93D9 /* LocateScreen.swift in Sources */,
 				11ECD56AC9746F1282B6F5EA /* LoadingScreen.swift in Sources */,
 				3CB2F72CBC536A6055E6B44C /* HomeScreen.swift in Sources */,
 				BC2F80D78C7B4E98114C2028 /* ExploreScreen.swift in Sources */,
-				5DEF8043E0E3463E07FACA3B /* PageTransition.swift in Sources */,
-				7E9DEE7DBD1154C0E161F108 /* Floating.swift in Sources */,
-				9C1C6D2C1BF947BC90AF636B /* EyeMotion.swift in Sources */,
-				FE0F180F4361EFAEACB5FD0A /* BubbleTitle.swift in Sources */,
-				6F7296C053452E66EA97BCA2 /* MainArt.swift in Sources */,
-				968D8CE496470359ADD0E0E6 /* IrisLettering.swift in Sources */,
-				C3FF707128CDD29B8CC9F064 /* HomeArt.swift in Sources */,
-				50076E6C1612C690C1F3A84B /* ArtRaster.swift in Sources */,
-				816E70868450FEDA1EDE7D95 /* ArtLayer.swift in Sources */,
 				20EEF65CB78975CEF6B1E969 /* VoiceListener.swift in Sources */,
 				1BD3BD48455B80D13F9377AC /* TargetParser.swift in Sources */,
 				7C33E664DA6033B1C9AFD7F9 /* Speaker.swift in Sources */,
@@ -823,6 +818,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE82AA3C4F857414D302EB56 /* IrisDesignTests.swift in Sources */,
 				B43AEED99A9FE287C9C34E44 /* DepthEstimationTests.swift in Sources */,
 				27823675AFD2B1EAE64B27B5 /* HandTrackingTests.swift in Sources */,
 				15442A1C76D81A8E1CD1121F /* ObjectDetectionTests.swift in Sources */,
