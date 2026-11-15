@@ -201,13 +201,7 @@ body.reduced .treasure-map-wrap,body.reduced .treasure-map-wrap *{animation:none
 body.reduced .motion-response,body.reduced .treasure-map-wrap,body.reduced .explore-optic{animation:none!important;transform:none!important}
 @media(prefers-reduced-motion:reduce){.motion-response,.treasure-map-wrap,.explore-optic{animation:none!important;transform:none!important}}
 
-/* Iris 18 — quiet optical rails and object-to-hand guidance. */
-.camera-edge-lights{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
-.camera-edge-lights svg{display:block;width:100%;height:100%}
-.edge-ray{animation:edge-light-pass 5.8s ease-in-out infinite;animation-delay:var(--flow-age,0ms);transform-box:fill-box;transform-origin:center}
-.ray-l2{animation-name:edge-light-return;animation-duration:7.2s}.ray-r1{animation-name:edge-light-return;animation-duration:6.4s}.ray-r2{animation-duration:8s}
-@keyframes edge-light-pass{0%,100%{transform:translate(-2px,-22px);opacity:.22}50%{transform:translate(2px,28px);opacity:.8}}
-@keyframes edge-light-return{0%,100%{transform:translate(2px,25px);opacity:.6}50%{transform:translate(-2px,-26px);opacity:.18}}
+/* Camera silhouette and hand-to-object connector. */
 .camera .object-boundary{color:#6FF1B1}
 .object-tint{fill:#6FF1B1;fill-opacity:.19;stroke:none}
 .camera .contour-stroke{stroke-width:2.2}.camera .contour-halo{stroke-width:8;opacity:.18}
@@ -217,12 +211,42 @@ body.reduced .motion-response,body.reduced .treasure-map-wrap,body.reduced .expl
 .camera .status-blob{z-index:5}
 .hand-tracking{position:absolute;inset:0;z-index:4;pointer-events:none}
 .hand-tracking>svg{width:100%;height:100%;display:block}
-.hand-distance{position:absolute;min-width:58px;height:30px;padding:5px 9px;display:grid;place-items:center;border-radius:12px;border:1px solid #A4FFD780;background:#092D2EEB;color:#EBFFF6;box-shadow:0 3px 10px #061B3733;font-size:13px;font-weight:900;line-height:18px;white-space:nowrap}
-.hand-tracked{position:absolute;right:16px;top:618px;display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:10px;background:#092653C9;border:1px solid #B5DEFA44;font-size:9px;font-weight:800;letter-spacing:.25px;color:#E7F5FF}
+.hand-tracked{position:absolute;right:16px;top:546px;display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:10px;background:#092653C9;border:1px solid #B5DEFA44;font-size:9px;font-weight:800;letter-spacing:.25px;color:#E7F5FF}
 .hand-tracked i{width:5px;height:5px;background:#6FF1B1;border-radius:50%}
 #handTipPulse{transform-box:fill-box;transform-origin:center;animation:tracking-point-pulse 2.3s ease-out infinite}
 @keyframes tracking-point-pulse{0%{transform:scale(.8);opacity:.7}75%,100%{transform:scale(1.6);opacity:0}}
-.hand-lost{position:absolute;right:18px;top:590px;z-index:4;padding:8px 11px;border:1px solid #B5DEFA55;border-radius:12px;background:#092653CF;color:#E7F5FF;font-size:11px;font-weight:800}
-body.reduced .edge-ray,body.reduced #handTipPulse{animation:none!important;transform:none!important}
-body.reduced .edge-ray{opacity:.4}
-@media(prefers-reduced-motion:reduce){.edge-ray,#handTipPulse{animation:none!important;transform:none!important}.edge-ray{opacity:.4}}
+.hand-lost{position:absolute;right:18px;top:546px;z-index:4;padding:8px 11px;border:1px solid #B5DEFA55;border-radius:12px;background:#092653CF;color:#E7F5FF;font-size:11px;font-weight:800}
+body.reduced body.reduced #handTipPulse{animation:none!important;transform:none!important}
+
+@media(prefers-reduced-motion:reduce){#handTipPulse{animation:none!important;transform:none!important}}
+
+/* Each chevron steers in place, keeping both vertical trails inside the screen. */
+.guidance-arrows{position:absolute;inset:0;z-index:3;pointer-events:none}
+.guidance-arrow{position:absolute;top:230px;width:72px;height:234px;transition:opacity .25s;filter:drop-shadow(0 0 7px #279FFF55)}
+.guidance-arrow.left{left:4px}.guidance-arrow.right{right:4px}
+.guidance-arrow-core{display:block;overflow:visible;width:100%;height:100%}
+.guidance-chevron{color:var(--step-color,#65C9FF);transition:transform .45s cubic-bezier(.2,.8,.2,1),color .3s}
+.guidance-chevron-heading{transform-box:view-box;transform-origin:0px 15px;transform:rotate(var(--guidance-angle,0deg));transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.guidance-chevron-aura{fill:currentColor;stroke:currentColor;stroke-width:5px;opacity:.2;filter:blur(3px)}
+.guidance-chevron-face{fill:currentColor;fill-opacity:.88;animation:guidance-chevron-flow calc(2.4s - var(--guidance-progress,0)*.8s) ease-in-out infinite;animation-delay:calc((3 - var(--step-index,0))*.24s)}
+.guidance-chevron-rim{fill:none;stroke:#C1EDFF;stroke-width:.8;stroke-opacity:.45;stroke-linejoin:round}
+.guidance-arrows[data-mode=searching],.guidance-arrows[data-mode=lost],.guidance-arrows[data-mode=unavailable]{opacity:.22}
+.guidance-arrows:not([data-mode=tracking]) .guidance-chevron-face{animation:none}
+.guidance-arrows[data-mode=reached] .guidance-arrow{filter:drop-shadow(0 0 10px #159FFF99)}
+@keyframes guidance-chevron-flow{0%,44%,100%{fill-opacity:.75;filter:brightness(1)}18%{fill-opacity:1;filter:brightness(1.55)}}
+/* A single measurement sits just above the hand-to-object connector. */
+#handDistanceLabel{font-family:'Nunito',ui-rounded,sans-serif;font-size:13px;font-weight:800;letter-spacing:.1px;font-variant-numeric:tabular-nums;fill:#F5FFFC;stroke:#061B37B3;stroke-width:2.5px;stroke-linejoin:round;paint-order:stroke fill;pointer-events:none}
+.camera .hand-lost{display:none}
+.distance-demo{flex-basis:100%;display:grid;grid-template-columns:1fr auto;gap:9px 12px;align-items:center;max-width:360px;margin:0 auto 5px;padding:12px 15px;border:1px solid #C7DAE8;border-radius:16px;background:#F7FCFF;color:#355A79;font-size:11px;font-weight:800}
+.distance-demo output{font-variant-numeric:tabular-nums;color:#123A73}.distance-demo input{grid-column:1/-1;width:100%;margin:0;accent-color:#248EEB;cursor:ew-resize}
+body.reduced .guidance-chevron-face{animation:none!important;fill-opacity:.92}
+@media(prefers-reduced-motion:reduce){.guidance-chevron-face{animation:none!important;fill-opacity:.92}}
+
+/* The supplied landing artwork keeps its original 852:1846 proportions. */
+.phone{height:var(--phone-height,800px)}
+.phone:has(.iris-landing){background:#000;box-shadow:0 28px 80px #09265326}
+.phone:has(.iris-landing)>.home-indicator{display:none}
+.home.iris-landing{background:#000}
+.home.iris-landing:after{display:none}
+.iris-landing .landing-start{position:absolute;z-index:5;left:28%;top:85.5%;width:44%;height:8%;padding:0;border:0;border-radius:22px;background:transparent;color:transparent;touch-action:pan-x}
+.iris-landing .landing-start:focus-visible{outline:2px solid #B9CFFF;outline-offset:2px;background:#A6BDFF12}

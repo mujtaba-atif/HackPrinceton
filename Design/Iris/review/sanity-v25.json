@@ -1,0 +1,36 @@
+{
+  "revision": 25,
+  "reviewedAt": "2026-11-15",
+  "url": "https://app-vv74nvdykzsio2xxoy5pgrvgmdczd43ramggdbyipubmjv56i7pp.makeproxy-c.figma.site/?screen=guidance",
+  "result": "passed",
+  "browserChecks": [
+    "Loading automatically reaches welcome; original landing artwork and white star streak visible; continue opens choices.",
+    "Locate/Explore choice screen renders; gentle and quick shake demonstrations respond.",
+    "Locate searching and no-object-found states render; acquisition shows object contour and hand overlay.",
+    "Explore text detected, text lost, result ready, summary show/hide, follow-up answer and rescan work.",
+    "Distance moves 31.5 in -> 25.6 in -> 31.5 in using closer/away controls.",
+    "Hiding hand retains 25.6 in and connector at M244 420L292.75 473.625; hand skeleton hidden; badge says Last measurement.",
+    "Showing hand restores live status and subsequent movement resumes number updates.",
+    "Distance slider reaches 0.0 in; hiding hand retains 0.0 in.",
+    "Left, right, back, forward and intermediate 36-degree bearing controls respond.",
+    "Reduced motion retains correct left heading with zero transition duration.",
+    "Reached, close-up and Explore transitions render; new Locate session has no stale label before acquisition."
+  ],
+  "sourceChecks": [
+    "JavaScript syntax checks",
+    "Asset references exist",
+    "SVG XML validation",
+    "Exact embedded PNG comparison",
+    "Figma archive CRC validation",
+    "Current Figma code-layer runtime parity"
+  ],
+  "limitations": [
+    "Camera, detection, physical distances and voice are simulated in this browser preview.",
+    "Native app and phone sensors were not run on the laptop. Physical iPhone validation remains separate."
+  ],
+  "evidence": [
+    "guidance-v25-held.png",
+    "guidance-v25-active.png",
+    "landing-v23.gif"
+  ]
+}

@@ -1,0 +1,665 @@
+{
+  "archive": "iris-design-v25.fig",
+  "archiveSha256": "ce34ccd470dd87f18a7fc3159978d32f43d9a4233e5ba0c9b62b950867e47c9c",
+  "currentMakeRepository": "make_repos/1pm9j2h.zip",
+  "codeComponentNodeId": "204:857",
+  "codeLayerNodeId": "204:858",
+  "scope": "Byte-for-byte comparison of current exported Make runtime files to Design/Iris; binary LFS pointers resolved from archived objects. No archived code was executed. Historical Git trees scanned for credential-like filenames only.",
+  "runtimeFiles": [
+    {
+      "file": "analyze.svg",
+      "figmaGitBlob": "bc30630b030e329e27aafc5a8780d79b9dc182bb",
+      "figmaBytes": 1031,
+      "figmaSha256": "08d85e59c6688ceb131dbb75b7fadde28e422227fe36e3585ba3a9f55989609c",
+      "localBytes": 1031,
+      "localSha256": "08d85e59c6688ceb131dbb75b7fadde28e422227fe36e3585ba3a9f55989609c",
+      "result": "exact-match"
+    },
+    {
+      "file": "app.js",
+      "figmaGitBlob": "813ce8f5d218a7de7f67e31ebb64c2facd1c544c",
+      "figmaBytes": 17074,
+      "figmaSha256": "fe40253eba9e8c75c6152eb04135b8fb5cdc8f07a6b5429b78d7b2d176c6cabc",
+      "localBytes": 17074,
+      "localSha256": "fe40253eba9e8c75c6152eb04135b8fb5cdc8f07a6b5429b78d7b2d176c6cabc",
+      "result": "exact-match"
+    },
+    {
+      "file": "assets.js",
+      "figmaGitBlob": "f356d7bcd4ad4bf9679b47e77c59a01dc8a8cafd",
+      "figmaBytes": 38233,
+      "figmaSha256": "e0b7fad5d7442de8446a8d8ae52f0f1ad08085307dd3bbcd722c1ca6fbc71eca",
+      "localBytes": 38233,
+      "localSha256": "e0b7fad5d7442de8446a8d8ae52f0f1ad08085307dd3bbcd722c1ca6fbc71eca",
+      "result": "exact-match"
+    },
+    {
+      "file": "body.svg",
+      "figmaGitBlob": "f47c9f2c7b7449d78935a4d74ffab1ea386bdf6d",
+      "figmaBytes": 768,
+      "figmaSha256": "86451c46e4531f83b107fc432d33a41cc856c5805e56f900b39850fea7846200",
+      "localBytes": 768,
+      "localSha256": "86451c46e4531f83b107fc432d33a41cc856c5805e56f900b39850fea7846200",
+      "result": "exact-match"
+    },
+    {
+      "file": "bottle-contour.svg",
+      "figmaGitBlob": "6b0beab4ff448f8e729337206c95dbb3cd66e5c0",
+      "figmaBytes": 701,
+      "figmaSha256": "4ad9515d3d683c64905a79422cc28c39088ac788a2f9fc4e4037b2d0022eabed",
+      "localBytes": 701,
+      "localSha256": "4ad9515d3d683c64905a79422cc28c39088ac788a2f9fc4e4037b2d0022eabed",
+      "result": "exact-match"
+    },
+    {
+      "file": "camera-demo.png",
+      "figmaGitBlob": "2a736b0e7a25c699933322f9caa93f43c8b12a02",
+      "resolvedLfsObjectSha256": "373d143c6ff9d6076aa9cbd7acf8d667990edd5af6e987212604adf0de03651e",
+      "figmaBytes": 1934334,
+      "figmaSha256": "373d143c6ff9d6076aa9cbd7acf8d667990edd5af6e987212604adf0de03651e",
+      "localBytes": 1934334,
+      "localSha256": "373d143c6ff9d6076aa9cbd7acf8d667990edd5af6e987212604adf0de03651e",
+      "result": "exact-match"
+    },
+    {
+      "file": "camera-edge-lights.svg",
+      "figmaGitBlob": "e5bba7d5110af9a5bee6e283182853b3c847050d",
+      "figmaBytes": 1817,
+      "figmaSha256": "edb196ae43537bf304905c533624450195280209d82a685f799e59ac23099c9f",
+      "localBytes": 1817,
+      "localSha256": "edb196ae43537bf304905c533624450195280209d82a685f799e59ac23099c9f",
+      "result": "exact-match"
+    },
+    {
+      "file": "crew-echo.svg",
+      "figmaGitBlob": "b2338439d59bf065779797695dbb1480ab2a3cf1",
+      "figmaBytes": 1438,
+      "figmaSha256": "e8691edda35941b59bb21b9bfcf3352ff2bb2cf9dc8d6e160129ef67c92ad93f",
+      "localBytes": 1438,
+      "localSha256": "e8691edda35941b59bb21b9bfcf3352ff2bb2cf9dc8d6e160129ef67c92ad93f",
+      "result": "exact-match"
+    },
+    {
+      "file": "crew-nova.svg",
+      "figmaGitBlob": "4f17c53921a77d377de5e966e6581e00096be389",
+      "figmaBytes": 1181,
+      "figmaSha256": "29d5e4777a0cd8f4f96e36e3cc1bfbb9ab8da79f2ff1805f21371d2d4f2ce9af",
+      "localBytes": 1181,
+      "localSha256": "29d5e4777a0cd8f4f96e36e3cc1bfbb9ab8da79f2ff1805f21371d2d4f2ce9af",
+      "result": "exact-match"
+    },
+    {
+      "file": "crew-pip.svg",
+      "figmaGitBlob": "20c65f3e461c04dc48dfee0f558e092e6ca475d5",
+      "figmaBytes": 1265,
+      "figmaSha256": "6ae17172adada6fe85d29a517769fc97ce0fe9342eaa98629f84c3acbba357ea",
+      "localBytes": 1265,
+      "localSha256": "6ae17172adada6fe85d29a517769fc97ce0fe9342eaa98629f84c3acbba357ea",
+      "result": "exact-match"
+    },
+    {
+      "file": "crew-skye.svg",
+      "figmaGitBlob": "e86ed50ded8f870dcdb355b29686edcbac60d6c4",
+      "figmaBytes": 1145,
+      "figmaSha256": "5c20f6e27f9191633beaa8d772a439aaf02180e6735336824c4d68ed187d1479",
+      "localBytes": 1145,
+      "localSha256": "5c20f6e27f9191633beaa8d772a439aaf02180e6735336824c4d68ed187d1479",
+      "result": "exact-match"
+    },
+    {
+      "file": "eye.svg",
+      "figmaGitBlob": "1b7aa9f70c686b6e391a2e8c50a8b1acdef96309",
+      "figmaBytes": 956,
+      "figmaSha256": "01a3bbc83cd0686542e3b51e0c635d7a5c5c735a9bb9a0246d8abc481dd0e866",
+      "localBytes": 956,
+      "localSha256": "01a3bbc83cd0686542e3b51e0c635d7a5c5c735a9bb9a0246d8abc481dd0e866",
+      "result": "exact-match"
+    },
+    {
+      "file": "find.svg",
+      "figmaGitBlob": "f36d91d8f0662e59c2edff7b86183cf5e1858c4e",
+      "figmaBytes": 1062,
+      "figmaSha256": "f96fb421b41e499c15e001fd2edab558636645935e4fdb6dda7bbee9da593589",
+      "localBytes": 1062,
+      "localSha256": "f96fb421b41e499c15e001fd2edab558636645935e4fdb6dda7bbee9da593589",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts.css",
+      "figmaGitBlob": "c323651e74624842f331b68555ab3942c745b527",
+      "figmaBytes": 1493,
+      "figmaSha256": "0ba955a7a37f615b3d75009f2a98207f9aa05c1e82a58b532fd04ddbe2740b1a",
+      "localBytes": 1493,
+      "localSha256": "0ba955a7a37f615b3d75009f2a98207f9aa05c1e82a58b532fd04ddbe2740b1a",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-0.ttf",
+      "figmaGitBlob": "265af60dac166c02ad0cf0e89cae2902153f047a",
+      "resolvedLfsObjectSha256": "9ecbdba35fa74f10a1a916c31649b802a12deb9e66c7b1fe4650afcfd4d16971",
+      "figmaBytes": 125528,
+      "figmaSha256": "9ecbdba35fa74f10a1a916c31649b802a12deb9e66c7b1fe4650afcfd4d16971",
+      "localBytes": 125528,
+      "localSha256": "9ecbdba35fa74f10a1a916c31649b802a12deb9e66c7b1fe4650afcfd4d16971",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-1.ttf",
+      "figmaGitBlob": "54cf2e0a6fe06e9ac6ce82aa9aafb6eb0a6f0b61",
+      "resolvedLfsObjectSha256": "1506fc96971e84d1a4ca89f0d1157a881b9ce217bbfa05d2b3c9e3c8f6723091",
+      "figmaBytes": 125536,
+      "figmaSha256": "1506fc96971e84d1a4ca89f0d1157a881b9ce217bbfa05d2b3c9e3c8f6723091",
+      "localBytes": 125536,
+      "localSha256": "1506fc96971e84d1a4ca89f0d1157a881b9ce217bbfa05d2b3c9e3c8f6723091",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-2.ttf",
+      "figmaGitBlob": "a5999eadf69023cad53e25607167f8cdcb584c92",
+      "resolvedLfsObjectSha256": "1a025dfce6e6e03bbe31ba82277ec5ed96df8b8dd58b3df6267269490b90b1dc",
+      "figmaBytes": 125464,
+      "figmaSha256": "1a025dfce6e6e03bbe31ba82277ec5ed96df8b8dd58b3df6267269490b90b1dc",
+      "localBytes": 125464,
+      "localSha256": "1a025dfce6e6e03bbe31ba82277ec5ed96df8b8dd58b3df6267269490b90b1dc",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-3.ttf",
+      "figmaGitBlob": "1557c749e9ed19e65353673c6352cfa2f836f4db",
+      "resolvedLfsObjectSha256": "c5776505c7b3df3c3ca763477b795d6bbc6517760bede0462ab77d1fb44954a6",
+      "figmaBytes": 125416,
+      "figmaSha256": "c5776505c7b3df3c3ca763477b795d6bbc6517760bede0462ab77d1fb44954a6",
+      "localBytes": 125416,
+      "localSha256": "c5776505c7b3df3c3ca763477b795d6bbc6517760bede0462ab77d1fb44954a6",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-4.ttf",
+      "figmaGitBlob": "1d214620f9e8ffde6eafe598a1e564c6a1902ab7",
+      "resolvedLfsObjectSha256": "9caa6d5464d4438c3092a05d47952099e208862cacd5f655acb64012a1a15e78",
+      "figmaBytes": 125376,
+      "figmaSha256": "9caa6d5464d4438c3092a05d47952099e208862cacd5f655acb64012a1a15e78",
+      "localBytes": 125376,
+      "localSha256": "9caa6d5464d4438c3092a05d47952099e208862cacd5f655acb64012a1a15e78",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-5.ttf",
+      "figmaGitBlob": "e4432e79ad18352a143eb9ee9ebca8280722f36a",
+      "resolvedLfsObjectSha256": "a699fa825cd47524461c459a54fe3cd51eb13e1e76ba238fe6ea86932979a808",
+      "figmaBytes": 106700,
+      "figmaSha256": "a699fa825cd47524461c459a54fe3cd51eb13e1e76ba238fe6ea86932979a808",
+      "localBytes": 106700,
+      "localSha256": "a699fa825cd47524461c459a54fe3cd51eb13e1e76ba238fe6ea86932979a808",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-6.ttf",
+      "figmaGitBlob": "97b887c85bb1757996da689970c68d42cd6d3e79",
+      "resolvedLfsObjectSha256": "ad2699609215220841b2bbb16dd1899f32559d24f55b4cdaaa913ca3e15e3fbd",
+      "figmaBytes": 106832,
+      "figmaSha256": "ad2699609215220841b2bbb16dd1899f32559d24f55b4cdaaa913ca3e15e3fbd",
+      "localBytes": 106832,
+      "localSha256": "ad2699609215220841b2bbb16dd1899f32559d24f55b4cdaaa913ca3e15e3fbd",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-7.ttf",
+      "figmaGitBlob": "3edb9ea27506b05fba63f2cfa31bc7bdddc927df",
+      "resolvedLfsObjectSha256": "ec2336c2beb651fb7f9fb968ef4e5b69e91af624c240331a239d3aefd6e41ef0",
+      "figmaBytes": 106792,
+      "figmaSha256": "ec2336c2beb651fb7f9fb968ef4e5b69e91af624c240331a239d3aefd6e41ef0",
+      "localBytes": 106792,
+      "localSha256": "ec2336c2beb651fb7f9fb968ef4e5b69e91af624c240331a239d3aefd6e41ef0",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/iris-8.ttf",
+      "figmaGitBlob": "4729284d795c1729a5872aa0d970b40b96d79894",
+      "resolvedLfsObjectSha256": "9cad4d40b0754d7cbc51ff2e991b80369123214e2300cbbd7adf91ed096e2dff",
+      "figmaBytes": 106804,
+      "figmaSha256": "9cad4d40b0754d7cbc51ff2e991b80369123214e2300cbbd7adf91ed096e2dff",
+      "localBytes": 106804,
+      "localSha256": "9cad4d40b0754d7cbc51ff2e991b80369123214e2300cbbd7adf91ed096e2dff",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/nunito-OFL.txt",
+      "figmaGitBlob": "c8210f08ca3cece05b4f7baa428afe8e1abe3293",
+      "figmaBytes": 4385,
+      "figmaSha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+      "localBytes": 4385,
+      "localSha256": "580df76c95a1ec5ab878ceb25bb3d85c6a076804e9c970c8c6972aea775fdf65",
+      "result": "exact-match"
+    },
+    {
+      "file": "fonts/nunitosans-OFL.txt",
+      "figmaGitBlob": "2ae17359801c71b7b568854b98f73969ad822474",
+      "figmaBytes": 4393,
+      "figmaSha256": "efbb0c9e864cef973982d9a17567e6be5c3d1759695574586f3f18c7ecca064b",
+      "localBytes": 4393,
+      "localSha256": "efbb0c9e864cef973982d9a17567e6be5c3d1759695574586f3f18c7ecca064b",
+      "result": "exact-match"
+    },
+    {
+      "file": "glass-wave-side.svg",
+      "figmaGitBlob": "5dd6e81ef971b8204c8cc38550a98b8cd4e6c62a",
+      "figmaBytes": 707,
+      "figmaSha256": "0953a3447a69d76f65dc939e74d44ce8393c8d3eee0751145c17da49722a9a0a",
+      "localBytes": 707,
+      "localSha256": "0953a3447a69d76f65dc939e74d44ce8393c8d3eee0751145c17da49722a9a0a",
+      "result": "exact-match"
+    },
+    {
+      "file": "glass-wave-top.svg",
+      "figmaGitBlob": "16d4a6e5dad58468837ab2fcdce421c4d4b259ea",
+      "figmaBytes": 867,
+      "figmaSha256": "783b117fe10d6be3043e3e687af1a874c9b89bfe98bb9e50c062479ea4e482b1",
+      "localBytes": 867,
+      "localSha256": "783b117fe10d6be3043e3e687af1a874c9b89bfe98bb9e50c062479ea4e482b1",
+      "result": "exact-match"
+    },
+    {
+      "file": "guidance.js",
+      "figmaGitBlob": "fa81d49794f48a0ea080a274653f2068d0d4deaf",
+      "figmaBytes": 5503,
+      "figmaSha256": "dfaab85bb4f521a1accd4ae70fb64c04d116e7f8c54221442c960635bc40f4ab",
+      "localBytes": 5503,
+      "localSha256": "dfaab85bb4f521a1accd4ae70fb64c04d116e7f8c54221442c960635bc40f4ab",
+      "result": "exact-match"
+    },
+    {
+      "file": "hero-echo.svg",
+      "figmaGitBlob": "d7278a053d197e2a3285496971785f1498244bef",
+      "figmaBytes": 1370,
+      "figmaSha256": "88e3466e6246b56e43d8b6b70963f6e674a1cdd6d17a000720c2b09588e505ab",
+      "localBytes": 1370,
+      "localSha256": "88e3466e6246b56e43d8b6b70963f6e674a1cdd6d17a000720c2b09588e505ab",
+      "result": "exact-match"
+    },
+    {
+      "file": "hero-nova.svg",
+      "figmaGitBlob": "9d8b9e7fc84ef821b99187ed0a1c0bb20cc6b104",
+      "figmaBytes": 1173,
+      "figmaSha256": "94752339dedf0372069552915683131bbb654894c23706323158b0db2ee954b2",
+      "localBytes": 1173,
+      "localSha256": "94752339dedf0372069552915683131bbb654894c23706323158b0db2ee954b2",
+      "result": "exact-match"
+    },
+    {
+      "file": "hero-pip.svg",
+      "figmaGitBlob": "f5ee1882bc064177a777aaeeb4949da25a16b6f8",
+      "figmaBytes": 1197,
+      "figmaSha256": "082faed6bd9cf0b06919c4abcdfc41d38c18a315a036963b92ad57faee5f271b",
+      "localBytes": 1197,
+      "localSha256": "082faed6bd9cf0b06919c4abcdfc41d38c18a315a036963b92ad57faee5f271b",
+      "result": "exact-match"
+    },
+    {
+      "file": "hero-skye.svg",
+      "figmaGitBlob": "c6d3a4b2d14138e4a6eedd7663e17cc4fc0be8d2",
+      "figmaBytes": 1077,
+      "figmaSha256": "c46b790e37c4e75c1fc5ad44e6cb0b5ff6f515667c5f0c0871a9aa4bcd87a8c1",
+      "localBytes": 1077,
+      "localSha256": "c46b790e37c4e75c1fc5ad44e6cb0b5ff6f515667c5f0c0871a9aa4bcd87a8c1",
+      "result": "exact-match"
+    },
+    {
+      "file": "index.html",
+      "figmaGitBlob": "659e86488d3d89e92871703fd1c21b80caea6e25",
+      "figmaBytes": 2366,
+      "figmaSha256": "a7122fe34b367f4cfefe9a7556bfb4326b5b74d8c28f5c3544e6bdf5a33da0b9",
+      "localBytes": 2366,
+      "localSha256": "a7122fe34b367f4cfefe9a7556bfb4326b5b74d8c28f5c3544e6bdf5a33da0b9",
+      "result": "exact-match"
+    },
+    {
+      "file": "landing-image.js",
+      "figmaGitBlob": "a0bc34829e4f26d44e863bdeab76eb1b9d06e8f6",
+      "figmaBytes": 2273877,
+      "figmaSha256": "279c83142da0571b3768070bd9059b86fc86c2a5600eafe1d62b49779258c0c6",
+      "localBytes": 2273877,
+      "localSha256": "279c83142da0571b3768070bd9059b86fc86c2a5600eafe1d62b49779258c0c6",
+      "result": "exact-match"
+    },
+    {
+      "file": "landing-motion.css",
+      "figmaGitBlob": "9e35831f1697012b2aa4bd19e036aebc5395a11d",
+      "figmaBytes": 3711,
+      "figmaSha256": "c5bafd2393bec2a6b7cea519fba0044b4bbecfc96fa86f0b270e7d9e9b2cdba2",
+      "localBytes": 3711,
+      "localSha256": "c5bafd2393bec2a6b7cea519fba0044b4bbecfc96fa86f0b270e7d9e9b2cdba2",
+      "result": "exact-match"
+    },
+    {
+      "file": "landing-motion.js",
+      "figmaGitBlob": "a65085af833ff8ad75f6e4765ba2a0c2f994fac7",
+      "figmaBytes": 7884,
+      "figmaSha256": "4bd9750d95da5478bc9f4ab2dddf1c18b30233600cb5168947940fbd3458e72d",
+      "localBytes": 7884,
+      "localSha256": "4bd9750d95da5478bc9f4ab2dddf1c18b30233600cb5168947940fbd3458e72d",
+      "result": "exact-match"
+    },
+    {
+      "file": "monster.svg",
+      "figmaGitBlob": "f88564cf1578f5a16265dfefd15f8c0940249e7a",
+      "figmaBytes": 1630,
+      "figmaSha256": "0b15ec6396728f2daaa94ed9db07cc724ff97ae2779bd087ccd8bb27b3c7dfd5",
+      "localBytes": 1630,
+      "localSha256": "0b15ec6396728f2daaa94ed9db07cc724ff97ae2779bd087ccd8bb27b3c7dfd5",
+      "result": "exact-match"
+    },
+    {
+      "file": "motion.js",
+      "figmaGitBlob": "5726db52f8948c405100f01e9b644b1303245ca0",
+      "figmaBytes": 5958,
+      "figmaSha256": "70a8eaf4ed68f74ade46dc18e0032b17fdfb2964425faebd8780d3e76d1e3ee9",
+      "localBytes": 5958,
+      "localSha256": "70a8eaf4ed68f74ade46dc18e0032b17fdfb2964425faebd8780d3e76d1e3ee9",
+      "result": "exact-match"
+    },
+    {
+      "file": "style.css",
+      "figmaGitBlob": "459e3e77bf3232360177afcd41bd3b3623d4f015",
+      "figmaBytes": 43584,
+      "figmaSha256": "9dbba7157ba489c7b1d498a8bacbd7f9c86f68bebdff6a5e0b10f9c4a27d5da6",
+      "localBytes": 43584,
+      "localSha256": "9dbba7157ba489c7b1d498a8bacbd7f9c86f68bebdff6a5e0b10f9c4a27d5da6",
+      "result": "exact-match"
+    },
+    {
+      "file": "tracking.js",
+      "figmaGitBlob": "7df362aeedd8dc7916b69276671e6b10459a63c6",
+      "figmaBytes": 5227,
+      "figmaSha256": "8cae2ecfc7caa3ef4cb94684ed7659bd1be03d5cb9b8899a05247a694c3e43ba",
+      "localBytes": 5227,
+      "localSha256": "8cae2ecfc7caa3ef4cb94684ed7659bd1be03d5cb9b8899a05247a694c3e43ba",
+      "result": "exact-match"
+    },
+    {
+      "file": "treasure-map.svg",
+      "figmaGitBlob": "56a8ff1feb5811ff9847375d47e3fe20c651ac6f",
+      "figmaBytes": 12297,
+      "figmaSha256": "af61bb4e02fed47401bee6765f0b63982c532bc19688fa209a5dc495e9a8863b",
+      "localBytes": 12297,
+      "localSha256": "af61bb4e02fed47401bee6765f0b63982c532bc19688fa209a5dc495e9a8863b",
+      "result": "exact-match"
+    }
+  ],
+  "nonRuntimeFiles": [
+    {
+      "file": ".figma/README.md",
+      "figmaGitBlob": "07dc3e69f2562ac1fa069b8ba2dc46e8004c1714",
+      "figmaBytes": 664,
+      "figmaSha256": "6ab2aa81b6dee16d3426441f67c7f0f1d4562ed358431aea232a543ad76bbdac",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/deploy",
+      "figmaGitBlob": "e8f9815103f9bd960db59c16e53a89126e8d078f",
+      "figmaBytes": 148,
+      "figmaSha256": "977759938f747a11b3f4bb321c466ea6a223c82de6e280e75d16e357f8816f3e",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/deploy-preview",
+      "figmaGitBlob": "61baa99d3b9cba6e694f677115d7b859acd74eb0",
+      "figmaBytes": 223,
+      "figmaSha256": "81566df60d69f0f980b51a9b001b912018e4c2d79fb72c3649106ad8358058c2",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/deploy.json",
+      "figmaGitBlob": "9a899ac1a1c17ec307661bc7082023d6ec5a55d6",
+      "figmaBytes": 26,
+      "figmaSha256": "684b3b8d6086c8b0a68952482fb08d1990bae8a598e13626373388a7d8465b50",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/dev",
+      "figmaGitBlob": "49b2dd27bc36ad8bc6d7e04b3a25dd00709257b1",
+      "figmaBytes": 131,
+      "figmaSha256": "4978fa855e9f878661ff3ed357e99fede12a54aef85c5e0cb7f1a89a67650042",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/dev.json",
+      "figmaGitBlob": "e58ac0bdc7959d7c3730cd5215c17d0d70b04837",
+      "figmaBytes": 937,
+      "figmaSha256": "b085a13de1d547bc4b5906dc1d921a6f20d07816d019e76ffd31910c57a56b5c",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/import-assets.mjs",
+      "figmaGitBlob": "fa52fe0beac2a432307e91f2163b5103f4750796",
+      "figmaBytes": 2540,
+      "figmaSha256": "19832cfcff92cdb381cee823ca4b41213f4128d82a6c7a0465040cb48dd717c1",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/install",
+      "figmaGitBlob": "700bc98be3bb4c5935c02b20890173d213ec8a76",
+      "figmaBytes": 90,
+      "figmaSha256": "90705d33ffd6b0700def7f2f304fd24ae04e17af5fc7d8437df44cf546d64891",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".figma/make/site.json",
+      "figmaGitBlob": "0967ef424bce6791893e9a57bb952f80fd536e93",
+      "figmaBytes": 3,
+      "figmaSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".gitattributes",
+      "figmaGitBlob": "6ed7361cd45bf7b94bd43223704288d526f74c82",
+      "figmaBytes": 7728,
+      "figmaSha256": "fdd53ecc7bf79a69d3ef228ec98e0151f10e02702b90b553f04785b61db68354",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".gitignore",
+      "figmaGitBlob": "d0cb07a22dec73889b4f2ec32cf47d94779d3aed",
+      "figmaBytes": 424,
+      "figmaSha256": "6770e60e045a25964f62df2a396a19b3f5c402facbf43c73c125b021b2fc5674",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": ".mise.toml",
+      "figmaGitBlob": "4ea25bd92d4b1e31d775c55ac098d7ac530febba",
+      "figmaBytes": 43,
+      "figmaSha256": "6d2834ef5f78a7dc4c384570a62b895137fdf63df171d237f0747932bd001435",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": "README.md",
+      "figmaGitBlob": "eeb27d11daa4526bc5cedddbd0d4aa654d863816",
+      "figmaBytes": 8823,
+      "figmaSha256": "829dfdbe1957c4f0eff788c47e02b498f74bc1be863e35363ca84da0504ff313",
+      "localBytes": 16415,
+      "localSha256": "41a223bbd66f749ce6ff587f1d4543f6c1265f761e001f7d013fd1878f3f5dce",
+      "result": "different",
+      "note": "Repository documentation includes the later revisions and export/parity notes; runtime is unaffected."
+    },
+    {
+      "file": "assets.json",
+      "figmaGitBlob": "9733244db88755926bcc4307a6d7ba464757a9d3",
+      "figmaBytes": 38211,
+      "figmaSha256": "5e2dbbcfab8f3d4c2bfc19ec6f647314f6ae99b6f5030e447816b0bb3f76e222",
+      "localBytes": 38211,
+      "localSha256": "5e2dbbcfab8f3d4c2bfc19ec6f647314f6ae99b6f5030e447816b0bb3f76e222",
+      "result": "exact-match",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": "package.json",
+      "figmaGitBlob": "61640591abaecc5d6bfa567cdbe51194a0b05d3d",
+      "figmaBytes": 586,
+      "figmaSha256": "8b86a6edc6f5ca98f48f39a2031a828768dab22cc21086c66a23dae5835ee6fc",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": "pnpm-lock.yaml",
+      "figmaGitBlob": "021c3deb7aa81cafcd7a0baac507e4cd35a947b7",
+      "figmaBytes": 34656,
+      "figmaSha256": "6110b313fa711c1e65268282ad4a8d06ceedee99611b616e0783dafb3cefd1d1",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    },
+    {
+      "file": "vite.config.ts",
+      "figmaGitBlob": "2e1b969a8e849cf59cda0457c903a113b91a7676",
+      "figmaBytes": 15632,
+      "figmaSha256": "e04db9241eb7bf640978c1f6928f92d0bf9d17a9eb6ee60c30dc56c37c81364d",
+      "result": "figma-only",
+      "note": "Figma hosting/editor scaffolding retained within .fig archive."
+    }
+  ],
+  "currentCommit": "50fc13cefb49f3659192dd79a2f84a0d76c148d4",
+  "packsVerified": [
+    {
+      "file": "packs/a9480d30-9ead-464b-b9c2-f388f28a2371.pack",
+      "gitPackChecksumSha1": "49d815e770541c13faaa739087af5e57f29bae14",
+      "bytes": 2918099
+    },
+    {
+      "file": "packs/7ca49867-8a52-4697-845d-3c0018824d41.pack",
+      "gitPackChecksumSha1": "a692240395deb070100a969aba87116a11d19128",
+      "bytes": 11264
+    },
+    {
+      "file": "packs/e665efea-eb9e-4b84-aece-a0116f0269ef.pack",
+      "gitPackChecksumSha1": "cdf0cb26a40e32faefd92b0284d966a62d7e9b73",
+      "bytes": 2651669
+    },
+    {
+      "file": "packs/7f2647e0-afc8-4264-93c7-d5f77c55b801.pack",
+      "gitPackChecksumSha1": "c145d683167ffc283468425cf1f96b6172223a28",
+      "bytes": 1720644
+    }
+  ],
+  "originalLandingArtwork": {
+    "file": "landing-reference.png",
+    "result": "exact-match-to-figma-embedded-png",
+    "bytes": 1705302,
+    "sha256": "18fa00c806970b05755cef71cbff2f30deb41889da866fca08d7bda2cdeef1ca"
+  },
+  "summary": {
+    "runtimeFileCount": 41,
+    "exactRuntimeMatches": 41,
+    "runtimeDifferences": [],
+    "resolvedLfsFiles": 10,
+    "uiSyncRequired": false
+  },
+  "credentialFilenameAudit": {
+    "scope": "Outer archive entry names and every stored Git tree object in all embedded Make repositories; filename-pattern check only, not a secret-content scan.",
+    "repositories": [
+      {
+        "archivePath": "make_repos/1rigdmr.zip",
+        "commit": "a30015c942513f27dba8b84b8e9c3c99bb191842",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/worrb8.zip",
+        "commit": "d6fb75c370d0a430a9a961533db2b3a3e356d281",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/1vnbb3x.zip",
+        "commit": "0022b96066ceb9c0aea45514b7cdd852158b8bc6",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/1ez7ovd.zip",
+        "commit": "119fc07ec19d79645b88fd0902a9d690b7b4ea76",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/1rtrg1t.zip",
+        "commit": "a5e01489b40a0e2055ca7eeea90ab51645a2a49f",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/6gfpog.zip",
+        "commit": "bb14cb2b21a010637365ed1067ae6b317fb01416",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/182dtmo.zip",
+        "commit": "211767e44df8123fd81a747ccf74bc192aab8839",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/kabf76.zip",
+        "commit": "4df04754137c8c1b979513eadf670ac908ed2535",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/11h9kft.zip",
+        "commit": "5b038af8590d292e57ca63cad7c8c6d1d8ac133e",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/pce64k.zip",
+        "commit": "6a40867fa27960400dca4908201d9301234bc9cf",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/cqs6bw.zip",
+        "commit": "43421ea21da8c4092cc869b5551d34c8c15b6556",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/8a2j7s.zip",
+        "commit": "9bbc0662714030a148d2c948f9d9cfa0aa2ea766",
+        "packs": 1
+      },
+      {
+        "archivePath": "make_repos/1lgszum.zip",
+        "commit": "98aaa96ba08e609f551e9f11651f21a6fb734219",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/v5hcgz.zip",
+        "commit": "7def5f81bcfac1bcf77a82661a40360ff8ef480f",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/109dikt.zip",
+        "commit": "da86d84a8dad0a6ba560800799e1c19623b35d2f",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/b63mu2.zip",
+        "commit": "ca4365d58206c5a681cffa39c89cb3b654356afe",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/o3n001.zip",
+        "commit": "28d80890e48b4018a5e0a2cfa0368c078ac1a884",
+        "packs": 2
+      },
+      {
+        "archivePath": "make_repos/1pm9j2h.zip",
+        "commit": "50fc13cefb49f3659192dd79a2f84a0d76c148d4",
+        "packs": 4
+      }
+    ],
+    "treeObjectCount": 114,
+    "matches": [],
+    "result": "no-credential-like-filenames"
+  }
+}
